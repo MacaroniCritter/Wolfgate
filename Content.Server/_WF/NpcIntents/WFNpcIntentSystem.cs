@@ -115,6 +115,13 @@ public sealed partial class WFNpcIntentSystem : EntitySystem
                && comp.Cooldowns.TryGetValue(target, out var until) && _timing.CurTime < until;
     }
 
+    /// <summary>Takes a target off those an NPC has finished with, because it has been forced to fight them again.</summary>
+    public void Provoked(EntityUid npc, EntityUid by)
+    {
+        if (TryComp(npc, out WFNpcIntentComponent? comp) && comp.Cooldowns.Remove(by))
+            _factions.UnignoreEntity(npc, by);
+    }
+
     /// <summary>
     /// Whether a crewman keeps its fire from a target: one it has finished with, or, for a boarder aboard a ship that
     /// is not its own, anyone who has not hit its party.
