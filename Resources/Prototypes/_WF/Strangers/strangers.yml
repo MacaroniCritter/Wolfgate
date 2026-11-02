@@ -112,8 +112,6 @@
   name: wild-eyed squatter
   suffix: Squatter
   components:
-  - type: WFNpcIntent
-    set: WFIntentsSettler
   - type: WFStranger
     dialogue: WFStrangerDialogueSquatter
     behaviour: Squat

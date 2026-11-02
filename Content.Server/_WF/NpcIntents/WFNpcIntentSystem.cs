@@ -394,6 +394,9 @@ public sealed partial class WFNpcIntentSystem : EntitySystem
     public void Begin(Entity<WFNpcIntentComponent> ent, EntityUid target, WFNpcIntentKind kind)
     {
         var comp = ent.Comp;
+        if (comp.Phase != WFNpcIntentPhase.None)
+            Reset(ent);
+
         var now = _timing.CurTime;
         var set = _proto.Index(comp.Set);
 

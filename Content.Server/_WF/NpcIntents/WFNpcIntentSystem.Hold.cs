@@ -1,6 +1,7 @@
 using System.Numerics;
 using Content.Server._NF.Bank;
 using Content.Server.Cargo.Systems;
+using Content.Server.Stack;
 using Content.Shared._WF.NpcIntents;
 using Content.Shared.Cargo.Components;
 using Content.Shared.Hands.EntitySystems;
@@ -21,7 +22,7 @@ public sealed partial class WFNpcIntentSystem
     [Dependency] private SharedContainerSystem _container = default!;
     [Dependency] private SharedGunSystem _gun = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
-    [Dependency] private SharedStackSystem _stack = default!;
+    [Dependency] private StackSystem _stack = default!;
 
     /// <summary>Tiles round the holder that thrown-down cash counts from.</summary>
     private const float DropRange = 1.8f;
@@ -97,8 +98,24 @@ public sealed partial class WFNpcIntentSystem
             owed -= take;
         }
 
+        Receive(ent, ent.Comp.Demand - ent.Comp.Paid);
         ent.Comp.Paid = ent.Comp.Demand;
         return true;
+    }
+
+    /// <summary>Puts thalers paid to the NPC in its pockets or hands.</summary>
+    private void Receive(Entity<WFNpcIntentComponent> ent, int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        foreach (var cash in _stack.SpawnMultiple("SpaceCash", amount, Transform(ent).Coordinates))
+        {
+            Stow(ent, cash);
+            ent.Comp.Took.Add(cash);
+        }
+
+        ent.Comp.TookCash += amount;
     }
 
     /// <summary>The demand is met: the whole gang lowers its guns, thanks the player and walks off.</summary>
@@ -135,6 +152,7 @@ public sealed partial class WFNpcIntentSystem
             var give = Math.Min(stack.Count, owed);
             _stack.Use(args.Used, give, stack);
             ent.Comp.Paid += give;
+            Receive(ent, give);
         }
         else if (_pricing.GetPrice(args.Used) >= owed)
         {
@@ -176,6 +194,7 @@ public sealed partial class WFNpcIntentSystem
         }
 
         ent.Comp.Paid += amount;
+        Receive(ent, amount);
         if (ent.Comp.Paid >= ent.Comp.Demand)
             Settle(ent);
 

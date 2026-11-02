@@ -180,7 +180,12 @@ public sealed partial class WFNpcIntentSystem
         return false;
     }
 
-    /// <summary>Everything a body holds, in its hands, pockets, worn clothes and the bags in them.</summary>
+    /// <summary>Tiles round a downed body that count as what it dropped.</summary>
+    private const float DropReach = 1.6f;
+
+    private readonly HashSet<Entity<ItemComponent>> _loose = new();
+
+    /// <summary>Everything a body holds, in its hands, pockets, worn clothes and the bags in them, and what it dropped going down.</summary>
     private void Carried(EntityUid body)
     {
         foreach (var item in _inventory.GetHandOrInventoryEntities(body))
@@ -188,6 +193,15 @@ public sealed partial class WFNpcIntentSystem
             var worn = _inventory.TryGetContainingSlot(item, out var slot) && (slot.SlotFlags & SlotFlags.POCKET) == 0;
             _carried.Add((item, worn));
             Inside(item, 0);
+        }
+
+        // A body going down lets go of what is in its hands.
+        _loose.Clear();
+        _lookup.GetEntitiesInRange(Transform(body).Coordinates, DropReach, _loose);
+        foreach (var loose in _loose)
+        {
+            if (!_container.IsEntityInContainer(loose))
+                _carried.Add((loose, false));
         }
     }
 
