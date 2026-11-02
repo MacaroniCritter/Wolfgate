@@ -140,6 +140,10 @@ public sealed partial class WFCrewWeaponSystem
         if (TerminatingOrDeleted(target) || !_mobs.IsAlive(target) || Transform(uid).GridUid is not { } grid)
             return false;
 
+        // Someone it has finished with, or a boarding party's mark that has not hit it (NpcIntents).
+        if (_factions.IsIgnored(uid, target) || EntityManager.System<Content.Server._WF.NpcIntents.WFNpcIntentSystem>().HoldsFireOn(uid, target))
+            return false;
+
         TryComp<WFCrewComponent>(uid, out var crew);
         if (OnSight(uid, crew, grid, target))
             return true;

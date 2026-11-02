@@ -39,6 +39,8 @@
   name: rough stranger
   suffix: Mugger
   components:
+  - type: WFNpcIntent
+    set: WFIntentsMugger
   - type: WFStranger
     dialogue: WFStrangerDialogueMugger
   - type: Loadout
