@@ -89,6 +89,7 @@ public sealed partial class WFCrashScenarioSystem : EntitySystem
         base.Initialize();
         SubscribeLocalEvent<GridSplitEvent>(OnGridSplit);
         SubscribeLocalEvent<ConsoleFTLAttemptEvent>(OnFTLAttempt);
+        SubscribeLocalEvent<Content.Server._WF.Planets.Hop.WFPlanetHopAttemptEvent>(OnHopAttempt);
         SubscribeLocalEvent<WFCrashScenarioConsoleComponent, ActivatableUIOpenAttemptEvent>(OnConsoleOpen,
             before: new[] { typeof(ShuttleConsoleSystem) });
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestart);

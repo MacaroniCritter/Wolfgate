@@ -26,6 +26,10 @@ wf-orbit-not-in-orbit = This hull is not in planet orbit.
 wf-orbit-outside-bounds = Outside the world's edge; no ground to descend to here.
 wf-orbit-out-of-range = Too far from { $planet } for orbital insertion.
 wf-orbit-refused = Orbital insertion refused.
+wf-orbit-hopping = Already on the way.
+wf-orbit-in-ftl = Can't do this mid-jump.
+wf-orbit-protected = This ship can't be moved.
+wf-orbit-anchored = This ship is anchored in place.
 wf-orbit-world-forming = { $planet } is still forming. Try again in a moment.
 
 ## Round-start hold

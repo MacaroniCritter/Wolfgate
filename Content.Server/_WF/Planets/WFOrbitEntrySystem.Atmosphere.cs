@@ -77,7 +77,7 @@ public sealed partial class WFOrbitEntrySystem
             return false;
         }
 
-        if (HasComp<FTLComponent>(grid))
+        if (HasComp<FTLComponent>(grid) || _hop.IsHopping(grid))
         {
             reason = Loc.GetString("wf-flight-busy");
             return false;
