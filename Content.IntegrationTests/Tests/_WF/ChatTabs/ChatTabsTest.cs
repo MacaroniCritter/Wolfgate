@@ -92,6 +92,21 @@ public sealed class ChatTabsTest : InteractionTest
         _chat.ProcessChatMessage(new ChatMessage(channel, text, text, NetEntity.Invalid, null), speechBubble: false);
     }
 
+    /// <summary>
+    /// The log shows exactly the history on the selected tab's channels: <paramref name="shown"/> among it, none of
+    /// <paramref name="hidden"/>. The server sends lines of its own while a test runs (a tip on OOC, say), so the
+    /// count is taken from the history rather than fixed.
+    /// </summary>
+    private void AssertLogShowsSelectedTab(string[] shown, string[] hidden)
+    {
+        var channels = _tabs.SelectedTab.Channels;
+        var visible = _chat.History.Select(h => h.Msg).Where(msg => (msg.Channel & channels) != 0).Select(msg => msg.Message).ToList();
+        Assert.That(visible, Is.SupersetOf(shown));
+        Assert.That(visible.Intersect(hidden), Is.Empty);
+        Assert.That(_log.EntryCount, Is.EqualTo(visible.Count),
+            () => $"the log shows the selected tab's lines; history: {string.Join(", ", _chat.History.Select(h => $"{h.Msg.Channel}: {h.Msg.Message}"))}");
+    }
+
     [Test]
     public async Task TabsFilterTheLog()
     {
@@ -155,7 +170,7 @@ public sealed class ChatTabsTest : InteractionTest
             _tabs.Select(Local);
             Assert.That(popup.IsActive(ChatChannel.Local));
             Assert.That(popup.IsActive(ChatChannel.OOC), Is.False);
-            Assert.That(_log.EntryCount, Is.EqualTo(1));
+            AssertLogShowsSelectedTab(new[] { "local" }, new[] { "ooc" });
         });
 
         await ClickControl(_box.ChatInput.FilterButton);
@@ -169,7 +184,7 @@ public sealed class ChatTabsTest : InteractionTest
         {
             Assert.That(_tabs.Tabs[Local].Channels & ChatChannel.OOC, Is.EqualTo(ChatChannel.OOC));
             Assert.That(popup.IsActive(ChatChannel.OOC));
-            Assert.That(_log.EntryCount, Is.EqualTo(2));
+            AssertLogShowsSelectedTab(new[] { "ooc", "local" }, Array.Empty<string>());
             Assert.That(_cfg.GetCVar(WolfgateCVars.ChatTabs), Does.Contain("Local=Local,Whisper,Emotes,Subtle,OOC|"));
             popup.Close();
         });
