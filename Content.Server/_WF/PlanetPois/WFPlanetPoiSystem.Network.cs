@@ -757,7 +757,7 @@ public sealed partial class WFPlanetPoiSystem
                 ClearForCity(ground, grid, result);
             await MergeSiteAsync(ground, grid, source, origin, footprint, created, createdDecals, turns);
             EnsureComp<RoofComponent>(ground);
-            foreach (var tile in result) _roof.SetRoof((ground, grid, null), tile, roofs.Contains(tile));
+            await SetRoofsAsync((ground, grid, null), result, roofs);
             return result;
         }
         finally { if (!TerminatingOrDeleted(stagingMap)) QueueDel(stagingMap); }
@@ -788,6 +788,10 @@ public sealed partial class WFPlanetPoiSystem
         // Engine re-anchoring assumes both grids already belong to the same map; the target is the map itself or a grid on it.
         var targetMap = Transform(ground).MapUid ?? ground;
         _transform.SetCoordinates(source.Owner, new EntityCoordinates(targetMap, targetMap == ground ? Vector2.Zero : _transform.GetWorldPosition(ground)));
+        // A city's forty thousand tiles go down a few chunks a tick, not in the merge's one call.
+        await LayMergeTilesAsync(ground, grid, source, origin, turns);
+        if (TerminatingOrDeleted(ground) || TerminatingOrDeleted(source.Owner))
+            return;
         var canSplit = grid.CanSplit;
         grid.CanSplit = false;
         try

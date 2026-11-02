@@ -28,14 +28,16 @@ public sealed class PlanetFirstMinuteTest
     /// <param name="lazy">Whether planet navmeshes are built only near someone (PathfindingSystem.WFPlanetLazy).</param>
     /// <param name="sites">Whether sites nobody is near sleep (WFSiteStashSystem).</param>
     /// <param name="only">One world to form instead of all of them.</param>
+    /// <param name="slice">Whether a big site's ground is laid ahead of its merge in slices (wf.planet_merge_slice_tiles).</param>
     [Explicit]
     [TestCase(false, false)]
     [TestCase(true, false)]
     [TestCase(false, true)]
     [TestCase(true, true)]
     [TestCase(true, true, true)]
-    [TestCase(true, true, false, "WFSurfaceAsclepiu")]
-    public async Task FirstMinuteAfterTheWorldsForm(bool stash, bool lazy, bool sites = false, string? only = null)
+    [TestCase(true, true, false, "WFSurfaceAsclepiu", true, TestName = "AsclepiuMergeSlices")]
+    [TestCase(true, true, false, "WFSurfaceAsclepiu", false, TestName = "AsclepiuNoMergeSlices")]
+    public async Task FirstMinuteAfterTheWorldsForm(bool stash, bool lazy, bool sites = false, string? only = null, bool slice = true)
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
         var server = pair.Server;
@@ -77,6 +79,7 @@ public sealed class PlanetFirstMinuteTest
             server.CfgMan.SetCVar(PlanetCVars.TerrainStash, stash);
             server.CfgMan.SetCVar(PlanetCVars.PathfindingLazy, lazy);
             server.CfgMan.SetCVar(PlanetCVars.SiteStash, sites);
+            server.CfgMan.SetCVar(PlanetCVars.MergeSliceTiles, slice ? PlanetCVars.MergeSliceTiles.DefaultValue : 0);
             // Formed at the lobby's pace, as a real round's are.
             server.CfgMan.SetCVar(PlanetCVars.PreloadBudget, server.CfgMan.GetCVar(PlanetCVars.PreloadBudgetLobby));
             server.CfgMan.SetCVar(PlanetCVars.GenerationBudget, server.CfgMan.GetCVar(PlanetCVars.GenerationBudgetLobby));

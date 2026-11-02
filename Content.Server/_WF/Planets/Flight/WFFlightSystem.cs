@@ -68,8 +68,8 @@ public sealed partial class WFFlightSystem : EntitySystem
     /// <summary>Lift-lost alarm volume (dB), kept under the callouts.</summary>
     public const float AlarmVolume = -6f;
 
-    /// <summary>Takeoff volume (dB); the placeholder clip is mastered near -7 LUFS.</summary>
-    public const float TakeoffVolume = -8f;
+    /// <summary>Takeoff volume (dB); the clip is mastered at -14 LUFS.</summary>
+    public const float TakeoffVolume = 0f;
 
     /// <summary>Hard-landing thud volume (dB) aboard the hull.</summary>
     public const float HardLandingVolume = 0f;

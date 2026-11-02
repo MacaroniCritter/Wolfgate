@@ -525,7 +525,10 @@ public sealed partial class WFPlanetPoiSystem
 
             var targetGrid = Comp<MapGridComponent>(target);
             if (target == ground || TryComp<BiomeComponent>(target, out _))
-                ClearForCity(target, targetGrid, tiles);
+            {
+                using (_preload.Time($"clearing {tiles.Count} tiles of {ToPrettyString(target)} for {city.ID}"))
+                    ClearForCity(target, targetGrid, tiles);
+            }
 
             await _preload.Breathe();
             await MergeSiteAsync(target, targetGrid, level.Grid, origin, footprint, created, createdDecals);
@@ -535,14 +538,14 @@ public sealed partial class WFPlanetPoiSystem
             if (TerminatingOrDeleted(ground) || TerminatingOrDeleted(target))
                 return new HashSet<Vector2i>();
             EnsureComp<RoofComponent>(target);
-            foreach (var tile in tiles)
-            {
-                _roof.SetRoof((target, targetGrid, null), tile, roofs.Contains(tile));
-            }
+            await SetRoofsAsync((target, targetGrid, null), tiles, roofs);
 
             floors.Add(new CityFloor(level.Depth, (target, targetGrid), tiles, tiles.Where(roofs.Contains).ToHashSet()));
             if (TryComp<BiomeComponent>(target, out var targetBiome))
-                _biome.WfPinTiles((target, targetBiome), tiles);
+            {
+                using (_preload.Time($"pinning {tiles.Count} tiles of {ToPrettyString(target)}"))
+                    _biome.WfPinTiles((target, targetBiome), tiles);
+            }
 
             if (!stationGrids.Contains(target))
                 stationGrids.Add(target);

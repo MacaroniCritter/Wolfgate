@@ -136,7 +136,9 @@ public sealed partial class PullController : VirtualController
             return false;
 
         // WOLFGATE(Planets) START: a pointer on another map has no distance to cap; capping it made a NaN position.
-        // The eye can still be on the old layer for a moment after the puller changes layer.
+        // The pointer is wherever the client's eye is, which is not always the puller's map: a vehicle operator or
+        // drone pilot looks through a camera on another, a key pressed off the viewport sends no position, and the
+        // eye is on the old layer for a moment after the puller changes layer.
         if (!float.IsFinite(coords.X) || !float.IsFinite(coords.Y) ||
             _transformSystem.ToMapCoordinates(coords, logError: false).MapId != Transform(player).MapID)
         {
