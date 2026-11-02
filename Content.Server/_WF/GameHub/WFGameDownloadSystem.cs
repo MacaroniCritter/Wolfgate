@@ -138,7 +138,11 @@ public sealed partial class WFGameDownloadSystem : EntitySystem
         {
             // Usually a client that disconnected mid-download.
             Log.Warning($"Game download to {session.Name} failed: {e.Message}");
-            SendIfConnected(new WFGameDownloadFailedEvent(game.ID), channel);
+            _task.RunOnMainThread(() =>
+            {
+                if (channel.IsConnected)
+                    RaiseNetworkEvent(new WFGameDownloadFailedEvent(game.ID), channel);
+            });
         }
         finally
         {
@@ -147,16 +151,6 @@ public sealed partial class WFGameDownloadSystem : EntitySystem
 
             _task.RunOnMainThread(() => _active.Remove(session.UserId));
         }
-    }
-
-    /// <summary>Sends from the game thread, unless the player left while the work ran.</summary>
-    private void SendIfConnected(EntityEventArgs message, INetChannel channel)
-    {
-        _task.RunOnMainThread(() =>
-        {
-            if (channel.IsConnected)
-                RaiseNetworkEvent(message, channel);
-        });
     }
 
     private Task<Stream> OpenTransfer(INetChannel channel)
