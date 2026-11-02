@@ -16,6 +16,7 @@ using Content.Shared.Station.Components;
 using Robust.Shared.Configuration;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
+using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -139,6 +140,14 @@ public sealed partial class WFShipSquatterSystem
     private void CollectGuards()
     {
         _guards.Clear();
+        var players = EntityQueryEnumerator<ActorComponent, MobStateComponent, TransformComponent>();
+        while (players.MoveNext(out var uid, out _, out var mob, out var xform))
+        {
+            if (mob.CurrentState != MobState.Dead && xform.MapID != MapId.Nullspace)
+                _guards.Add(_transform.GetMapCoordinates(uid, xform));
+        }
+
+        // Someone asleep in a bunk with their player gone still has a mind.
         var minds = EntityQueryEnumerator<MindContainerComponent, MobStateComponent, TransformComponent>();
         while (minds.MoveNext(out var uid, out var mind, out var mob, out var xform))
         {

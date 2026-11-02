@@ -80,7 +80,8 @@ public sealed partial class WFShipSquatterSystem
         Choose((uid.Value, comp), user, ev.Option);
     }
 
-    private void Choose(Entity<WFShipSquatterComponent> ent, EntityUid user, int index)
+    /// <summary>The player answers with an option of the current node.</summary>
+    public void Choose(Entity<WFShipSquatterComponent> ent, EntityUid user, int index)
     {
         var comp = ent.Comp;
         if (comp.Talking != user || comp.Node is not { } nodeId || !_prototypes.TryIndex(comp.Dialogue, out var dialogue)

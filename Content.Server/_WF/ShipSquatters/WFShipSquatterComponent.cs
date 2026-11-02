@@ -16,7 +16,7 @@ public enum WFSquatterMood : byte
 /// Someone who has moved into a landed ship: he sets up a bed, wanders the rooms making a mess, insists the ship is his
 /// and turns violent only on those who force him.
 /// </summary>
-[RegisterComponent, Access(typeof(WFShipSquatterSystem))]
+[RegisterComponent]
 public sealed partial class WFShipSquatterComponent : Component
 {
     /// <summary>The ship he squats in.</summary>
@@ -173,7 +173,7 @@ public sealed partial class WFShipSquatterComponent : Component
 }
 
 /// <summary>On a ship that has had a squatter, so it never gets a second.</summary>
-[RegisterComponent, Access(typeof(WFShipSquatterSystem))]
+[RegisterComponent]
 public sealed partial class WFSquattedShipComponent : Component
 {
     [ViewVariables]
