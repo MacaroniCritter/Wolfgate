@@ -26455,3 +26455,25 @@ Entries:
   id: 2865
   time: '2026-10-31T18:14:09.0000000+00:00'
   url: https://github.com/Monolith-Station/Monolith/pull/4940
+- author: SuperGDPWYL
+  changes:
+    - type: Remove
+      message: You can no longer produce telecrystals via the crystalliser.
+  id: 2868
+  time: '2026-11-01T05:08:33.0000000+00:00'
+  url: https://github.com/Monolith-Station/Monolith/pull/4882
+- author: EckoAurum
+  changes:
+    - type: Add
+      message: >-
+        The closely guarded patent over cloning technology and gene storage has
+        expired. Cloning and genetic-backups are now available.
+    - type: Add
+      message: >-
+        Director of Care now receives a Genetic Database Flatpack in their
+        Locker.
+    - type: Fix
+      message: Traits and bank accounts now properly apply after cloning.
+  id: 2869
+  time: '2026-11-01T05:10:49.0000000+00:00'
+  url: https://github.com/Monolith-Station/Monolith/pull/4868

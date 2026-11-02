@@ -1,6 +1,7 @@
 using Content.Server.Body.Components;
 using Content.Server.Polymorph.Components;
 using Content.Shared._WF.Genitals.Components;
+using Content.Shared._WF.Genitals.Profile;
 using Content.Shared.Body.Components;
 using Content.Shared.Cloning;
 using Content.Shared.Humanoid;
@@ -21,12 +22,16 @@ public sealed partial class GenitalOrganSystem
     /// <summary>A clone grows from the genetic template, so a removed organ grows back once the clone's owner consents.</summary>
     private void OnCloning(Entity<GenitalsComponent> ent, ref CloningEvent args)
     {
-        // CloneAppearance has already copied age and species, so this checks the clone's own eligibility.
-        var target = args.Target;
+        ApplyCloneTemplate(args.Target, ent.Comp.SourceProfile);
+    }
+
+    /// <summary>Gives a clone the genetic template of its source.</summary>
+    public void ApplyCloneTemplate(EntityUid target, GenitalProfile? template)
+    {
+        // The clone's appearance has already been copied, so this checks the clone's own eligibility.
         if (!EnsureAnatomy(target))
             return;
 
-        var template = ent.Comp.SourceProfile;
         ApplyTemplate((target, Comp<GenitalsComponent>(target)), template);
 
         // Normally the mind transfer raises the consent event later; build now if consent is already there.

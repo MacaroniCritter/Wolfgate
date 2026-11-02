@@ -6784,6 +6784,17 @@ entities:
     - type: Transform
       pos: 12.5,27.5
       parent: 1
+- proto: computerBodyScanner
+  entities:
+  - uid: 2513
+    components:
+    - type: Transform
+      pos: 7.5,-2.5
+      parent: 1
+    - type: DeviceLinkSource
+      linkedPorts:
+        1909:
+        - MedicalScannerSender: MedicalScannerReceiver
 - proto: ComputerCargoOrders
   entities:
   - uid: 1861
@@ -6799,6 +6810,10 @@ entities:
     - type: Transform
       pos: 6.5,-4.5
       parent: 1
+    - type: DeviceLinkSource
+      linkedPorts:
+        1907:
+        - CloningPodSender: CloningPodReceiver
 - proto: ComputerComms
   entities:
   - uid: 2194
@@ -10864,6 +10879,13 @@ entities:
     components:
     - type: Transform
       pos: 7.5,-20.5
+      parent: 1
+- proto: GeneticDatabaseServer
+  entities:
+  - uid: 2514
+    components:
+    - type: Transform
+      pos: 6.5,-2.5
       parent: 1
 - proto: GravityGeneratorMini
   entities:

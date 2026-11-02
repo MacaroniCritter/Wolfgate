@@ -5,7 +5,7 @@ meta:
   forkId: ""
   forkVersion: ""
   time: 02/27/2025 03:29:13
-  entityCount: 9503
+  entityCount: 9505
 maps: []
 grids:
 - 1668
@@ -21380,6 +21380,24 @@ entities:
     - type: Transform
       pos: 3.5,-12.5
       parent: 1668
+- proto: computerBodyScanner
+  entities:
+  - uid: 9504
+    components:
+    - type: Transform
+      pos: 18.5,-12.5
+      parent: 1668
+    - type: DeviceLinkSource
+      linkedPorts:
+        734:
+        - MedicalScannerSender: MedicalScannerReceiver
+- proto: GeneticDatabaseServer
+  entities:
+  - uid: 9505
+    components:
+    - type: Transform
+      pos: 23.5,-9.5
+      parent: 1668
 - proto: MachineThermobath
   entities:
   - uid: 671
@@ -22897,8 +22915,6 @@ entities:
       parent: 1668
     - type: DeviceLinkSource
       linkedPorts:
-        734:
-        - MedicalScannerSender: MedicalScannerReceiver
         733:
         - CloningPodSender: CloningPodReceiver
 - proto: ComputerComms
