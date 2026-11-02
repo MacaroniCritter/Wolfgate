@@ -45,7 +45,6 @@ public sealed partial class WFPlanetHopSystem
         _transform.SetCoordinates(hull, new EntityCoordinates(holdMap, -grid.LocalAABB.Center));
         _transform.SetWorldRotation(hull, Angle.Zero);
         _shuttle.LeaveNoFTLBehind((hull, xform), oldMatrix, fromMap);
-        xform.LocalRotation = Angle.Zero;
 
         var mainPos = _transform.GetWorldPosition(hull);
 

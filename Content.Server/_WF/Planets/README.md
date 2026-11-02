@@ -6,6 +6,15 @@ shuttle console's orbit button (an unsanctioned world asks first), descend throu
 thrusters, lift off again, and land hard, skid, break up or crash when lift is lost. Hulls that stop keeping station
 fall out of orbit, and a world's gravity well pulls adrift hulls in from the sector.
 
+The hop into and out of orbit is `WFPlanetHopSystem` (`Hop/`), its own state and not FTL: no hull in a hop ever has an
+`FTLComponent`, and no drive, beacon, range or cooldown is asked or started, so a driveless hull or one with its drive
+cooling down can enter and leave. A hop warms up for five seconds on the old map (ripple, spool-up sound, shields
+down), then the hull and the grids docked to it wait five seconds on a private hold map (`WFPlanetHopMapComponent`,
+where the approach overlay draws the planet), and land at the spot picked at the start, pushed inside the world's ring
+and clear of other grids. The physical refusals are a hop or an FTL jump already under way, a protected or anchored
+hull, a transit map, and whatever a system adds on `WFPlanetHopAttemptEvent` (docking clamps, the crash and Reaver
+scenarios). Systems that cared about an FTL jump listen for `WFPlanetHopStartedEvent` and `WFPlanetHopCompletedEvent`.
+
 The shuttle console's flight panel (`WFOrbitButton`, fed by `WFConsoleOrbitTargetComponent`) shows the flight
 phase, lift and power against what flight needs, what holds a landed hull down, and how many thrusters to convert
 or add (`CEZLevelsSystem.WfGetLiftAdvice`). Holding ascend on the ground lifts off and holding descend in orbit enters
@@ -277,6 +286,12 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Content.Server/_WF/Planets/Flight/WFThrustAmbienceSystem.cs`](Flight/WFThrustAmbienceSystem.cs)
 - [`Content.Server/_WF/Planets/Forecast/WFWeatherForecastConsoleSystem.cs`](Forecast/WFWeatherForecastConsoleSystem.cs)
 - [`Content.Server/_WF/Planets/GameTicker.WFRoundHold.cs`](GameTicker.WFRoundHold.cs)
+- [`Content.Server/_WF/Planets/Hop/WFPlanetHopComponent.cs`](Hop/WFPlanetHopComponent.cs)
+- [`Content.Server/_WF/Planets/Hop/WFPlanetHopEvents.cs`](Hop/WFPlanetHopEvents.cs)
+- [`Content.Server/_WF/Planets/Hop/WFPlanetHopSystem.cs`](Hop/WFPlanetHopSystem.cs)
+- [`Content.Server/_WF/Planets/Hop/WFPlanetHopSystem.Effects.cs`](Hop/WFPlanetHopSystem.Effects.cs)
+- [`Content.Server/_WF/Planets/Hop/WFPlanetHopSystem.Spot.cs`](Hop/WFPlanetHopSystem.Spot.cs)
+- [`Content.Server/_WF/Planets/Hop/WFPlanetHopSystem.Transit.cs`](Hop/WFPlanetHopSystem.Transit.cs)
 - [`Content.Server/_WF/Planets/Infestation/WFCarcinomaInfestationComponent.cs`](Infestation/WFCarcinomaInfestationComponent.cs)
 - [`Content.Server/_WF/Planets/Infestation/WFCarcinomaInfestationSystem.cs`](Infestation/WFCarcinomaInfestationSystem.cs)
 - [`Content.Server/_WF/Planets/Jetpack/WFAtmosphericJetpackFuelSystem.cs`](Jetpack/WFAtmosphericJetpackFuelSystem.cs)
@@ -293,7 +308,6 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Content.Server/_WF/Planets/WFLooseDebrisSystem.cs`](WFLooseDebrisSystem.cs)
 - [`Content.Server/_WF/Planets/WFOrbitDecayComponent.cs`](WFOrbitDecayComponent.cs)
 - [`Content.Server/_WF/Planets/WFOrbitDecaySystem.cs`](WFOrbitDecaySystem.cs)
-- [`Content.Server/_WF/Planets/WFOrbitEntrySystem.Approach.cs`](WFOrbitEntrySystem.Approach.cs)
 - [`Content.Server/_WF/Planets/WFOrbitEntrySystem.Atmosphere.cs`](WFOrbitEntrySystem.Atmosphere.cs)
 - [`Content.Server/_WF/Planets/WFOrbitEntrySystem.cs`](WFOrbitEntrySystem.cs)
 - [`Content.Server/_WF/Planets/WFOrbitEntrySystem.Liftoff.cs`](WFOrbitEntrySystem.Liftoff.cs)
@@ -353,6 +367,7 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Content.Shared/_WF/Planets/WFPlanetBoundsComponent.cs`](../../../Content.Shared/_WF/Planets/WFPlanetBoundsComponent.cs)
 - [`Content.Shared/_WF/Planets/WFPlanetBuiltTilesComponent.cs`](../../../Content.Shared/_WF/Planets/WFPlanetBuiltTilesComponent.cs)
 - [`Content.Shared/_WF/Planets/WFPlanetEnvironmentComponent.cs`](../../../Content.Shared/_WF/Planets/WFPlanetEnvironmentComponent.cs)
+- [`Content.Shared/_WF/Planets/WFPlanetHopMapComponent.cs`](../../../Content.Shared/_WF/Planets/WFPlanetHopMapComponent.cs)
 - [`Content.Shared/_WF/Planets/WFPlanetLayerComponent.cs`](../../../Content.Shared/_WF/Planets/WFPlanetLayerComponent.cs)
 - [`Content.Shared/_WF/Planets/WFPlanetOrbitMessages.cs`](../../../Content.Shared/_WF/Planets/WFPlanetOrbitMessages.cs)
 - [`Content.Shared/_WF/Planets/WFPlanetRadarSystem.cs`](../../../Content.Shared/_WF/Planets/WFPlanetRadarSystem.cs)
@@ -430,6 +445,7 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Content.IntegrationTests/Tests/_WF/Planets/OrbitBeaconPinTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/OrbitBeaconPinTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/OrbitDecayTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/OrbitDecayTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/OrbitEntryTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/OrbitEntryTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/Planets/OrbitEntryTest.Hop.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/OrbitEntryTest.Hop.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/ParachuteTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/ParachuteTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/PlanetAmbiencePlaybackTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/PlanetAmbiencePlaybackTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/PlanetAmbiencePrototypeTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/PlanetAmbiencePrototypeTest.cs)
@@ -722,6 +738,7 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Content.Server/_FarHorizons/StarSystem/StarSystemMapSystem.cs`](../../_FarHorizons/StarSystem/StarSystemMapSystem.cs)
   - keep the star off hulls that arrive on top of it.
   - register sector bodies that have a Wolfgate surface.
+- [`Content.Server/_Mono/FireControl/FireControlSystem.cs`](../../_Mono/FireControl/FireControlSystem.cs): no firing mid-hop
 - [`Content.Server/Atmos/EntitySystems/AtmosphereSystem.API.cs`](../../Atmos/EntitySystems/AtmosphereSystem.API.cs): bare planet ground nobody built on isn't tracked
 - [`Content.Server/Atmos/EntitySystems/AtmosphereSystem.Processing.cs`](../../Atmos/EntitySystems/AtmosphereSystem.Processing.cs)
   - bare planet ground keeps no map tile alive
@@ -763,9 +780,14 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
   - a planet layer loads nearest its loaders first
   - less loads at once round an eye than round a body
 - [`Content.Server/Physics/Controllers/MoverController.cs`](../../Physics/Controllers/MoverController.cs): planet lift and cargo load scale thrust
+- [`Content.Server/Pinpointer/PinpointerSystem.cs`](../../Pinpointer/PinpointerSystem.cs)
+  - a hop moves the pinpointer's map like a jump
+  - pinpointers find their target again after a hop
 - [`Content.Server/Shuttles/Systems/ShuttleSystem.FasterThanLight.cs`](../../Shuttles/Systems/ShuttleSystem.FasterThanLight.cs)
+  - a hull mid-hop can't jump, nor can a ship docked to one
   - the docking branch never calls TrySetupFTL, so it asks the same gate.
   - a planet is left from orbit, never from the surface, the air or mid-transit.
+  - a hop leaves NoFTL entities behind too
   - a hull coming down on a planet hurts a mob under it and shoves it clear, and gibs nobody
 - [`Content.Server/Shuttles/Systems/ThrusterSystem.cs`](../../Shuttles/Systems/ThrusterSystem.cs)
   - show atmospheric rating and conversion status.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Content.IntegrationTests.Pair;
 using Content.Server._WF.Planets.Bounds;
+using Content.Server._WF.Planets.Hop;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Systems;
 using Content.Shared._WF.CCVar;
@@ -16,7 +17,7 @@ using static Content.IntegrationTests.Tests._WF.Caverns.CavernFixture;
 namespace Content.IntegrationTests.Tests._WF.Planets;
 
 /// <summary>
-/// A ship put on a bounded world, by FTL or by being put back from the edge, lies wholly inside its circle: the
+/// A ship put on a bounded world, by a hop or by being put back from the edge, lies wholly inside its circle: the
 /// hull's origin is often a corner, so the reach is measured from the middle of its bounds and not from the origin.
 /// </summary>
 [TestFixture]
@@ -88,7 +89,7 @@ public sealed class PlanetArrivalTest
         await pair.CleanReturnAsync();
     }
 
-    /// <summary>A jump onto the ground layer aimed on, past and far beyond the edge comes out inside.</summary>
+    /// <summary>A hop onto the ground layer aimed on, past and far beyond the edge comes out inside.</summary>
     [TestCase(0f)]
     [TestCase(20f)]
     [TestCase(200f)]
@@ -99,7 +100,7 @@ public sealed class PlanetArrivalTest
         var server = pair.Server;
         var entMan = server.EntMan;
         var bounds = server.System<WFPlanetBoundsSystem>();
-        var shuttles = server.System<ShuttleSystem>();
+        var hops = server.System<WFPlanetHopSystem>();
 
         var layers = await Build(pair, radius);
         var ground = layers[0];
@@ -107,14 +108,15 @@ public sealed class PlanetArrivalTest
         var start = await pair.CreateTestMap();
         var hull = await BuildHull(pair, start.MapUid, 40, 14);
         var accepted = false;
+        string? refusal = null;
 
         await server.WaitPost(() =>
         {
             var shuttle = entMan.GetComponent<ShuttleComponent>(hull);
-            accepted = shuttles.WfFTLToLayer((hull, shuttle), ground, new Vector2(radius + pastTheEdge, 0f));
+            accepted = hops.TryStart((hull, shuttle), ground, new Vector2(radius + pastTheEdge, 0f), null, true, out refusal);
         });
 
-        Assert.That(accepted, Is.True, "The jump was refused.");
+        Assert.That(accepted, Is.True, $"The hop was refused: {refusal}");
 
         for (var tick = 0; tick < 3000 && await IsJumping(pair, hull); tick += 10)
         {
@@ -123,7 +125,8 @@ public sealed class PlanetArrivalTest
 
         await server.WaitAssertion(() =>
         {
-            Assert.That(entMan.HasComponent<FTLComponent>(hull), Is.False, "The jump never finished.");
+            Assert.That(entMan.HasComponent<WFPlanetHopComponent>(hull), Is.False, "The hop never finished.");
+            Assert.That(entMan.HasComponent<FTLComponent>(hull), Is.False, "The hop gave the hull an FTLComponent.");
             Assert.That(entMan.GetComponent<TransformComponent>(hull).MapUid, Is.EqualTo(ground));
             Assert.That(bounds.IsHullInside(hull), Is.True,
                 $"The hull came out with its middle at {bounds.HullCentre(hull)}, outside the {radius} circle.");
@@ -138,7 +141,7 @@ public sealed class PlanetArrivalTest
     private static async Task<bool> IsJumping(TestPair pair, EntityUid hull)
     {
         var jumping = false;
-        await pair.Server.WaitPost(() => jumping = pair.Server.EntMan.HasComponent<FTLComponent>(hull));
+        await pair.Server.WaitPost(() => jumping = pair.Server.EntMan.HasComponent<WFPlanetHopComponent>(hull));
         return jumping;
     }
 
