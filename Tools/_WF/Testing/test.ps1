@@ -77,8 +77,17 @@ function Get-TestArgs([string] $project, [string] $name, [string] $whereExpr, [i
         'NUnit.TestOutputXml=.'
     )
     if ($whereExpr) { $list += "NUnit.Where=$whereExpr" }
-    if ($workerCount -gt 0) { $list += "NUnit.NumberOfTestWorkers=$workerCount" }
+    if ($workerCount -gt 0) {
+        $list += "NUnit.NumberOfTestWorkers=$workerCount"
+        $list += 'NUnit.MapWarningTo=Failed'   # as CI runs the integration suite: a warning fails the run
+    }
     return $list
+}
+
+# The test count from a run's summary line, or 0 when the adapter found no test to run.
+function Get-TestCount([string] $log) {
+    $m = Get-Content $log | Select-String -Pattern 'Total:\s+(\d+)' | Select-Object -Last 1
+    if ($m) { [int] $m.Matches[0].Groups[1].Value } else { 0 }
 }
 
 function Format-Arg([string] $a) {
@@ -91,6 +100,7 @@ function Invoke-Suite([string] $name, [string[]] $testArgs) {
     $log = Join-Path $results "$name.log"
     & dotnet @testArgs | Tee-Object -FilePath $log | Where-Object { $_ -match '^\s*Failed\b|^(Passed|Failed)!' } | ForEach-Object { Write-Host "[$name] $_" }
     $ok = $LASTEXITCODE -eq 0
+    $script:testsRun += Get-TestCount $log
     Write-Host ("{0}: {1:n0} s" -f $name, $sw.Elapsed.TotalSeconds)
     return $ok
 }
@@ -126,13 +136,19 @@ try {
     if (-not $NoBuild) { Invoke-Build }
 
     $clauses = @()
-    if ($Test) { $clauses += "test =~ '$Test'" }
+    if ($Test) {
+        # A literal substring: escape it for the regex. NUnit hands the escapes through untouched and has no escape
+        # for its own string delimiter, so a quote can't be matched this way.
+        if ($Test.Contains("'")) { throw '-Test cannot contain a quote; use -Where with a "-delimited string' }
+        $clauses += "test =~ '$([regex]::Escape($Test))'"
+    }
     if ($Where) { $clauses += "($Where)" }
     $unitWhere = $clauses -join ' && '
     if (-not $Shipyard) { $clauses += "test !~ ShipyardTest" }
     $integrationWhere = $clauses -join ' && '
 
     $ok = $true
+    $testsRun = 0
     if (-not $Integration) {
         $ok = (Invoke-Suite 'unit' (Get-TestArgs 'Content.Tests/Content.Tests.csproj' 'unit' $unitWhere 0)) -and $ok
     }
@@ -151,6 +167,12 @@ try {
             }
             $ok = (Invoke-Parallel $byName) -and $ok
         }
+    }
+
+    if (($Test -or $Where) -and $testsRun -eq 0) {
+        # dotnet test exits 0 when a filter matches nothing; a typo in the name must not look like a pass.
+        Write-Host 'no test matched the filter'
+        $ok = $false
     }
 
     if (-not $ok) { exit 1 }
