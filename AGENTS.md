@@ -138,6 +138,9 @@ reason; `--check` fails until both are filled in.
 - Logic: add an NUnit test under `Content.IntegrationTests/Tests/_WF` (or `Content.Tests/_WF` for pure logic
   with no server). Never use `PoolSettings { Destructive =
   true }`; each one permanently costs CI about 1.9 GB and the runner is near its limit.
+- Run tests with `Tools/_WF/Testing/test.ps1` (`-Test <Fixture>` for one fixture in about 30 s, no arguments for the
+  whole suite in about 12 min). It builds once, then runs from `bin/` with server GC and 8 workers; plain
+  `dotnet test` takes 3 times as long. Its README in `Docs/_WF/Testing` has the measurements.
 - Client or Shared changes: start a real client and grep its log for `Sandbox violation`. Integration tests
   don't run the sandbox check.
 - Report failures with their output. Don't call something working unless you ran it.

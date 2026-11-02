@@ -8,6 +8,8 @@ using Robust.UnitTesting;
 
 namespace Content.IntegrationTests.Tests.PrototypeTests;
 
+// WOLFGATE(Testing): four independent two-minute tests, otherwise a serial five-minute tail of the whole run
+[Parallelizable(ParallelScope.All)]
 public sealed class PrototypeTests
 {
     /// <summary>
