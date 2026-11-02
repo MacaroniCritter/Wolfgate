@@ -23,7 +23,7 @@
     landingTile: WFCavernFloorPoolbed
     landingEntity: MonoFloorWaterEntity
     shade: WFCavernShadeAsclepiu
-    climbPoint: WFCavernClimbAsclepiu
+    stairs: WFCavernStairsAsclepiu
     rim: [FloraRockSolid]
     rimCount: 2
 
@@ -60,7 +60,7 @@
     - TgFloraRockSideriteGrowth
     landingTile: WFCavernFloorAsh
     shade: WFCavernShadeFervidus
-    climbPoint: WFCavernClimbFervidus
+    stairs: WFCavernStairsFervidus
     rim: [BasaltOne, BasaltThree]
 
 - type: wfCavern
@@ -83,7 +83,7 @@
     avoid: [MonoFloorWaterEntity, MonoPlanetmapOreSandRich, CMRockOrange, WFMerakSpittingCactus]
     landingTile: WFCavernFloorSandDrift
     shade: WFCavernShadeMerak
-    climbPoint: WFCavernClimbMerak
+    stairs: WFCavernStairsMerak
     rim: [FloraRockSolidPlanet]
     rimCount: 2
 
@@ -106,7 +106,7 @@
     avoid: [MonoFloorWaterEntity, MonoPlanetmapOreChromite, GoonSetpiecesRootwall, WallXenoResin, DoorXenoResin, WFXenoEggWild]
     landingTile: WFCavernFloorChromiteScree
     shade: WFCavernShadeAerumna
-    climbPoint: WFCavernClimbAerumna
+    stairs: WFCavernStairsAerumna
     rim: [ShadowBasaltOne, ShadowBasaltThree, CrystalPink]
 
 - type: wfCavern
@@ -136,7 +136,7 @@
     avoid: [FloorLiquidPlasmaEntity, MonoPlanetmapOreSnow, CMRockIce, BayCrystal, ChompQuartz]
     landingTile: WFCavernFloorSnowdrift
     shade: WFCavernShadeThrascias
-    climbPoint: WFCavernClimbThrascias
+    stairs: WFCavernStairsThrascias
     rim: [CrystalCyan]
 
 - type: wfCavern
@@ -159,5 +159,5 @@
     avoid: [WFBloodRiver, WallMeat, GoonSetpiecesHive, ChompResin, PolarisResin, TauCetiMeatlandWall, WFCarcinomaBoneLumpOne, WFCarcinomaBoneLumpTwo, WFCarcinomaBoneLumpThree, WFCarcinomaPimple, WFCarcinomaTendonVine, WFCarcinomaWeepingPolyp]
     landingTile: WFCavernFloorGut
     shade: WFCavernShadeCarcinoma
-    climbPoint: WFCavernClimbCarcinoma
+    stairs: WFCavernStairsCarcinoma
     rim: [WFFleshPolyp]

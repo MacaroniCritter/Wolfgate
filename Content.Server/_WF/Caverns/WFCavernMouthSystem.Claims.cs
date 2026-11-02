@@ -545,14 +545,13 @@ public sealed partial class WFCavernMouthSystem
         return grids.Count == 0 ? Block.None : Block.Waiting;
     }
 
-    /// <summary>Cuts the mouth: ring and hole on the ground, the pad in the cavern, then shades, rim and climb point.</summary>
+    /// <summary>Cuts the mouth: ring and hole on the ground, the pad in the cavern, then shades, rim and stairs.</summary>
     // One SetTiles per map. Pinned tiles skip tile, entity and decal generation, so this holds on unloaded chunks too.
     private WFCavernMouth Stamp(Entity<WFCavernGroundComponent> ground, MouthContext context, WFCavernSite site, WFCavernMouthKind kind)
     {
         var spec = context.Spec;
         var mouth = new WFCavernMouth(site.Origin, site.Shape, kind);
         var groundGrid = (context.Ground.Owner, context.Ground.Comp2);
-        var levelGrid = (context.Level.Owner, context.Level.Comp2);
         var groundBiome = context.Ground.Comp1;
         var levelBiome = context.Level.Comp1;
         var pad = mouth.Pad(spec.PadRadius);
@@ -618,7 +617,8 @@ public sealed partial class WFCavernMouthSystem
             }
         }
 
-        SpawnClimb(ground, context, levelGrid, mouth.ClimbTile);
+        // Up from the hole's edge to the lip: the stairs sit under the hole tile beside the stairs top.
+        SpawnStairs(ground, context, mouth.ClimbTile - spec.StairsSide.ToIntVec(), spec.StairsSide);
 
         ground.Comp.Mouths.Add(mouth);
         return mouth;
@@ -667,17 +667,43 @@ public sealed partial class WFCavernMouthSystem
         ground.Comp.Shades[index] = shade;
     }
 
-    /// <summary>Anchors a climb point in the cavern under a ground tile unless one is there, its delay scaled by the surface's gravity.</summary>
-    private void SpawnClimb(Entity<WFCavernGroundComponent> ground, MouthContext context, Entity<MapGridComponent> levelGrid, Vector2i index)
+    /// <summary>
+    /// Cuts the world's stairs in the cavern under a hole tile, coming out on the ground tile beside it on a side,
+    /// unless some stand there. The landing's own entity, such as a pool's water, is taken off the tile.
+    /// </summary>
+    private void SpawnStairs(Entity<WFCavernGroundComponent> ground, MouthContext context, Vector2i index, Direction side)
     {
-        if (ground.Comp.ClimbPoints.ContainsKey(index))
+        if (ground.Comp.Stairways.ContainsKey(index))
             return;
 
-        var climb = SpawnAnchored(context.Spec.ClimbPoint, levelGrid, index);
-        var climbComp = EnsureComp<WFCavernClimbComponent>(climb);
-        climbComp.Delay = context.Spec.ClimbSeconds * Math.Clamp(context.Surface.Gravity, 1f, 2.5f);
-        Dirty(climb, climbComp);
-        ground.Comp.ClimbPoints[index] = climb;
+        var levelGrid = (context.Level.Owner, context.Level.Comp2);
+
+        if (context.Spec.LandingEntity is { } landing)
+        {
+            var doomed = new List<EntityUid>();
+            var anchored = _map.GetAnchoredEntities(levelGrid.Owner, levelGrid.Item2, index);
+
+            while (anchored.MoveNext(out var uid))
+            {
+                if (MetaData(uid.Value).EntityPrototype?.ID == landing.Id)
+                    doomed.Add(uid.Value);
+            }
+
+            foreach (var uid in doomed)
+            {
+                Del(uid);
+            }
+        }
+
+        // The stairs face away from the side they come out on.
+        var stairs = SpawnAttachedTo(context.Spec.Stairs, _map.GridTileToLocal(levelGrid.Owner, levelGrid.Item2, index),
+            rotation: side.GetOpposite().ToAngle());
+        var xform = Transform(stairs);
+
+        if (!xform.Anchored && !_transform.AnchorEntity((stairs, xform), levelGrid, index))
+            Log.Error($"Could not anchor {ToPrettyString(stairs)} on {ToPrettyString(levelGrid.Owner)} at {index}.");
+
+        ground.Comp.Stairways[index] = stairs;
     }
 
     /// <summary>

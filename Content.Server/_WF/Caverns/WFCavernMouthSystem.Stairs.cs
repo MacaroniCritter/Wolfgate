@@ -24,7 +24,7 @@ public sealed partial class WFCavernMouthSystem
     /// Opens the ground tile over stairs and keeps the exit tile beside it as solid, clear ground: what the biome grew
     /// on either goes, and both are pinned. A tile that is already a hole is kept.
     /// </summary>
-    // The hole queue fits the hole out, without the landing and climb point that stairs stand in for.
+    // The hole queue fits the hole out, without the landing and cut stairs that these stairs stand in for.
     public WFCavernStairsRefusal TryOpenStairs(Entity<WFCavernGroundComponent> ground, Vector2i index, Vector2i exit)
     {
         if (!TryGetContext(ground, out var context))
@@ -68,7 +68,7 @@ public sealed partial class WFCavernMouthSystem
         return ground.Comp.Shades.ContainsKey(index) && !UnderGrid(Comp<MapComponent>(ground).MapId, index);
     }
 
-    /// <summary>Has the hole queue give a hole the landing and climb point it went without while stairs stood under it.</summary>
+    /// <summary>Has the hole queue give a hole the landing and stairs it went without while other stairs stood under it.</summary>
     public void RefitHole(Entity<WFCavernGroundComponent> ground, Vector2i index)
     {
         if (ground.Comp.Shades.ContainsKey(index))
@@ -100,7 +100,7 @@ public sealed partial class WFCavernMouthSystem
     }
 
     /// <summary>
-    /// Gives holes that lost their stairs the landing and climb point every other hole has, and the lip of one, and
+    /// Gives holes that lost their stairs the landing and cut stairs every other hole has, and the lip of one, and
     /// makes the shade of a hole that gained stairs plain. A mouth's hole keeps its lip.
     /// </summary>
     private void RefitHoles(Entity<WFCavernGroundComponent> ground, MouthContext context)
@@ -117,7 +117,7 @@ public sealed partial class WFCavernMouthSystem
             if (!ground.Comp.Shades.ContainsKey(index) || !IsEmpty(context.Ground, index))
                 continue;
 
-            var stairs = HasStairs(levelGrid, index);
+            var stairs = HasStairs(ground, levelGrid, index);
             if (!stairs)
                 holes.Add(index);
 
@@ -131,7 +131,7 @@ public sealed partial class WFCavernMouthSystem
         {
             holes.Sort((a, b) => a.X != b.X ? a.X.CompareTo(b.X) : a.Y.CompareTo(b.Y));
             PrepareLandings(context, holes);
-            EnsureClimbs(ground, context, holes);
+            EnsureStairways(ground, context, holes);
         }
 
         foreach (var (index, plain) in restyled)
@@ -153,14 +153,15 @@ public sealed partial class WFCavernMouthSystem
         SpawnShade(ground, context, index, LandingMultiplier(context, index), plain);
     }
 
-    /// <summary>Whether stairs stand on a cavern tile: any z-level high ground, built stairs or a mapped stairway.</summary>
-    private bool HasStairs(Entity<MapGridComponent> level, Vector2i index)
+    /// <summary>Whether stairs stand on a cavern tile: any z-level high ground, built stairs or a mapped stairway, but not the stairs the caverns cut themselves.</summary>
+    private bool HasStairs(Entity<WFCavernGroundComponent> ground, Entity<MapGridComponent> level, Vector2i index)
     {
         var anchored = _map.GetAnchoredEntities(level, level.Comp, index);
 
         while (anchored.MoveNext(out var uid))
         {
-            if (HasComp<CEZLevelHighGroundComponent>(uid) && !TerminatingOrDeleted(uid))
+            if (HasComp<CEZLevelHighGroundComponent>(uid) && !TerminatingOrDeleted(uid)
+                && !(ground.Comp.Stairways.TryGetValue(index, out var cut) && cut == uid.Value))
                 return true;
         }
 

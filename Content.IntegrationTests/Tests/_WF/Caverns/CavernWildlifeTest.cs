@@ -106,7 +106,7 @@ public sealed class CavernWildlifeTest
 
         // Pinned, so the unload keeps its tile and the animal on it; the hole is opened by hand after.
         await server.WaitPost(() =>
-            biomes.WfPinTiles((world.Ground, entMan.GetComponent<BiomeComponent>(world.Ground)), new[] { Spot }));
+            biomes.WfPinTiles((world.Ground, entMan.GetComponent<BiomeComponent>(world.Ground)), new[] { Spot, Spot - new Vector2i(1, 0) }));
         await UnloadChunks(pair, world.Ground, From, To);
 
         await server.WaitAssertion(() =>
@@ -114,7 +114,9 @@ public sealed class CavernWildlifeTest
                 "Precondition: the animal on its pinned tile fell when the chunk unloaded."));
 
         await server.WaitPost(() =>
-            maps.SetTile(world.Ground, entMan.GetComponent<MapGridComponent>(world.Ground), Spot, Tile.Empty));
+            // Two tiles: the cut stairs go under the first, so the animal over Spot still falls.
+            maps.SetTiles(world.Ground, entMan.GetComponent<MapGridComponent>(world.Ground),
+                new List<(Vector2i, Tile)> { (Spot, Tile.Empty), (Spot - new Vector2i(1, 0), Tile.Empty) }));
         await Wake(pair, animal);
         await server.WaitRunTicks(pair.SecondsToTicks(2f));
 
@@ -153,7 +155,9 @@ public sealed class CavernWildlifeTest
                 "Precondition: the animal is not standing on the ground."));
 
         await server.WaitPost(() =>
-            maps.SetTile(world.Ground, entMan.GetComponent<MapGridComponent>(world.Ground), Spot, Tile.Empty));
+            // Two tiles: the cut stairs go under the first, so the animal over Spot still falls.
+            maps.SetTiles(world.Ground, entMan.GetComponent<MapGridComponent>(world.Ground),
+                new List<(Vector2i, Tile)> { (Spot, Tile.Empty), (Spot - new Vector2i(1, 0), Tile.Empty) }));
         await Wake(pair, animal);
         await server.WaitRunTicks(pair.SecondsToTicks(2f));
 

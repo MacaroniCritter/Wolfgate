@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Content.Server._WF.Caverns;
+using Content.Shared._CE.ZLevels.Core.Components;
 using Content.Shared._DV.Planet;
 using Content.Shared._WF.Caverns;
 using Content.Shared._WF.Planets;
 using Content.Shared.Burial.Components;
+using Content.Server.Construction.Components;
 using Content.Shared.Lathe;
 using Content.Shared.Maps;
 using Content.Shared.Parallax.Biomes;
@@ -89,7 +91,7 @@ public sealed class CavernPrototypeTest
                     entities.UnionWith(spec.Avoid.Select(entity => entity.Id));
                     entities.UnionWith(spec.Rim.Select(entity => entity.Id));
                     entities.Add(spec.Shade);
-                    entities.Add(spec.ClimbPoint);
+                    entities.Add(spec.Stairs);
 
                     foreach (var tile in tiles)
                     {
@@ -103,8 +105,12 @@ public sealed class CavernPrototypeTest
 
                     Assert.That(proto.Index<EntityPrototype>(spec.Shade).HasComponent<WFCavernShaftComponent>(factory), Is.True,
                         $"{cavern.ID}'s shade {spec.Shade} is not a shaft.");
-                    Assert.That(proto.Index<EntityPrototype>(spec.ClimbPoint).HasComponent<WFCavernClimbComponent>(factory), Is.True,
-                        $"{cavern.ID}'s climb point {spec.ClimbPoint} can't be climbed.");
+                    Assert.That(proto.Index<EntityPrototype>(spec.Stairs).HasComponent<WFCavernStairsComponent>(factory), Is.True,
+                        $"{cavern.ID}'s stairs {spec.Stairs} are not cavern stairs.");
+                    Assert.That(proto.Index<EntityPrototype>(spec.Stairs).HasComponent<CEZLevelHighGroundComponent>(factory), Is.True,
+                        $"{cavern.ID}'s stairs {spec.Stairs} can't be walked.");
+                    Assert.That(proto.Index<EntityPrototype>(spec.Stairs).HasComponent<ConstructionComponent>(factory), Is.False,
+                        $"{cavern.ID}'s stairs {spec.Stairs} can be taken apart.");
                 }
             }
         });

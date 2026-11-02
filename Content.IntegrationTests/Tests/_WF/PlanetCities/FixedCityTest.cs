@@ -110,14 +110,14 @@ public sealed class FixedCityTest
             Assert.That(mapSystem.GetAnchoredEntities((below, belowGrid), ahead)
                 .Any(uid => entMan.GetComponent<MetaDataComponent>(uid).EntityPrototype?.ID?.Contains("Wall") == true),
                 Is.True, "The basement stairs were turned apart from the house.");
-            // Over a cavern the stairwell is a plain opening: no sinkhole's lip and no climb point beside the stairs.
+            // Over a cavern the stairwell is a plain opening: no sinkhole's lip and no cut stairs beside the stairs.
             if (caverns)
             {
                 var holes = entMan.GetComponent<WFCavernGroundComponent>(ground);
                 Assert.That(holes.Shades.TryGetValue(shaft, out var shade) && entMan.GetComponent<WFCavernShaftComponent>(shade).Plain,
                     Is.True, "The stairwell is dressed as a sinkhole.");
-                Assert.That(holes.ClimbPoints.Keys.Any(climb => Math.Max(Math.Abs(climb.X - shaft.X), Math.Abs(climb.Y - shaft.Y)) <= 1),
-                    Is.False, "The stairwell was given a climb point.");
+                Assert.That(holes.Stairways.Keys.Any(climb => Math.Max(Math.Abs(climb.X - shaft.X), Math.Abs(climb.Y - shaft.Y)) <= 1),
+                    Is.False, "The stairwell was given cut stairs.");
             }
 
             // The off-road sites stand off the roads, each on a footpath that runs from its door to one.
