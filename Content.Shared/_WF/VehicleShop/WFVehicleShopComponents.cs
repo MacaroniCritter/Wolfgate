@@ -1,3 +1,4 @@
+using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
@@ -21,6 +22,13 @@ public sealed partial class WFVehicleShopComponent : Component
     /// <summary>The share of a vehicle's value paid for it at the pad.</summary>
     [DataField]
     public float SellFraction = 0.75f;
+
+    /// <summary>The share of a vehicle's value a full repair costs, wrecked to whole; less damage costs less.</summary>
+    [DataField]
+    public float RepairFraction = 0.2f;
+
+    [DataField]
+    public SoundSpecifier? RepairSound = new SoundPathSpecifier("/Audio/Items/ratchet.ogg");
 }
 
 /// <summary>Where a vehicle purchase terminal delivers, and where vehicles are sold.</summary>
@@ -63,7 +71,8 @@ public sealed class WFVehicleShopState(
     string? padVehicle,
     int sellPrice,
     bool occupied,
-    bool licensed = false) : BoundUserInterfaceState
+    bool licensed = false,
+    int repairPrice = 0) : BoundUserInterfaceState
 {
     public readonly List<WFVehicleListing> Listings = listings;
 
@@ -82,6 +91,9 @@ public sealed class WFVehicleShopState(
 
     /// <summary>Whether the customer carries a heavy vehicle licence.</summary>
     public readonly bool Licensed = licensed;
+
+    /// <summary>What repairing the vehicle on the pad costs; 0 when it needs nothing.</summary>
+    public readonly int RepairPrice = repairPrice;
 }
 
 [Serializable, NetSerializable]
@@ -92,6 +104,9 @@ public sealed class WFVehicleShopBuyMessage(int index) : BoundUserInterfaceMessa
 
 [Serializable, NetSerializable]
 public sealed class WFVehicleShopSellMessage : BoundUserInterfaceMessage;
+
+[Serializable, NetSerializable]
+public sealed class WFVehicleShopRepairMessage : BoundUserInterfaceMessage;
 
 /// <summary>Raised to ask whether someone carries a heavy vehicle licence.</summary>
 [ByRefEvent]

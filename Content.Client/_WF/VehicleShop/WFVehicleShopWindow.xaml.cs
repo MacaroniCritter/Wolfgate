@@ -13,7 +13,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client._WF.VehicleShop;
 
-/// <summary>A vehicle purchase terminal: each vehicle for sale with a picture and its price, and the pad's state with the sale button.</summary>
+/// <summary>A vehicle purchase terminal: each vehicle for sale with a picture and its price, and the pad's state with the repair and sale buttons.</summary>
 [GenerateTypedNameReferences]
 public sealed partial class WFVehicleShopWindow : FancyWindow
 {
@@ -21,6 +21,7 @@ public sealed partial class WFVehicleShopWindow : FancyWindow
 
     public event Action<int>? OnBuy;
     public event Action? OnSell;
+    public event Action? OnRepair;
 
     private readonly List<(WFVehicleListing Listing, bool Carried, Button Buy)> _rows = new();
 
@@ -29,6 +30,7 @@ public sealed partial class WFVehicleShopWindow : FancyWindow
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
         SellButton.OnPressed += _ => OnSell?.Invoke();
+        RepairButton.OnPressed += _ => OnRepair?.Invoke();
     }
 
     public void UpdateState(WFVehicleShopState state)
@@ -60,6 +62,10 @@ public sealed partial class WFVehicleShopWindow : FancyWindow
                 ("vehicle", state.PadVehicle ?? string.Empty)),
             _ => Loc.GetString("wf-vehicle-shop-pad-clear"),
         };
+
+        RepairButton.Visible = state.Pad == WFVehicleShopPad.Vehicle && state.RepairPrice > 0;
+        RepairButton.Disabled = state.Balance is not { } repairFunds || repairFunds < state.RepairPrice;
+        RepairButton.Text = Loc.GetString("wf-vehicle-shop-repair", ("price", BankSystemExtensions.ToSpesoString(state.RepairPrice)));
 
         SellButton.Visible = state.Pad == WFVehicleShopPad.Vehicle;
         SellButton.Disabled = state.Occupied;

@@ -9,6 +9,7 @@ using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Item;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Physics;
 using Content.Shared.Popups;
 using Content.Shared.Prototypes;
 using Content.Shared.SubFloor;
@@ -16,9 +17,12 @@ using Content.Shared._Mono.Traits.Physical;
 using Content.Shared._WF.VehicleShop;
 using Content.Shared._WF.Vehicles.Base;
 using Content.Shared._WF.Vehicles.Core;
+using Content.Shared._WF.Vehicles.Hardpoint;
+using Robust.Server.Audio;
 using Robust.Server.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
+using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Prototypes;
 
@@ -26,7 +30,7 @@ namespace Content.Server._WF.VehicleShop;
 
 /// <summary>
 /// Vehicle purchase terminals: a vehicle is paid for from the customer's bank and delivered onto the terminal's pad, and
-/// a vehicle standing on the pad is bought back for a share of its value.
+/// a vehicle standing on the pad is repaired, or bought back for a share of its value.
 /// </summary>
 public sealed class WFVehicleShopSystem : EntitySystem
 {
@@ -34,6 +38,8 @@ public sealed class WFVehicleShopSystem : EntitySystem
     private static readonly EntProtoId VehicleKey = "RMCVehicleKey";
 
     [Dependency] private IAdminLogManager _adminLog = default!;
+    [Dependency] private AudioSystem _audio = default!;
+    [Dependency] private HardpointSystem _hardpoints = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
     [Dependency] private VehicleLockSystem _locks = default!;
     [Dependency] private BankSystem _bank = default!;
@@ -48,6 +54,13 @@ public sealed class WFVehicleShopSystem : EntitySystem
 
     private const string CashStack = "Credit";
 
+    /// <summary>The layers of what stands in a vehicle's way, as against what only stops bullets and light.</summary>
+    private const int SolidLayers = (int) (CollisionGroup.Impassable | CollisionGroup.MidImpassable | CollisionGroup.HighImpassable
+        | CollisionGroup.LowImpassable | CollisionGroup.Vehicle);
+
+    /// <summary>The least any repair costs, so a scratch isn't free.</summary>
+    private const int MinRepairPrice = 100;
+
     /// <inheritdoc/>
     public override void Initialize()
     {
@@ -55,6 +68,7 @@ public sealed class WFVehicleShopSystem : EntitySystem
         SubscribeLocalEvent<WFVehicleShopComponent, BoundUIOpenedEvent>(OnOpened);
         SubscribeLocalEvent<WFVehicleShopComponent, WFVehicleShopBuyMessage>(OnBuy);
         SubscribeLocalEvent<WFVehicleShopComponent, WFVehicleShopSellMessage>(OnSell);
+        SubscribeLocalEvent<WFVehicleShopComponent, WFVehicleShopRepairMessage>(OnRepair);
     }
 
     private void OnOpened(Entity<WFVehicleShopComponent> ent, ref BoundUIOpenedEvent args)
@@ -159,6 +173,38 @@ public sealed class WFVehicleShopSystem : EntitySystem
         UpdateUi(ent, user);
     }
 
+    private void OnRepair(Entity<WFVehicleShopComponent> ent, ref WFVehicleShopRepairMessage args)
+    {
+        var user = args.Actor;
+        var (_, status, vehicle) = InspectPad(ent);
+        if (status != WFVehicleShopPad.Vehicle || vehicle is not { } vehicleUid)
+        {
+            UpdateUi(ent, user);
+            return;
+        }
+
+        var price = RepairPrice(ent, vehicleUid);
+        if (price <= 0)
+        {
+            UpdateUi(ent, user);
+            return;
+        }
+
+        if (!_bank.TryBankWithdraw(user, price))
+        {
+            _popup.PopupEntity(Loc.GetString("wf-vehicle-shop-no-funds"), ent, user);
+            UpdateUi(ent, user);
+            return;
+        }
+
+        _hardpoints.RestoreIntegrity(vehicleUid);
+        _audio.PlayPvs(ent.Comp.RepairSound, vehicleUid);
+        _popup.PopupEntity(Loc.GetString("wf-vehicle-shop-repaired", ("vehicle", Name(vehicleUid)), ("price", price)), ent, user);
+        _adminLog.Add(LogType.ShipYardUsage, LogImpact.Low,
+            $"{ToPrettyString(user):actor} repaired {ToPrettyString(vehicleUid)} for {price} at {ToPrettyString(ent)}");
+        UpdateUi(ent, user);
+    }
+
     /// <summary>Sends the catalogue, the customer's balance and what the pad holds.</summary>
     private void UpdateUi(Entity<WFVehicleShopComponent> ent, EntityUid user)
     {
@@ -168,9 +214,10 @@ public sealed class WFVehicleShopSystem : EntitySystem
         var name = thing is { } onPad ? Name(onPad) : null;
         var price = vehicle is { } priced ? SellPrice(ent, priced) : 0;
         var occupied = vehicle is { } inside && IsOccupied(inside);
+        var repair = vehicle is { } damaged ? RepairPrice(ent, damaged) : 0;
 
         _ui.SetUiState(ent.Owner, WFVehicleShopUiKey.Key,
-            new WFVehicleShopState(Listings(ent), balance, status, name, price, occupied, HasLicence(user)));
+            new WFVehicleShopState(Listings(ent), balance, status, name, price, occupied, HasLicence(user), repair));
     }
 
     /// <summary>Everything a terminal sells: its catalogue, then each further catalogue in order.</summary>
@@ -258,8 +305,11 @@ public sealed class WFVehicleShopSystem : EntitySystem
         return null;
     }
 
-    /// <summary>Whether something would be in a delivered vehicle's way: solid, and neither loose items nor what lies under the floor.</summary>
-    private bool Blocks(EntityUid other, EntityUid pad)
+    /// <summary>
+    /// Whether something would be in a delivered vehicle's way: someone standing there, or a solid thing that would stop
+    /// a walker too, so neither loose items, what lies under the floor, nor wall lights and fans.
+    /// </summary>
+    public bool Blocks(EntityUid other, EntityUid pad)
     {
         if (other == pad
             || HasComp<MapGridComponent>(other)
@@ -268,7 +318,19 @@ public sealed class WFVehicleShopSystem : EntitySystem
             || HasComp<SubFloorHideComponent>(other))
             return false;
 
-        return TryComp<PhysicsComponent>(other, out var body) && body.CanCollide && body.Hard;
+        if (!TryComp<PhysicsComponent>(other, out var body) || !body.CanCollide || !TryComp<FixturesComponent>(other, out var fixtures))
+            return false;
+
+        if (HasComp<MobStateComponent>(other))
+            return body.Hard;
+
+        foreach (var fixture in fixtures.Fixtures.Values)
+        {
+            if (fixture.Hard && (fixture.CollisionLayer & SolidLayers) != 0)
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>The room the biggest of some vehicles takes up, about its centre, from the hard fixtures of each.</summary>
@@ -313,6 +375,17 @@ public sealed class WFVehicleShopSystem : EntitySystem
         }
 
         return (int) Math.Max(0, Math.Floor(value * ent.Comp.SellFraction));
+    }
+
+    /// <summary>What making a vehicle whole costs: its share of the vehicle's value, by how much of its integrity is gone.</summary>
+    public int RepairPrice(Entity<WFVehicleShopComponent> ent, EntityUid vehicle)
+    {
+        var missing = _hardpoints.GetMissingIntegrity(vehicle, out var max);
+        if (missing <= 0f || max <= 0f)
+            return 0;
+
+        var cost = _pricing.GetPrice(vehicle) * ent.Comp.RepairFraction * (missing / max);
+        return Math.Max(MinRepairPrice, (int) Math.Ceiling(cost));
     }
 
     /// <summary>Whether anyone, or anything dragged in, is still inside the vehicle.</summary>

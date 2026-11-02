@@ -3,7 +3,7 @@ using Robust.Client.UserInterface;
 
 namespace Content.Client._WF.VehicleShop;
 
-/// <summary>Opens a vehicle purchase terminal's window and sends its buy and sell presses.</summary>
+/// <summary>Opens a vehicle purchase terminal's window and sends its buy, sell and repair presses.</summary>
 public sealed class WFVehicleShopBoundUserInterface : BoundUserInterface
 {
     [ViewVariables]
@@ -20,6 +20,7 @@ public sealed class WFVehicleShopBoundUserInterface : BoundUserInterface
         _window.Title = EntMan.GetComponent<MetaDataComponent>(Owner).EntityName;
         _window.OnBuy += index => SendMessage(new WFVehicleShopBuyMessage(index));
         _window.OnSell += () => SendMessage(new WFVehicleShopSellMessage());
+        _window.OnRepair += () => SendMessage(new WFVehicleShopRepairMessage());
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)

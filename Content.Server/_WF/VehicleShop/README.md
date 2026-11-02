@@ -14,6 +14,13 @@ the box and pizza vans, the ambulance and the transport and medical humvees. Pri
 vehicle's appraisal, so nothing bought here sells for a profit, here or with a ship (`VehicleShopTest` checks every
 catalogue). Entry point: `WFVehicleShopSystem`; the client window is `WFVehicleShopWindow`.
 
+A pad and its terminal are also the repair and upgrade bay. A damaged vehicle on the pad gets a Repair button: the frame
+and every part made whole for 20% of its value at worst, less for less damage, 100 at the least (`RepairPrice`). The
+expeditionary terminal also lists `WFVehicleCatalogBayParts`, the parts that need no licence, handed over the counter and
+fitted with a crowbar on the vehicle as anywhere else. Ships map `WFComputerVehicleShopExpeditionary` and a pad; players buy
+`WFVehicleBayTerminalFlatpack` and `WFVehicleDeliveryPadFlatpack` from John Wolfgate and the Wolfgate vendor. The flatpack's
+terminal (`WFComputerVehicleBay`) comes apart like any computer, and a pad breaks up into steel.
+
 A terminal can list further catalogues after its own (`extraCatalogs`). A listing that is an item (a part, a beacon, a
 licence) is handed over the counter and needs no pad; a terminal that sells only items shows no pad line. A listing
 marked `licence: true` is refused to anyone not carrying a heavy vehicle licence (`WFVehicleShopLicenceCheckEvent`,
