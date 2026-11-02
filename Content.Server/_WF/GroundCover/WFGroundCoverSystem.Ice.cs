@@ -1,3 +1,4 @@
+using Content.Server._WF.Planets;
 using Content.Server.Atmos.Components;
 using Content.Shared._WF.GroundCover;
 using Content.Shared.Atmos;
@@ -12,17 +13,16 @@ namespace Content.Server._WF.GroundCover;
 
 public sealed partial class WFGroundCoverSystem
 {
+    [Dependency] private WFPlanetClimateSystem _climate = default!;
     [Dependency] private FrictionContactsSystem _friction = default!;
     [Dependency] private SharedPhysicsSystem _physics = default!;
     [Dependency] private SpeedModifierContactsSystem _speedContacts = default!;
     [Dependency] private StepTriggerSystem _stepTrigger = default!;
 
-    /// <summary>Water starts to freeze once its air has held at or below this for <see cref="IceDelay"/>.</summary>
-    public const float IceFreezeAt = Atmospherics.T0C - 2f;
-
-    /// <summary>Ice starts to thaw once its air has held above this for <see cref="IceDelay"/>.</summary>
-    public const float IceThawAt = Atmospherics.T0C;
-
+    /// <summary>
+    /// How long air must hold below a water's <see cref="WFFreezableWaterComponent.FreezeAt"/> before it freezes, or
+    /// above its <see cref="WFFreezableWaterComponent.ThawAt"/> before the ice thaws.
+    /// </summary>
     public static readonly TimeSpan IceDelay = TimeSpan.FromMinutes(3);
 
     /// <summary>How fast ice spreads in from the shore, or thaws back from it, in tiles a minute.</summary>
@@ -42,8 +42,13 @@ public sealed partial class WFGroundCoverSystem
 
     private const int IceChunksPerTick = 4;
 
-    /// <summary>Longest stretch a chunk nobody saw catches up on at once.</summary>
-    private const float IceCatchUpSeconds = 3600f;
+    /// <summary>A chunk unseen for longer than this catches up along its world's temperature curve, not the air now.</summary>
+    private static readonly TimeSpan IceHistoryAfter = TimeSpan.FromMinutes(10);
+
+    private static readonly TimeSpan IceHistoryStep = TimeSpan.FromMinutes(5);
+
+    /// <summary>Most steps a catch-up takes; a longer absence takes longer steps.</summary>
+    private const int IceHistoryMaxSteps = 600;
 
     private static readonly TimeSpan IceInterval = TimeSpan.FromSeconds(2);
 
@@ -135,11 +140,11 @@ public sealed partial class WFGroundCoverSystem
                 return false;
 
             // Water first seen in a cold spell has been freezing all along.
-            if (IceTemperature(gridUid, map, index, chunk) is { } start && start <= IceFreezeAt)
+            if (IceTemperature(gridUid, map, index, chunk) is { } start && start <= chunk.FreezeAt)
             {
                 chunk.Front = MaxShore;
                 chunk.Cold = (float) IceDelay.TotalSeconds;
-                chunk.Thickness = MathF.Min(IceMaxThickness, (Atmospherics.T0C - start) * 60f);
+                chunk.Thickness = MathF.Min(IceMaxThickness, (chunk.ThawAt - start) * 60f);
             }
 
             chunk.Updated = now;
@@ -161,10 +166,11 @@ public sealed partial class WFGroundCoverSystem
             return false;
         }
 
-        var seconds = MathF.Min((float) (now - chunk.Updated).TotalSeconds, IceCatchUpSeconds);
+        var since = chunk.Updated;
+        var seconds = (float) (now - since).TotalSeconds;
         chunk.Updated = now;
         if (IceTemperature(gridUid, map, index, chunk) is { } temperature)
-            StepIce(chunk, temperature, seconds);
+            CatchUpIce(chunk, map, temperature, since, now);
 
         if (chunk.Holes != null)
         {
@@ -183,11 +189,37 @@ public sealed partial class WFGroundCoverSystem
         return ApplyIce(gridUid, index, chunk);
     }
 
+    /// <summary>
+    /// Moves a chunk's ice on from a time to now. A short gap is spent in the air now; a long one, as for a chunk
+    /// nobody watched through a season, is walked in steps along the world's own temperature curve, shifted to the
+    /// air now.
+    /// </summary>
+    private void CatchUpIce(WFIceChunk chunk, EntityUid map, float temperature, TimeSpan since, TimeSpan now)
+    {
+        var gap = now - since;
+        if (gap <= TimeSpan.Zero)
+            return;
+
+        if (gap <= IceHistoryAfter || _climate.GetClearTemperatureAt(map, now) is not { } current)
+        {
+            StepIce(chunk, temperature, (float) gap.TotalSeconds);
+            return;
+        }
+
+        var step = TimeSpan.FromTicks(Math.Max(IceHistoryStep.Ticks, gap.Ticks / IceHistoryMaxSteps));
+        for (var at = since; at < now; at += step)
+        {
+            var end = at + step > now ? now : at + step;
+            var then = _climate.GetClearTemperatureAt(map, at + (end - at) / 2) ?? current;
+            StepIce(chunk, temperature + then - current, (float) (end - at).TotalSeconds);
+        }
+    }
+
     /// <summary>Moves a chunk's ice on by some seconds in air of a temperature.</summary>
     public static void StepIce(WFIceChunk chunk, float temperature, float seconds)
     {
         var delay = (float) IceDelay.TotalSeconds;
-        if (temperature <= IceFreezeAt)
+        if (temperature <= chunk.FreezeAt)
         {
             chunk.Warm = 0f;
             var cold = MathF.Min(seconds, chunk.Cold + seconds - delay);
@@ -198,9 +230,9 @@ public sealed partial class WFGroundCoverSystem
             var spread = cold * IceTilesPerMinute / 60f;
             chunk.Thaw = MathF.Max(0f, chunk.Thaw - spread);
             chunk.Front = MathF.Min(MaxShore, chunk.Front + spread);
-            chunk.Thickness = MathF.Min(IceMaxThickness, chunk.Thickness + cold / 60f * (Atmospherics.T0C - temperature));
+            chunk.Thickness = MathF.Min(IceMaxThickness, chunk.Thickness + cold / 60f * (chunk.ThawAt - temperature));
         }
-        else if (temperature > IceThawAt)
+        else if (temperature > chunk.ThawAt)
         {
             chunk.Cold = 0f;
             var warm = MathF.Min(seconds, chunk.Warm + seconds - delay);
@@ -211,7 +243,7 @@ public sealed partial class WFGroundCoverSystem
             // Warmth melts the ice's thickness first, faster the warmer it is; only then does the shore open.
             if (chunk.Thickness > 0f)
             {
-                var melt = (temperature - Atmospherics.T0C) / 60f;
+                var melt = (temperature - chunk.ThawAt) / 60f;
                 var needed = chunk.Thickness / melt;
                 if (warm <= needed)
                 {
@@ -366,6 +398,17 @@ public sealed partial class WFGroundCoverSystem
 
         if (chunk.Waters.Count == 0)
             return null;
+
+        foreach (var water in chunk.Waters.Values)
+        {
+            if (TryComp<WFFreezableWaterComponent>(water, out var kind))
+            {
+                chunk.FreezeAt = kind.FreezeAt;
+                chunk.ThawAt = kind.ThawAt;
+            }
+
+            break;
+        }
 
         const int side = WFSnowCover.ChunkSize + MaxShore * 2;
         var distance = new byte[side * side];

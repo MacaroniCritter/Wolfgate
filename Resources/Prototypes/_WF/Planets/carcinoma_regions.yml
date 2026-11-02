@@ -76,6 +76,9 @@
     sprite: _WF/Planets/BloodWater/blood-lake.rsi
   - type: Icon
     sprite: _WF/Planets/BloodWater/blood-lake.rsi
+  # Blood isn't water: it never freezes into lake ice.
+  - type: WFFreezableWater
+    freezeAt: 0
   - type: SolutionContainerManager
     solutions:
       pool:

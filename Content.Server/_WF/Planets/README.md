@@ -142,8 +142,10 @@ patches were there is pack ice (cracked, rough and clear ice) with clear frozen 
 short runs of ice cliff; the clear ice is slightly see-through, so the layer below shows through it, and the lakes and
 the smooth clear ice are slippery as the old ice was. Pine pockets are a small
 share of the snow. Every liquid plasma pool sits in a crystal field of frozen plasma, with crystal rocks and trees and a
-few small crystal wall clusters. The planet is still dry: its lakes are tiles, not water entities. `ThrasciasBiomeTest`
-samples the whole surface.
+few small crystal wall clusters. Its lakes are real water (`WFThrasciasLakeWater`) over the lake bed tile, so they freeze and thaw
+by the air like every world's: at Thrascias's temperature they read frozen from the first tile, and warm the world and they
+thaw. Roads and sites keep out of them as out of any lake. `ThrasciasBiomeTest` samples the whole surface and `LakeClimateTest`
+drives each world's lakes through its air.
 
 Jetpacks in the atmosphere: a gas jetpack refuses below a world's orbit layer and cuts out if carried down. The
 atmospheric jetpack (`WFJetpackAtmospheric`, `WFAtmosphericJetpackComponent`) is the reverse: it burns welding fuel,
@@ -299,6 +301,7 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Content.Server/_WF/Planets/WFOrbitEntrySystem.Liftoff.cs`](WFOrbitEntrySystem.Liftoff.cs)
 - [`Content.Server/_WF/Planets/WFPlanetBiomassSystem.cs`](WFPlanetBiomassSystem.cs)
 - [`Content.Server/_WF/Planets/WFPlanetClimateSystem.cs`](WFPlanetClimateSystem.cs)
+- [`Content.Server/_WF/Planets/WFPlanetClimateSystem.History.cs`](WFPlanetClimateSystem.History.cs)
 - [`Content.Server/_WF/Planets/WFPlanetFaunaSpawnerComponent.cs`](WFPlanetFaunaSpawnerComponent.cs)
 - [`Content.Server/_WF/Planets/WFPlanetFaunaSystem.cs`](WFPlanetFaunaSystem.cs)
 - [`Content.Server/_WF/Planets/WFPlanetGroundSpawnedEvent.cs`](WFPlanetGroundSpawnedEvent.cs)
