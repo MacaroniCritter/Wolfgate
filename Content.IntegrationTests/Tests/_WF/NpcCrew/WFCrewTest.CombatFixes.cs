@@ -254,7 +254,8 @@ public sealed partial class WFCrewTest
     {
         var deck = await CreateDeck(new Vector2(500, 1700), 9, true);
         var east = await CreateDeck(new Vector2(525, 1702), 5, true);
-        var west = await CreateDeck(new Vector2(475, 1702), 5, true);
+        // As far off the west guns as east is off the east guns; any further, and a nudge of the deck hands one to east.
+        var west = await CreateDeck(new Vector2(484, 1702), 5, true);
         EntityUid gunner = default;
         var eastGuns = new List<EntityUid>();
         var westGuns = new List<EntityUid>();

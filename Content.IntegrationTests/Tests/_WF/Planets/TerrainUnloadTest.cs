@@ -539,6 +539,23 @@ public sealed class TerrainUnloadTest
         await pair.CleanReturnAsync();
     }
 
+    /// <summary>The ground a mouth's stairs come out on stays, with nothing standing on it.</summary>
+    private static bool IsStairsLip(IEntityManager entMan, Vector2i index)
+    {
+        var query = entMan.AllEntityQueryEnumerator<Content.Server._WF.Caverns.WFCavernGroundComponent>();
+
+        while (query.MoveNext(out var ground))
+        {
+            foreach (var stairs in ground.Stairways.Keys)
+            {
+                if (Math.Abs(stairs.X - index.X) + Math.Abs(stairs.Y - index.Y) <= 1)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// Loading and unloading the same ground over and over leaves no more lying about than the first time did, on any
     /// world: a spawner that stays where it is must not lay its corpse or its loot again. And on the surface an
@@ -604,8 +621,11 @@ public sealed class TerrainUnloadTest
                             var index = new Vector2i(x, y);
 
                             if (maps.TryGetTileRef(map, grid, index, out var tile) && !tile.Tile.IsEmpty
-                                && !maps.GetAnchoredEntities(map, grid, index).Any())
+                                && !maps.GetAnchoredEntities(map, grid, index).Any()
+                                && !IsStairsLip(entMan, index))
+                            {
                                 bare++;
+                            }
                         }
 
                         Assert.That(bare, Is.Zero, $"{surface}: unloading the surface left {bare} bare floor tiles behind.");
