@@ -129,6 +129,10 @@ public sealed class WFGameHubTest
 
                 Assert.That(hub.CompleteLevel(Report(13, 100), session));
                 Assert.That(CountSpawned(server, LowPrize, HighPrize), Is.EqualTo(2), "The round's prize cap holds");
+
+                var otherGame = new WFGameLevelCompleteEvent(source, ClientHub.Doom2Game, 42, 100, 100, 100, 100);
+                Assert.That(hub.CompleteLevel(otherGame, session), "Phase 2's last map is a real level");
+                Assert.That(CountSpawned(server, LowPrize, HighPrize), Is.EqualTo(2), "A cabinet pays only for its own game");
             });
 
             server.EntMan.DeleteEntity(cabinet);
@@ -240,6 +244,14 @@ public sealed class WFGameHubTest
             var flatpack = server.EntMan.SpawnEntity("WFDoomArcadeFlatpack", map.GridCoords);
             var entity = server.EntMan.GetComponent<FlatpackComponent>(flatpack).Entity;
             Assert.That(entity?.Id, Is.EqualTo(Cabinet));
+
+            Assert.That(inventory.StartingInventory, Does.ContainKey("WFFreedoom2ArcadeFlatpack"));
+            var phase2Pack = server.EntMan.SpawnEntity("WFFreedoom2ArcadeFlatpack", map.GridCoords);
+            var phase2 = server.EntMan.GetComponent<FlatpackComponent>(phase2Pack).Entity;
+            Assert.That(phase2?.Id, Is.EqualTo("WFFreedoom2Arcade"));
+
+            var cabinet = server.EntMan.SpawnEntity("WFFreedoom2Arcade", map.GridCoords);
+            Assert.That(server.EntMan.GetComponent<WFGameCabinetComponent>(cabinet).Game, Is.EqualTo(ClientHub.Doom2Game));
         });
 
         await pair.CleanReturnAsync();

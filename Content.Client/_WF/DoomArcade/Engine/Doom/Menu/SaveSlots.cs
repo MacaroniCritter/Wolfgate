@@ -24,13 +24,20 @@ namespace Content.Client._WF.DoomArcade.Engine
 {
     public sealed class SaveSlots
     {
+        private readonly GameOptions options;
         private static readonly int slotCount = 6;
         private static readonly int descriptionSize = 24;
 
         private string[] slots;
 
+        public SaveSlots(GameOptions options)
+        {
+            this.options = options;
+        }
+
         private void ReadSlots()
         {
+            var saves = options.Saves;
             slots = new string[slotCount];
 
             var directory = ConfigUtilities.GetExeDirectory();
@@ -38,10 +45,10 @@ namespace Content.Client._WF.DoomArcade.Engine
             for (var i = 0; i < slots.Length; i++)
             {
                 var path = Path.Combine(directory, "doomsav" + i + ".dsg");
-                if (File.Exists(path))
+                if (saves.Exists(path))
                 {
                     {
-                        Array.Copy(File.ReadAllBytes(path), buffer, buffer.Length);
+                        Array.Copy(saves.ReadAllBytes(path), buffer, buffer.Length);
                         slots[i] = DoomInterop.ToString(buffer, 0, buffer.Length);
                     }
                 }

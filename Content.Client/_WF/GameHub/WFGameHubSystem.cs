@@ -17,9 +17,10 @@ using Robust.Shared.Utility;
 namespace Content.Client._WF.GameHub;
 
 /// <summary>Talks to the server for a game's data and leaderboard, opens games, and plays other players' games nearby.</summary>
-public sealed class WFGameHubSystem : EntitySystem
+public sealed partial class WFGameHubSystem : EntitySystem
 {
     public const string DoomGame = "WFGameFreedoom";
+    public const string Doom2Game = "WFGameFreedoom2";
 
     private const float NoiseVolume = -4f;
     private const float MusicVolume = -13.75f;
@@ -116,13 +117,13 @@ public sealed class WFGameHubSystem : EntitySystem
     /// <summary>Opens a game from a PDA. A game added to the hub needs its window opened here.</summary>
     public void Launch(string game, EntityUid source)
     {
-        if (game != DoomGame)
+        if (game is not (DoomGame or Doom2Game))
             return;
 
         _pdaWindow?.Close();
         _pdaWindow = new DoomArcadeWindow();
         _pdaWindow.OpenCentered();
-        _pdaWindow.Begin(source);
+        _pdaWindow.Begin(source, game);
     }
 
     public void SendNoise(EntityUid source, string game, string sound, float volume)

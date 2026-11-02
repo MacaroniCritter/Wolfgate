@@ -7,7 +7,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Client._WF.GameHub;
 
 /// <summary>Shows the top players of a game, from a cabinet or the PDA Gamehub.</summary>
-public sealed class WFGameLeaderboardWindow : DefaultWindow
+public sealed partial class WFGameLeaderboardWindow : DefaultWindow
 {
     [Dependency] private IEntitySystemManager _systems = default!;
     [Dependency] private IPrototypeManager _protos = default!;

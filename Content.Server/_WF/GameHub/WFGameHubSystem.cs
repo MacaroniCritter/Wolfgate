@@ -17,7 +17,7 @@ using Robust.Shared.Timing;
 namespace Content.Server._WF.GameHub;
 
 /// <summary>Passes a game's sound on to nearby players, keeps its leaderboard and pays cabinet prizes.</summary>
-public sealed class WFGameHubSystem : EntitySystem
+public sealed partial class WFGameHubSystem : EntitySystem
 {
     private const int LeaderboardSize = 10;
 
@@ -101,7 +101,7 @@ public sealed class WFGameHubSystem : EntitySystem
         var score = ScoreLevel(ev.KillPercent, ev.ItemPercent, ev.SecretPercent, ev.Seconds);
         _ = _db.SaveGameLevelScoreAsync(session.UserId, session.Name, game.ID, ev.Level, score);
 
-        if (TryComp<WFGameCabinetComponent>(source, out var cabinet))
+        if (TryComp<WFGameCabinetComponent>(source, out var cabinet) && cabinet.Game == game.ID)
             TryPayPrize(session, source.Value, cabinet, game.ID, ev.Level, score);
 
         return true;

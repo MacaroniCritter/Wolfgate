@@ -16,7 +16,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Server._WF.GameHub;
 
 /// <summary>Streams a game's data to the players who ask for it, at a capped rate.</summary>
-public sealed class WFGameDownloadSystem : EntitySystem
+public sealed partial class WFGameDownloadSystem : EntitySystem
 {
     private const int ChunkSize = 8192;
 

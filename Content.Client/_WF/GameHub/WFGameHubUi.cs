@@ -25,7 +25,7 @@ public sealed partial class WFGameHubUi : UIFragment
 }
 
 /// <summary>Lists every game prototype with its download state.</summary>
-public sealed class WFGameHubFragment : BoxContainer
+public sealed partial class WFGameHubFragment : BoxContainer
 {
     private const float BytesPerMegabyte = 1024f * 1024f;
 

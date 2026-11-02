@@ -1,3 +1,5 @@
+using Content.Client._WF.GameHub;
+using Content.Shared._WF.GameHub;
 using Robust.Client.UserInterface;
 
 namespace Content.Client._WF.DoomArcade;
@@ -16,6 +18,7 @@ public sealed class DoomArcadeBoundUserInterface : BoundUserInterface
         base.Open();
 
         _window = this.CreateWindow<DoomArcadeWindow>();
-        _window.Begin(Owner);
+        var cabinet = EntMan.GetComponentOrNull<WFGameCabinetComponent>(Owner);
+        _window.Begin(Owner, cabinet?.Game ?? WFGameHubSystem.DoomGame);
     }
 }

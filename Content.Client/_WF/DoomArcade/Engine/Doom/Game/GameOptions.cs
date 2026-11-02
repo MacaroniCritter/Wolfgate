@@ -207,6 +207,8 @@ namespace Content.Client._WF.DoomArcade.Engine
             set => sound = value;
         }
 
+        public SaveFiles Saves { get; set; }
+
         public IMusic Music
         {
             get => music;
