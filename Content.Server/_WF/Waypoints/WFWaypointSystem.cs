@@ -1,7 +1,10 @@
 using System.Numerics;
+using Content.Server.NPC.HTN;
+using Content.Server.Shuttles.Components;
 using Content.Shared._WF.Waypoints;
 using Content.Shared.Shuttles.BUIStates;
 using Content.Shared.Shuttles.Components;
+using Robust.Shared.Map;
 
 namespace Content.Server._WF.Waypoints;
 
@@ -28,6 +31,13 @@ public sealed class WFWaypointSystem : EntitySystem
     {
         if (IsRadarUi(args.UiKey))
             TryRemove(ent, args.Id);
+    }
+
+    /// <summary>Whether a helm has an autopilot target, which keeps its planner awake with no living player near.</summary>
+    public bool AutopilotEngaged(EntityUid uid, HTNComponent htn)
+    {
+        return TryComp<ShuttleConsoleComponent>(uid, out var helm) &&
+               htn.Blackboard.TryGetValue<EntityCoordinates>(helm.AutopilotTargetKey, out _, EntityManager);
     }
 
     /// <summary>Marks a waypoint on the console's grid and current map; false when the input or the grid doesn't allow it.</summary>

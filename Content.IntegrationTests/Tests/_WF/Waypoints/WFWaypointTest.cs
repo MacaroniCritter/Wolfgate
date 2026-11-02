@@ -9,8 +9,11 @@ using Content.Client._WF.Waypoints;
 using Content.Client.Shuttles.UI;
 using Content.Server._WF.Waypoints;
 using Content.Server.NPC.HTN;
+using Content.Server.Power.Components;
 using Content.Server.Shuttles.Components;
+using Content.Shared._Mono.Shuttles;
 using Content.Shared._WF.Waypoints;
+using Content.Shared.CCVar;
 using Content.Shared.Shuttles.BUIStates;
 using Content.Shared.Shuttles.Components;
 using Robust.Client.UserInterface;
@@ -159,6 +162,11 @@ public sealed class WFWaypointTest
             var grid = pair.Client.EntMan.GetEntity(entities.GetNetEntity(map.Grid.Owner));
             Assert.That(pair.Client.EntMan.GetComponent<WFWaypointsComponent>(grid).Waypoints, Has.Count.EqualTo(1),
                 "The list reaches the client.");
+            var row = Find<Button>("WfWaypointRemove1");
+            var scroll = Descendants(Panel()).OfType<ScrollContainer>().Single();
+            Assert.That(scroll.Height, Is.GreaterThan(row.Height - 1), "The list must have room to show its rows.");
+            Assert.That(row.GlobalPosition.Y + row.Height, Is.LessThan(Panel().GlobalPosition.Y + Panel().Height + 1),
+                "A row must sit inside the panel, not be clipped away.");
             Press(Find<Button>("WfWaypointFly1"));
         });
         await pair.RunTicksSync(30);
@@ -235,6 +243,63 @@ public sealed class WFWaypointTest
             entities.System<SharedUserInterfaceSystem>().CloseUi(scanner, RadarConsoleUiKey.Key, actor);
             pair.Server.PlayerMan.SetAttachedEntity(pair.Player!, null);
             entities.DeleteEntity(scanner);
+            entities.DeleteEntity(actor);
+        });
+        await pair.CleanReturnAsync();
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task HelmFliesToAWaypointWhoeverIsAtIt(bool ghost)
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, Dirty = true });
+        var map = await pair.CreateTestMap();
+        var entities = pair.Server.EntMan;
+        var grid = map.Grid.Owner;
+        var transforms = entities.System<SharedTransformSystem>();
+        var start = Vector2.Zero;
+        EntityUid console = default, actor = default;
+        await pair.Server.WaitAssertion(() =>
+        {
+            // On a live server NPCs with no living player near them sleep; the helm's planner is one of them.
+            pair.Server.CfgMan.SetCVar(CCVars.NPCEnabled, true);
+            pair.Server.CfgMan.SetCVar(CCVars.NPCPauseWhenNoPlayersInRange, true);
+            var maps = entities.System<SharedMapSystem>();
+            var plating = new Tile(pair.Server.ResolveDependency<ITileDefinitionManager>()["Plating"].TileId);
+            for (var x = -3; x <= 3; x++)
+            for (var y = -3; y <= 3; y++)
+                maps.SetTile(grid, map.Grid.Comp, new Vector2i(x, y), plating);
+            entities.EnsureComponent<ShuttleComponent>(grid);
+            foreach (var (position, rotation) in new[] { (new Vector2(0.5f, 3.5f), 0), (new Vector2(0.5f, -2.5f), 180), (new Vector2(3.5f, 0.5f), 270), (new Vector2(-2.5f, 0.5f), 90) })
+                transforms.SetLocalRotation(entities.SpawnEntity("DebugThruster", new EntityCoordinates(grid, position)), Angle.FromDegrees(rotation));
+            entities.SpawnEntity("DebugGyroscope", new EntityCoordinates(grid, new Vector2(1.5f, 1.5f)));
+            console = entities.SpawnEntity("ComputerShuttle", new EntityCoordinates(grid, new Vector2(0.5f, 0.5f)));
+            entities.RemoveComponent<ApcPowerReceiverComponent>(console);
+            actor = entities.SpawnEntity(ghost ? "AdminObserver" : "MobHuman", new EntityCoordinates(grid, new Vector2(-0.5f, 0.5f)));
+            pair.Server.PlayerMan.SetAttachedEntity(pair.Player!, actor);
+            start = transforms.GetWorldPosition(grid);
+        });
+        // Past the two second sleep check, so a helm nobody living is near has already gone to sleep.
+        await pair.RunTicksSync(150);
+
+        await pair.Server.WaitPost(() => entities.EventBus.RaiseLocalEvent(console, new ShuttleConsoleAutopilotPositionMessage
+        {
+            Coordinates = new MapCoordinates(start + new Vector2(300, 0), map.MapId),
+            Angle = transforms.GetWorldRotation(grid),
+        }));
+
+        var moved = 0f;
+        for (var i = 0; i < 40 && moved < 5f; i++)
+        {
+            await pair.RunTicksSync(30);
+            await pair.Server.WaitPost(() => moved = (transforms.GetWorldPosition(grid) - start).Length());
+        }
+        Assert.That(moved, Is.GreaterThanOrEqualTo(5f), "The autopilot must actually fly the ship.");
+
+        await pair.Server.WaitPost(() =>
+        {
+            pair.Server.PlayerMan.SetAttachedEntity(pair.Player!, null);
+            entities.DeleteEntity(console);
             entities.DeleteEntity(actor);
         });
         await pair.CleanReturnAsync();

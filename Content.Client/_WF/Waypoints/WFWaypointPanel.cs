@@ -89,7 +89,8 @@ public sealed class WFWaypointPanel : PanelContainer
                 new BoxContainer { SeparationOverride = 4, Children = { _pick, _add, _fly } },
                 _status,
                 _empty,
-                new ScrollContainer { HScrollEnabled = false, MaxHeight = ListHeight, Children = { _rows } },
+                // A scroll container measures as zero height unless told otherwise, which would hide every row.
+                new ScrollContainer { HScrollEnabled = false, ReturnMeasure = true, MaxHeight = ListHeight, Children = { _rows } },
             },
         });
     }

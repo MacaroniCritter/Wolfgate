@@ -191,6 +191,8 @@ namespace Content.Server.NPC.Systems
                 // WOLFGATE(NpcCrew): ship crews with something to do must work even without nearby player bodies.
                 // var hasNearbyPlayer = false;
                 var hasNearbyPlayer = EntityManager.System<Content.Server._WF.NpcCrew.Systems.WFCrewSleepSystem>().StaysAwake(npcUid);
+                // WOLFGATE(Waypoints): a helm on autopilot flies on with nobody living near, such as an admin ghost at it.
+                hasNearbyPlayer |= EntityManager.System<Content.Server._WF.Waypoints.WFWaypointSystem>().AutopilotEngaged(npcUid, htn);
 
                 var minDistance = htn.SleepPlayerCheckRangeOverride ?? _playerPauseDistance; // Mono
                 // Mono

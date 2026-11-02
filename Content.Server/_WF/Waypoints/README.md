@@ -12,7 +12,8 @@ maps it is greyed out and can only be deleted.
 
 At a helm, Fly sends the autopilot to the typed coordinates and Go to a saved waypoint, through the same
 `ShuttleConsoleAutopilotPositionMessage` as the map tab's Autopilot button; the ship keeps its present heading on arrival,
-and manual flying cancels it as usual. A mass scanner has no autopilot, so it only manages the list. Neither the panel
+and manual flying cancels it as usual. A helm with an autopilot target stays awake with no living player near, so it
+works for an admin ghost, on the map tab too, and carries on if the pilot leaves or dies. A mass scanner has no autopilot, so it only manages the list. Neither the panel
 nor the markers appear on a console with no grid under it, such as a handheld scanner in open space.
 
 `WFWaypointSystem` handles the requests; `ShuttleNavControl.Waypoints.cs` and `WFWaypointPanel` are the client.
@@ -59,5 +60,6 @@ nor the markers appear on a console with no grid under it, such as a handheld sc
   - keep the panel on the grid's current list.
   - the crew's marked positions.
   - cursor and scanner coordinates over everything else.
+- [`Content.Server/NPC/Systems/NPCSystem.cs`](../../NPC/Systems/NPCSystem.cs): a helm on autopilot flies on with nobody living near, such as an admin ghost at it.
 
 <!-- WOLFGATE-GENERATED END -->
