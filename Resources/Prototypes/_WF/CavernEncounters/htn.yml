@@ -21,7 +21,7 @@
     - !type:HTNCompoundTask
       task: IdleCompound
 
-# A tunnel raider fights like any armed humanoid until WFCavernRaiderSystem sends him running.
+# A tunnel raider fights like any armed humanoid until WFCavernRaiderSystem sends him running or WFNpcIntentSystem has him hold someone up.
 - type: htnCompound
   id: WFCavernRaiderCompound
   branches:
@@ -33,6 +33,13 @@
       operator: !type:MoveToOperator
         pathfindInPlanning: false
         targetKey: WFCavernMoveTarget
+  # Holding someone up (WFNpcIntentSystem): stand and wait for the answer.
+  - preconditions:
+    - !type:KeyExistsPrecondition
+      key: WFIntentHold
+    tasks:
+    - !type:HTNPrimitiveTask
+      operator: !type:WFIntentHoldOperator
   - tasks:
     - !type:HTNCompoundTask
       task: SimpleHumanoidHostileCompound

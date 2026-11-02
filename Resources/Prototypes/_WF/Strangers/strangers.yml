@@ -39,6 +39,8 @@
   name: rough stranger
   suffix: Mugger
   components:
+  - type: WFNpcIntent
+    set: WFIntentsMugger
   - type: WFStranger
     dialogue: WFStrangerDialogueMugger
   - type: Loadout
@@ -110,6 +112,8 @@
   name: wild-eyed squatter
   suffix: Squatter
   components:
+  - type: WFNpcIntent
+    set: WFIntentsSettler
   - type: WFStranger
     dialogue: WFStrangerDialogueSquatter
     behaviour: Squat

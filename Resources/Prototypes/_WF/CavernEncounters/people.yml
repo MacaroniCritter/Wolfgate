@@ -39,6 +39,9 @@
       task: WFCavernRaiderCompound
   - type: NPCRetaliation
     attackMemoryLength: 10
+  - type: WFNpcIntent
+    set: WFIntentsTunnelRaider
+    holds: true
   - type: WFCavernRaider
     loot:
     - ScrapSteel
@@ -60,6 +63,9 @@
   parent: WFMobTunnelRaiderBase
   id: WFMobTunnelRaiderGunner
   components:
+  - type: WFNpcIntent
+    set: WFIntentsBandit
+    holds: true
   - type: Loadout
     prototypes: [ WFCavernGearRaiderGunner ]
 
