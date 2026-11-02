@@ -35,8 +35,8 @@ public sealed class PlanetFirstMinuteTest
     [TestCase(false, true)]
     [TestCase(true, true)]
     [TestCase(true, true, true)]
-    [TestCase(true, true, false, "WFSurfaceAsclepiu")]
-    [TestCase(true, true, false, "WFSurfaceAsclepiu", false)]
+    [TestCase(true, true, false, "WFSurfaceAsclepiu", true, TestName = "AsclepiuMergeSlices")]
+    [TestCase(true, true, false, "WFSurfaceAsclepiu", false, TestName = "AsclepiuNoMergeSlices")]
     public async Task FirstMinuteAfterTheWorldsForm(bool stash, bool lazy, bool sites = false, string? only = null, bool slice = true)
     {
         await using var pair = await PoolManager.GetServerClient(new PoolSettings { Dirty = true });
