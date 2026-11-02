@@ -83,7 +83,8 @@ public sealed partial class WFDetachLookupSystem : EntitySystem
     // A parent detached earlier in the batch is already in null-space, so use the broadphase it left.
     private bool TryFindOldBroadphase(EntityUid parent, [NotNullWhen(true)] out BroadphaseComponent? broadphase)
     {
-        if (_detachedFrom.TryGetValue(parent, out broadphase))
+        // A grid's children sit in the grid's own tree, not the one the grid itself is on.
+        if (TryComp(parent, out broadphase) || _detachedFrom.TryGetValue(parent, out broadphase))
             return true;
 
         return TryComp(parent, out TransformComponent? parentXform) &&
