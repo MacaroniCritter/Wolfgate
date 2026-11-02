@@ -42,6 +42,7 @@ public sealed partial class WFCompanyWindow : DefaultWindow
         {
             _system.Received -= Receive;
             _system.LogosChanged -= OnLogos;
+            _shipPreview?.Close();
         };
         if (_system.State is { } state)
             Receive(state);

@@ -569,6 +569,9 @@ public sealed partial class ShuttleSystem
         if (WfRefusesFtlDeparture(uid)) // WOLFGATE(Planets): a planet is left from orbit, never from the surface, the air or mid-transit.
             return false;
 
+        if (WfDisruptedDeparture(uid)) // WOLFGATE(BoardingAction): a disrupted or hacked ship can't leave, whatever starts the jump.
+            return false;
+
         if (HasComp<FTLComponent>(uid))
         {
             Log.Warning($"Tried queuing {ToPrettyString(uid)} which already has {nameof(FTLComponent)}?");

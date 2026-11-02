@@ -15,6 +15,7 @@ using Content.Shared.IdentityManagement; // Frontier
 using Content.Shared.NPC; // Frontier
 using Content.Server._NF.Salvage; // Frontier
 using Content.Server.Shuttles.Components;
+using Content.Server._WF.BoardingAction.Components; // WOLFGATE(BoardingAction)
 
 namespace Content.Server.Salvage;
 
@@ -76,6 +77,16 @@ public sealed partial class SalvageSystem
                 UpdateConsoles(station.Value, data); // Sure, why not?
                 return;
             }
+
+            // WOLFGATE(BoardingAction) START: a held ship can't leave on an expedition, and must hear so before one is generated.
+            if (HasComp<WFFtlDisruptedComponent>(grid))
+            {
+                PlayDenySound(uid, component);
+                _popupSystem.PopupEntity(Loc.GetString("wf-boarding-ftl-disrupted"), uid, PopupType.MediumCaution);
+                UpdateConsoles(station.Value, data);
+                return;
+            }
+            // WOLFGATE END
 
             var xform = Transform(grid);
             var bounds = xform.WorldMatrix.TransformBox(gridComp.LocalAABB).Enlarged(ShuttleFTLRange);

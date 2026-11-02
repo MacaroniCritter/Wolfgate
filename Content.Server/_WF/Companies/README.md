@@ -78,6 +78,7 @@ a failed spawn refunds both. Each licence launches once per round. The ship gets
 the shipyard refuses to buy it back. The drydock and chop shop refuse to break it, and everything aboard at launch,
 contents included, gets `WFCompanyPropertyComponent` and appraises at nothing (anything put inside it later keeps its
 value), so a free ship each round can't be turned into cash. Server side: `WFCompanySystem.Hangar` and `WFRoundSetupSystem.Hangar`.
+Preview on a licence or beside the licence picker opens the `ShipPreview` window; it follows the picker while open.
 
 **Paying members.** Besides hourly wages, the owner can pay any online member from the Members tab, straight into that
 character's bank, with an optional note; the member gets a chat message and the ledger a Payment row.

@@ -222,6 +222,50 @@ public sealed class HarpoonTest
     }
 
     [Test]
+    public async Task ClearsItsOwnMachinesAndStrikesAnotherShips()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        var entities = server.ResolveDependency<IEntityManager>();
+        var maps = server.System<SharedMapSystem>();
+
+        EntityUid gridA = default, gridB = default, turret = default, user = default, machine = default, harpoon = default;
+
+        await server.WaitPost(() =>
+        {
+            entities.DeleteEntity(map.Grid);
+            gridA = MakeGrid(entities, maps, map.MapId, Vector2.Zero, 5);
+            gridB = MakeGrid(entities, maps, map.MapId, new Vector2(12f, 0f), 3);
+            (turret, user) = MakeTurret(entities, gridA);
+            entities.SpawnEntity("Thruster", new EntityCoordinates(gridA, new Vector2(3.5f, 1.5f)));
+            machine = entities.SpawnEntity("Thruster", new EntityCoordinates(gridB, new Vector2(0.5f, 1.5f)));
+        });
+
+        await server.WaitRunTicks(5);
+        await server.WaitPost(() =>
+        {
+            Man(entities, user, turret);
+            Fire(entities, user, turret, new MapCoordinates(new Vector2(12.5f, 1.5f), map.MapId));
+            harpoon = entities.GetEntity(entities.GetComponent<ShipHarpoonTurretComponent>(turret).Harpoon!.Value);
+        });
+
+        await server.WaitRunTicks(30);
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(entities.GetComponent<ShipHarpoonComponent>(harpoon).Embedded, Is.True);
+            Assert.That(entities.GetComponent<TransformComponent>(harpoon).ParentUid, Is.EqualTo(machine),
+                "It passes its own ship's thruster and sinks into the other's.");
+
+            entities.DeleteEntity(user);
+            entities.DeleteEntity(gridA);
+            entities.DeleteEntity(gridB);
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
     public async Task ShallowShotGlancesOff()
     {
         await using var pair = await PoolManager.GetServerClient();

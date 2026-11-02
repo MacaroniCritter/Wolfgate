@@ -20,6 +20,7 @@ public sealed class ShuttleBoundUserInterfaceState : BoundUserInterfaceState
     /// <summary>Names of the distinct ships currently applying an active tractor beam to this shuttle.</summary>
     public string[] TractorSources;
     // WOLFGATE END
+    public Content.Shared._WF.BoardingAction.WFBoardingHelmState? Boarding; // WOLFGATE(BoardingAction): hacks and disruption, for the helm banner.
 
     public ShuttleBoundUserInterfaceState(NavInterfaceState navState, ShuttleMapInterfaceState mapState, DockingInterfaceState dockState, // WOLFGATE(TractorBeam)
         string[]? tractorSources = null) // WOLFGATE(TractorBeam)

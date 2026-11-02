@@ -2,6 +2,7 @@ using Robust.Shared.Utility;
 using Content.Shared.Stacks;
 using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
 
 namespace Content.Shared._WF.Tether;
 
@@ -60,7 +61,7 @@ public sealed partial class RopeTypePrototype : IPrototype
 
     /// <summary>Drawn instead of a plain strip, once per segment along the rope; u runs across it, v along it.</summary>
     [DataField]
-    public ResPath? Texture;
+    public ResPath? SegmentTexture;
 
     /// <summary>Width at end B as a share of the width at end A, so a tentacle narrows to its tip.</summary>
     [DataField]
@@ -69,6 +70,26 @@ public sealed partial class RopeTypePrototype : IPrototype
     /// <summary>Verlet chain resolution. The point count is clamped to [8, 96].</summary>
     [DataField]
     public float SegmentsPerMetre = 3f;
+
+    /// <summary>A repeating strand texture for the core, multiplied by the rope's colour. Null draws a flat strip.</summary>
+    [DataField]
+    public ResPath? Texture;
+
+    /// <summary>Metres of rope one repeat of <see cref="Texture"/> covers.</summary>
+    [DataField]
+    public float TextureLength = 0.8f;
+
+    /// <summary>How hard the drawn rope resists folding, from 0 (free to curl) to 1. Stiff cable bends in long curves.</summary>
+    [DataField]
+    public float BendStiffness;
+
+    /// <summary>Colour of the sparks that run along the rope. Null has none.</summary>
+    [DataField]
+    public Color? SparkColor;
+
+    /// <summary>Metres of rope to each spark.</summary>
+    [DataField]
+    public float SparkSpacing = 10f;
 
     /// <summary>Stack refunded when the rope is untied. Null refunds nothing.</summary>
     [DataField]

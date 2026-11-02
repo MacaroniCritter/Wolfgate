@@ -42,6 +42,10 @@ public sealed partial class ShuttleSystem
             return false;
         }
 
+        // WOLFGATE(BoardingAction): a lockdown holds the dampening, which steering otherwise sets every update
+        if (WfLockedDown(transform.GridUid.Value))
+            return false;
+
         shuttleComponent.BodyModifier = mode switch
         {
             InertiaDampeningMode.Off => SpaceFrictionStrength,
@@ -72,6 +76,8 @@ public sealed partial class ShuttleSystem
 
         if (SetInertiaDampening(uid, physicsComponent, shuttleComponent, transform, args.Mode) && args.Mode != InertiaDampeningMode.Query)
             component.DampeningMode = args.Mode;
+        else if (WfLockedDown(transform.GridUid.Value)) // WOLFGATE(BoardingAction): the helm has to show the refused mode didn't take
+            _console.RefreshShuttleConsoles(transform.GridUid.Value);
     }
 
     private void OnSetMaxShuttleSpeed(EntityUid uid, ShuttleConsoleComponent component, SetMaxShuttleSpeedRequest args)

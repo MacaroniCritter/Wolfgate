@@ -20,6 +20,8 @@ using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
+using Robust.Shared.Physics;
+using Robust.Shared.Physics.Systems;
 
 namespace Content.IntegrationTests.Tests._WF.NpcCrew;
 
@@ -254,7 +256,7 @@ public sealed partial class WFCrewTest
     {
         var deck = await CreateDeck(new Vector2(500, 1700), 9, true);
         var east = await CreateDeck(new Vector2(525, 1702), 5, true);
-        // As far off the west guns as east is off the east guns; any further, and a nudge of the deck hands one to east.
+        // As far off the west guns as east is off the east guns: a gun takes the target whose origin is nearest it.
         var west = await CreateDeck(new Vector2(484, 1702), 5, true);
         EntityUid gunner = default;
         var eastGuns = new List<EntityUid>();
@@ -268,6 +270,14 @@ public sealed partial class WFCrewTest
             }
 
             SEntMan.EnsureComponent<ShuttleComponent>(deck);
+            // An anchored gun passes its recoil to its grid and a hit shoves the target's; the split is judged by position,
+            // so nothing here may move. Static after the shuttle component, which makes its grid dynamic on startup.
+            var physics = Server.System<SharedPhysicsSystem>();
+            foreach (var still in new[] { deck, east, west })
+            {
+                physics.SetBodyType(still, BodyType.Static);
+            }
+
             SEntMan.SpawnAtPosition("WFTestGunnery", new EntityCoordinates(deck, new Vector2(4.5f, 4.5f)));
             gunner = Server.System<WFCrewSystem>().SpawnCrewman(WFCrewRoles.Gunner,
                 new EntityCoordinates(deck, new Vector2(4.5f, 3.5f)), "battery")!.Value;

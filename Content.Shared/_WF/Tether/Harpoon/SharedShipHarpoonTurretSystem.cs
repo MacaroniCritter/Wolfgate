@@ -140,7 +140,7 @@ public abstract partial class SharedShipHarpoonTurretSystem : EntitySystem
 
     private void OnShotAttempted(Entity<ShipHarpoonTurretComponent> turret, ref ShotAttemptedEvent args)
     {
-        if (turret.Comp.Operator != GetNetEntity(args.User))
+        if (turret.Comp.Manned && turret.Comp.Operator != GetNetEntity(args.User))
         {
             args.Cancel();
             return;
@@ -160,7 +160,7 @@ public abstract partial class SharedShipHarpoonTurretSystem : EntitySystem
             return;
         }
 
-        if (args.Used.Comp.ShootCoordinates is { } target && !InArc(turret, target))
+        if (turret.Comp.Manned && args.Used.Comp.ShootCoordinates is { } target && !InArc(turret, target))
         {
             Refuse(turret, args.User, "wf-harpoon-turret-out-of-arc");
             args.Cancel();

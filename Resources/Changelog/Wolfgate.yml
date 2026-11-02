@@ -4783,3 +4783,62 @@ Entries:
   id: 100317
   time: '2026-11-02T07:31:15.0000000+00:00'
   url: https://github.com/VanguardControl/Wolfgate/pull/453
+- author: Gandalf2k15
+  changes:
+    - type: Add
+      message: >-
+        You can preview ships in the company hangar before you buy or launch
+        them.
+  id: 100318
+  time: '2026-11-02T09:48:52.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/455
+- author: Gandalf2k15
+  changes:
+    - type: Tweak
+      message: The test suite runs three times faster on developer machines.
+  id: 100319
+  time: '2026-11-02T21:45:42.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/456
+- author: Gandalf2k15
+  changes:
+    - type: Fix
+      message: >-
+        Leg and foot markings no longer hide under the other limb when facing
+        east or west.
+  id: 100320
+  time: '2026-11-02T22:28:18.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/461
+- author: Balls2zawall
+  changes:
+    - type: Tweak
+      message: >-
+        Changed the configuration of the Shiv's ore magnet and ore processor,
+        and increased the size of the blast doors to make the whole thing more
+        accessible to use.
+  id: 100321
+  time: '2026-11-02T22:28:37.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/458
+- author: Happyowl93
+  changes:
+    - type: Add
+      message: >-
+        Added the ARACHNE hacking harpoon, a ship gun that fires a dart on a 250
+        m cable. A hit disables the target's FTL, then parks it and stops its
+        guns firing on you, but your own ship guns stay locked until the cable
+        is gone.  Made available to PDV, VG and Underground Market
+    - type: Tweak
+      message: New sprites for the tow harpoon, its turret and its cable.
+    - type: Tweak
+      message: Cables now draw as smooth curves and fold less when slack.
+  id: 100322
+  time: '2026-11-02T23:35:38.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/460
+- author: Gandalf2k15
+  changes:
+    - type: Fix
+      message: >-
+        NPC gunners stand down at once when their crew's docking policy is
+        reset.
+  id: 100323
+  time: '2026-11-02T23:35:51.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/462

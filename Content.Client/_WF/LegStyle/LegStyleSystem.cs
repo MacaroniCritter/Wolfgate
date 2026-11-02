@@ -42,6 +42,26 @@ public sealed partial class LegStyleSystem : EntitySystem
     }
 
     /// <summary>
+    /// The layer a marking goes above. A leg or foot marking takes the upper base of its pair, or the other limb's
+    /// bare skin hides it whenever its own limb is the near one in a side view.
+    /// </summary>
+    public int MarkingAnchor(Entity<SpriteComponent> sprite, HumanoidVisualLayers part, int layer)
+    {
+        HumanoidVisualLayers? pair = part switch
+        {
+            HumanoidVisualLayers.LLeg => HumanoidVisualLayers.RLeg,
+            HumanoidVisualLayers.RLeg => HumanoidVisualLayers.LLeg,
+            HumanoidVisualLayers.LFoot => HumanoidVisualLayers.RFoot,
+            HumanoidVisualLayers.RFoot => HumanoidVisualLayers.LFoot,
+            _ => null,
+        };
+
+        return pair is { } other && _sprite.LayerMapTryGet((sprite.Owner, sprite.Comp), other, out var index, false)
+            ? Math.Max(layer, index)
+            : layer;
+    }
+
+    /// <summary>
     /// Reshapes a newly added leg or foot marking layer on digitigrade legs with the map its clothing uses, as most
     /// markings are drawn for plantigrade legs. Art the style lists as drawn for its legs is left alone.
     /// </summary>

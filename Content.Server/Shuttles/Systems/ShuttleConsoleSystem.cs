@@ -444,6 +444,7 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
                 GetTractorCaptureSources(shuttleGridUid))
             {
                 ShieldShunt = GetWolfgateShieldShuntState(shuttleGridUid),
+                Boarding = GetWfBoardingState(shuttleGridUid), // WOLFGATE(BoardingAction): hacks and disruption, for the helm banner.
                 CockpitAutopilotActive = GetWfCockpitAutopilotStatus(entity), // WOLFGATE(Cockpit): report confirmed steering in the initial helm snapshot.
             });
             // WOLFGATE END

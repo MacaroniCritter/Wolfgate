@@ -2,7 +2,8 @@
 
 Ropes between two attach points, and the content built on them: anchor eyes, the tether installer that bolts an eye to
 a tile at range, the manned harpoon turret that leaves a tow cable in a ship it hits, and power cords that join two
-hulls' power nets.
+hulls' power nets. The harpoon code also runs unmanned launchers (`manned: false`) and expendable harpoons, which is how
+the BoardingAction module builds its hacking gun.
 
 Players pay rope out from one attach point with a coil and use the coil on a second point to tie it off; attach points
 have verbs to untie and to take in or pay out slack, and a cutting tool cuts a rope. Entry points: `RopeSystem`
@@ -56,6 +57,11 @@ re-created against the new bodies rather than snapping.
 | `color` / `tautColor` | Drawn colour, lerped by strain. |
 | `width` | Drawn width in metres. Thins as the rope goes taut. |
 | `segmentsPerMetre` | Verlet chain resolution; the point count is clamped to [8, 96]. |
+| `texture` | Optional repeating strand drawn along the core and multiplied by the colour: a plain PNG with `wrap: repeat` in its `.png.yml`. Without one the core is a flat strip. |
+| `textureLength` | Metres of rope one repeat of `texture` covers. |
+| `bendStiffness` | How hard the drawn rope resists folding, 0 to 1. Client only: it shapes the curve and adds no force. |
+| `sparkColor` | Colour of sparks that run along the rope. None if unset. |
+| `sparkSpacing` | Metres of rope to each spark. |
 | `stackType` | Stack refunded when the rope is untied. |
 | `breakSound` | Played when it parts. |
 
@@ -213,13 +219,14 @@ Rerun any Skipped test on its own: pair tests can be skipped by unrelated
 - [`Resources/Textures/_WF/Tether/rope_steel_cable.rsi/`](../../../Resources/Textures/_WF/Tether/rope_steel_cable.rsi/)
 - [`Resources/Textures/_WF/Tether/rope_synthetic.rsi/`](../../../Resources/Textures/_WF/Tether/rope_synthetic.rsi/)
 - [`Resources/Textures/_WF/Tether/rope_tow_cable.rsi/`](../../../Resources/Textures/_WF/Tether/rope_tow_cable.rsi/)
+- [`Resources/Textures/_WF/Tether/tow_cable.png`](../../../Resources/Textures/_WF/Tether/tow_cable.png)
+- [`Resources/Textures/_WF/Tether/tow_cable.png.yml`](../../../Resources/Textures/_WF/Tether/tow_cable.png.yml)
 
 ### Tools
 
 - [`Tools/_WF/Tether/brown_rope.png`](../../../Tools/_WF/Tether/brown_rope.png)
 - [`Tools/_WF/Tether/bungee_rope.png`](../../../Tools/_WF/Tether/bungee_rope.png)
 - [`Tools/_WF/Tether/cable_rope.png`](../../../Tools/_WF/Tether/cable_rope.png)
-- [`Tools/_WF/Tether/harpoon_sprites.py`](../../../Tools/_WF/Tether/harpoon_sprites.py)
 - [`Tools/_WF/Tether/metal_rope.png`](../../../Tools/_WF/Tether/metal_rope.png)
 - [`Tools/_WF/Tether/nylon_rope.png`](../../../Tools/_WF/Tether/nylon_rope.png)
 - [`Tools/_WF/Tether/power_cord_sprites.py`](../../../Tools/_WF/Tether/power_cord_sprites.py)
@@ -232,6 +239,7 @@ Rerun any Skipped test on its own: pair tests can be skipped by unrelated
 
 ## Non-modular edits
 
+- [`Content.Shared/_CE/ZLevels/Climbing/CEZLevelClimbingSystem.cs`](../../../Content.Shared/_CE/ZLevels/Climbing/CEZLevelClimbingSystem.cs): a fired harpoon strikes another ship's machines, but still clears its own
 - [`Content.Shared/Weapons/Ranged/Systems/SharedGunSystem.cs`](../../../Content.Shared/Weapons/Ranged/Systems/SharedGunSystem.cs)
   - manned turret gun relay
   - a mounted weapon can stand in for whatever the entity is holding, e.g. a manned harpoon turret

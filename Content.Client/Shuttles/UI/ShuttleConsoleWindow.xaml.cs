@@ -230,6 +230,7 @@ public sealed partial class ShuttleConsoleWindow : FancyWindow,
         CollisionBanner.SetShuttle(coordinates?.EntityId);
         // WOLFGATE END
         WfUpdateTractorCapture(cState.TractorSources); // WOLFGATE(TractorBeam)
+        WfUpdateBoarding(cState.Boarding); // WOLFGATE(BoardingAction): hacks and disruption
         WfAccessUpdateState(coordinates?.EntityId, owner); // WOLFGATE(ShipAccess)
         WfShieldUpdateState(cState.ShieldShunt, cState.NavState.Angle); // WOLFGATE(ShipShields): share authoritative allocation across helms.
         WfHailUpdateState(owner); // WOLFGATE(Hailing): point the banner and window at this console

@@ -12,6 +12,7 @@
     noRot: false
     layers:
     - state: harpoon
+      map: [ "enum.ShipHarpoonVisualLayers.Base" ]
   - type: Item
     size: Huge
   - type: ShipHarpoon

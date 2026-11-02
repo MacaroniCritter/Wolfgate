@@ -148,7 +148,7 @@
   color: "#7a1f2a"
   tautColor: "#c2353f"
   width: 0.4
-  texture: /Textures/_WF/SandMaw/tentacle.png
+  segmentTexture: /Textures/_WF/SandMaw/tentacle.png
   taper: 0.35
   segmentsPerMetre: 3
   breakSound:

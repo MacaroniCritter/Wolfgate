@@ -62,7 +62,8 @@ public static class RopeVerlet
         float frameTime,
         float drift,
         float time,
-        int seed)
+        int seed,
+        float bend = 0f)
     {
         count = Math.Clamp(count, 2, Math.Min(points.Length, previous.Length));
         if (!float.IsFinite(frameTime) || frameTime <= 0f || !float.IsFinite(segmentRest) || segmentRest <= 0f)
@@ -80,6 +81,16 @@ public static class RopeVerlet
 
         points[0] = endA;
         points[count - 1] = endB;
+
+        // Pulling each point towards its neighbours straightens tight folds; the length constraint then has the last word.
+        if (bend > 0f)
+        {
+            for (var i = 1; i < count - 1; i++)
+            {
+                points[i] = Vector2.Lerp(points[i], (points[i - 1] + points[i + 1]) * 0.5f, bend);
+            }
+        }
+
         for (var iteration = 0; iteration < Iterations; iteration++)
         {
             for (var i = 0; i < count - 1; i++)
@@ -104,6 +115,33 @@ public static class RopeVerlet
             points[i] = Sanitize(points[i], endA);
             previous[i] = Sanitize(previous[i], endA);
         }
+    }
+
+    /// <summary>
+    /// Lays <paramref name="count"/> points evenly along an existing chain's shape, so a rope that changes length keeps
+    /// the curve it had instead of snapping straight.
+    /// </summary>
+    public static Vector2[] Resample(Vector2[] old, int oldCount, int count)
+    {
+        var points = new Vector2[count];
+        for (var i = 0; i < count; i++)
+        {
+            var along = i / (count - 1f) * (oldCount - 1);
+            var index = Math.Min((int) along, oldCount - 2);
+            points[i] = Vector2.Lerp(old[index], old[index + 1], along - index);
+        }
+
+        return points;
+    }
+
+    /// <summary>
+    /// How far along a rope one of its running sparks is, in metres from the first end. It doesn't depend on the rope's
+    /// length, so sparks hold their speed and their place while a cable pays out.
+    /// </summary>
+    public static float SparkDistance(float time, int index, float speed, float spacing, float offset)
+    {
+        var phase = time * speed / spacing + offset;
+        return (phase - MathF.Floor(phase) + index) * spacing;
     }
 
     /// <summary>True when either pinned end moved far enough that the chain must be laid out afresh.</summary>

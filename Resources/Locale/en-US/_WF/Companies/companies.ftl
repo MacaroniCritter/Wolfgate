@@ -43,6 +43,7 @@ wf-company-hangar-licences = Licences ({ $count }/{ $max })
 wf-company-hangar-empty = No licences yet.
 wf-company-hangar-out = Out this round.
 wf-company-hangar-ready = Ready. Launching now costs { $registry } from the account and { $fee } from you.
+wf-company-hangar-preview = Preview
 wf-company-hangar-launch = Launch
 wf-company-hangar-sell = Sell licence
 wf-company-hangar-ship-name = Ship name

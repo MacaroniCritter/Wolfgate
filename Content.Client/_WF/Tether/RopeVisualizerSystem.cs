@@ -1,6 +1,7 @@
 using System.Numerics;
 using Content.Shared._WF.Tether;
 using Robust.Client.Graphics;
+using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
@@ -19,7 +20,7 @@ public sealed partial class RopeVisualizerSystem : EntitySystem
     [Dependency] private IPrototypeManager _protos = default!;
     [Dependency] private IEyeManager _eye = default!;
     [Dependency] private IGameTiming _timing = default!;
-    [Dependency] private Robust.Client.ResourceManagement.IResourceCache _resources = default!;
+    [Dependency] private IResourceCache _resources = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
 
     /// <summary>Metres of viewport margin kept simulated, so a rope entering the screen is already settled.</summary>
@@ -115,7 +116,7 @@ public sealed partial class RopeVisualizerSystem : EntitySystem
             {
                 var step = MathF.Min(remaining, RopeVerlet.MaxStep);
                 RopeVerlet.Step(chain.Points, chain.Previous, chain.Count, endA, endB, chain.SegmentRest,
-                    step, drift, time, chain.Seed);
+                    step, drift, time, chain.Seed, chain.BendStiffness);
                 remaining -= step;
             }
         }
@@ -133,7 +134,7 @@ public sealed partial class RopeVisualizerSystem : EntitySystem
         }
     }
 
-    /// <summary>Creates or resizes a rope's chain. A length change re-seeds it along the new line.</summary>
+    /// <summary>Creates or resizes a rope's chain. A new chain is seeded along the line; a resized one keeps its shape.</summary>
     private RopeChain GetChain(
         EntityUid uid,
         RopeComponent rope,
@@ -147,28 +148,42 @@ public sealed partial class RopeVisualizerSystem : EntitySystem
         if (!_chains.TryGetValue(uid, out var chain))
         {
             chain = new RopeChain { Seed = uid.GetHashCode() };
+            if (proto.Texture is { } texture)
+            {
+                chain.Texture = _resources.GetResource<TextureResource>(texture).Texture;
+                chain.TextureLength = MathF.Max(proto.TextureLength, 0.01f);
+            }
+            chain.BendStiffness = Math.Clamp(proto.BendStiffness, 0f, 1f);
             _chains[uid] = chain;
         }
 
+        chain.SparkColor = proto.SparkColor;
+        chain.SparkSpacing = MathF.Max(proto.SparkSpacing, 1f);
+        chain.Length = MathF.Max(rope.Length, RopeMath.MinLength);
         chain.Color = Color.InterpolateBetween(proto.Color, proto.TautColor,
             Math.Clamp(float.IsFinite(rope.Strain) ? rope.Strain : 0f, 0f, 1f));
         chain.Width = MathF.Max(proto.Width, 0.01f);
         chain.Taper = Math.Clamp(proto.Taper, 0.05f, 1f);
-        chain.Texture = proto.Texture is { } texture
-            ? _resources.GetResource<Robust.Client.ResourceManagement.TextureResource>(texture).Texture
+        chain.SegmentTexture = proto.SegmentTexture is { } segmentTexture
+            ? _resources.GetResource<TextureResource>(segmentTexture).Texture
             : null;
 
-        if (chain.Count != count || chain.Points.Length < count || !MathHelper.CloseTo(chain.SegmentRest, rest, 0.0001f))
+        if (chain.Count != count || chain.Points.Length < count)
         {
-            chain.Points = new Vector2[count];
-            chain.Previous = new Vector2[count];
+            var resized = chain.Count >= 2;
+            var points = resized ? RopeVerlet.Resample(chain.Points, chain.Count, count) : new Vector2[count];
+            chain.Points = points;
+            chain.Previous = (Vector2[]) points.Clone();
             chain.Count = count;
-            chain.SegmentRest = rest;
-            RopeVerlet.Seed(chain.Points, chain.Previous, count, endA, endB, MathF.Min(rope.Length * 0.1f, 0.6f));
+            if (!resized)
+                RopeVerlet.Seed(chain.Points, chain.Previous, count, endA, endB, MathF.Min(rope.Length * 0.1f, 0.6f));
+
             chain.EndA = endA;
             chain.EndB = endB;
             chain.MapId = mapId;
         }
+
+        chain.SegmentRest = rest;
 
         return chain;
     }

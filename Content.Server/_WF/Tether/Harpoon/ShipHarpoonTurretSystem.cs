@@ -1,4 +1,6 @@
 ﻿using System.Numerics;
+using Content.Shared._Crescent.ShipShields;
+using Content.Shared._Mono.Weapons.Ranged.Components;
 using Content.Shared._WF.Tether;
 using Content.Shared._WF.Tether.Harpoon;
 using Content.Shared.Actions;
@@ -21,6 +23,7 @@ using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Spawners;
 
 namespace Content.Server._WF.Tether.Harpoon;
 
@@ -35,6 +38,7 @@ public sealed partial class ShipHarpoonTurretSystem : SharedShipHarpoonTurretSys
     [Dependency] private PvsOverrideSystem _pvs = default!;
     [Dependency] private RopeSystem _rope = default!;
     [Dependency] private SharedActionsSystem _actions = default!;
+    [Dependency] private SharedAppearanceSystem _appearance = default!;
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private SharedPhysicsSystem _physics = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
@@ -105,7 +109,7 @@ public sealed partial class ShipHarpoonTurretSystem : SharedShipHarpoonTurretSys
 
     private void OnTurretExamined(Entity<ShipHarpoonTurretComponent> turret, ref ExaminedEvent args)
     {
-        if (!args.IsInDetailsRange)
+        if (!args.IsInDetailsRange || !turret.Comp.Manned)
             return;
 
         args.PushMarkup(Loc.GetString(IsPowered(turret) ? "wf-harpoon-turret-examine-powered" : "wf-harpoon-turret-examine-unpowered"));
@@ -226,6 +230,12 @@ public sealed partial class ShipHarpoonTurretSystem : SharedShipHarpoonTurretSys
             ClearHarpoon(turret);
             Rearm(harpoon);
             Launch(harpoon);
+            if (!turret.Comp.Manned)
+                EnsureComp<ProjectileGridPhaseComponent>(harpoon).SourceGrid = Transform(turret).GridUid;
+
+            if (comp.Expendable)
+                EnsureComp<TimedDespawnComponent>(harpoon).Lifetime = (float) comp.FlightTime.TotalSeconds;
+
             comp.Turret = GetNetEntity(turret);
             Dirty(harpoon, comp);
             turret.Comp.Harpoon = GetNetEntity(harpoon);
@@ -331,7 +341,8 @@ public sealed partial class ShipHarpoonTurretSystem : SharedShipHarpoonTurretSys
             return;
         }
 
-        if (!args.OtherFixture.Hard)
+        // A shield has no faces to fly in through; it decides for itself what it stops.
+        if (!args.OtherFixture.Hard || HasComp<ShipShieldComponent>(args.OtherEntity))
             return;
 
         var velocity = _physics.GetMapLinearVelocity(harpoon) - _physics.GetMapLinearVelocity(args.OtherEntity);
@@ -353,6 +364,13 @@ public sealed partial class ShipHarpoonTurretSystem : SharedShipHarpoonTurretSys
             harpoon.Comp.Embedded || !TryComp<ProjectileComponent>(harpoon, out var projectile) ||
             projectile.Weapon == null || projectile.ProjectileSpent)
             return;
+
+        // Nothing bites into a shield. One that lets this harpoon touch it at all stops it.
+        if (HasComp<ShipShieldComponent>(args.OtherEntity))
+        {
+            Glance(harpoon);
+            return;
+        }
 
         var velocity = _physics.GetMapLinearVelocity(harpoon) - _physics.GetMapLinearVelocity(args.OtherEntity);
         var speed = velocity.Length();
@@ -474,6 +492,9 @@ public sealed partial class ShipHarpoonTurretSystem : SharedShipHarpoonTurretSys
         if (TryGetEntity(harpoon.Comp.Turret, out var turret) &&
             TryComp<ShipHarpoonTurretComponent>(turret, out var comp))
             ClearHarpoon((turret.Value, comp));
+
+        if (harpoon.Comp.Expendable)
+            QueueDel(harpoon);
     }
 
     /// <summary>A harpoon that bit becomes the far end of a real tow cable.</summary>
@@ -481,6 +502,8 @@ public sealed partial class ShipHarpoonTurretSystem : SharedShipHarpoonTurretSys
     {
         harpoon.Comp.Embedded = true;
         Dirty(harpoon);
+        _appearance.SetData(harpoon, ShipHarpoonVisuals.Embedded, true);
+        RemComp<TimedDespawnComponent>(harpoon);
         EnsureComp<RopeAttachPointComponent>(harpoon);
 
         if (!TryGetEntity(harpoon.Comp.Turret, out var turret) ||
@@ -525,6 +548,10 @@ public sealed partial class ShipHarpoonTurretSystem : SharedShipHarpoonTurretSys
             return;
         }
 
+        // An expendable harpoon is a ship gun's round, and its description speaks for it.
+        if (component.Expendable)
+            return;
+
         args.PushMarkup(Loc.GetString("wf-harpoon-examine-load"));
         args.PushMarkup(Loc.GetString("wf-harpoon-examine-shields"));
     }
@@ -553,6 +580,7 @@ public sealed partial class ShipHarpoonTurretSystem : SharedShipHarpoonTurretSys
         args.Handled = true;
         component.Embedded = false;
         Dirty(uid, component);
+        _appearance.SetData(uid, ShipHarpoonVisuals.Embedded, false);
         _projectiles.EmbedDetach(uid, null, args.User);
     }
 
@@ -590,6 +618,9 @@ public sealed partial class ShipHarpoonTurretSystem : SharedShipHarpoonTurretSys
         if (max > 0f && distance > max)
         {
             ClearHarpoon(turret);
+            if (TryComp<ShipHarpoonComponent>(harpoon, out var flying) && flying.Expendable)
+                QueueDel(harpoon.Value);
+
             return;
         }
 

@@ -95,10 +95,13 @@
   breakForce: 80000
   maxLength: 60
   loadBearing: true
-  color: "#4a4d50"
+  color: "#6a6e72"
   tautColor: "#c4c6c8"
-  width: 0.18
+  width: 0.2
   segmentsPerMetre: 2
+  texture: /Textures/_WF/Tether/tow_cable.png
+  textureLength: 0.8
+  bendStiffness: 0.25
   stackType: WFRopeTowCable
   breakSound:
     path: /Audio/Items/snap.ogg

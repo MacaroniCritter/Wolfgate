@@ -13,6 +13,9 @@
   - ShipVoucherVGKeelback
   - ShipVoucherVGLancehead
   - ShipVoucherVGLeviathan
+  # WOLFGATE(BoardingAction): Viper Group researches the hacking harpoon
+  - WFHackHarpoonGunFlatpack
+  - WFHackDart
 
 - type: latheRecipePack
   id: MonoViperGroupStatic

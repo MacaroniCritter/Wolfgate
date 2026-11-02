@@ -141,6 +141,9 @@ public sealed partial class ShuttleConsoleSystem
         if (shuttleComp.Enabled == false)
             return;
 
+        if (WfRefuseDisruptedFtl(shuttleUid.Value, ent.Owner, wfActor)) // WOLFGATE(BoardingAction): CanFTL's reason never reaches the pilot, so a held ship says why here.
+            return;
+
         // Check shuttle can even FTL
         if (!_shuttle.CanFTL(shuttleUid.Value, out var reason))
         {
