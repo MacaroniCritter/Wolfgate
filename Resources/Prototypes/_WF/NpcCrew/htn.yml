@@ -4,6 +4,18 @@
 - type: htnCompound
   id: WFCrewCompound
   branches:
+  # Sent to take someone alive: that comes before any other fight.
+  - tasks:
+    - !type:HTNPrimitiveTask
+      operator: !type:WFCrewGrabOperator
+    - !type:HTNPrimitiveTask
+      operator: !type:MoveToOperator
+        targetKey: WFCrewGrabDestination
+        rangeKey: InteractRange
+        removeKeyOnFinish: false
+    - !type:HTNPrimitiveTask
+      operator: !type:WFCrewGrabOperator
+        perform: true
   - preconditions:
     - !type:WFCrewMayFightPrecondition
     tasks:

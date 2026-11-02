@@ -63,7 +63,7 @@ public sealed partial class WFEncounterSystem
                 break;
 
             case WFEncounterAdminOrder.Board:
-                if (!ship.Hunt || ship.Extort != null)
+                if (!ship.Hunt || ship.Extort != null || ship.Abduct != null)
                     return Loc.GetString("wf-encounter-admin-order-not-hunter");
                 ship.Prey = mark;
                 ship.Raided = false;

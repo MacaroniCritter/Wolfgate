@@ -140,6 +140,9 @@ public sealed partial class WFCrewWeaponSystem
         if (TerminatingOrDeleted(target) || !_mobs.IsAlive(target) || Transform(uid).GridUid is not { } grid)
             return false;
 
+        if (HasComp<WFCrewNonLethalComponent>(uid) && CompOrNull<Content.Shared.Cuffs.Components.CuffableComponent>(target)?.CuffedHandCount > 0)
+            return false;
+
         TryComp<WFCrewComponent>(uid, out var crew);
         if (OnSight(uid, crew, grid, target))
             return true;

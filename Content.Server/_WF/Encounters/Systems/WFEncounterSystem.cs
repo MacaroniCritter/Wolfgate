@@ -427,7 +427,7 @@ public sealed partial class WFEncounterSystem : EntitySystem
         {
             // An extorter flies its wander legs as its own roaming, not as orders that can be flown out.
             if (!comp.Ships.TryGetValue(ship.Key, out var state) || TerminatingOrDeleted(state.Grid) || IsStranded(state)
-                || state.Extort != null)
+                || state.Extort != null || state.Abduct != null)
                 continue;
 
             if (!IssueShipOrders(comp, prototype, ship, state))
@@ -685,8 +685,9 @@ public sealed partial class WFEncounterSystem : EntitySystem
             KnownThreatsOnly = ship.KnownThreatsOnly,
             NpcTargetsOnly = ship.NpcTargetsOnly,
             Icon = ship.Icon,
-            Hunt = ship.Hunt || ship.Extort != null,
+            Hunt = ship.Hunt || ship.Extort != null || ship.Abduct != null,
             Extort = ship.Extort is { } extort ? NewExtort(extort) : null,
+            Abduct = ship.Abduct is { } abduct ? NewAbduct(abduct) : null,
             Distress = ship.Distress,
             Evades = ship.Evades,
             Flees = ship.Flees,
@@ -755,6 +756,10 @@ public sealed partial class WFEncounterSystem : EntitySystem
         encounter.Comp.Resolution = resolution;
         encounter.Comp.ResolvedAt = _timing.CurTime;
         EndExtortCalls(encounter.Comp);
+        foreach (var ship in encounter.Comp.Ships.Values)
+        {
+            EndAbduction(ship);
+        }
         if (resolution is WFEncounterResolution.Completed or WFEncounterResolution.Expired
             && encounter.Comp.Lifetime == WFEncounterLifetime.Transient && !encounter.Comp.Pinned)
             encounter.Comp.JumpAt = _timing.CurTime + JumpDelay;
@@ -794,6 +799,10 @@ public sealed partial class WFEncounterSystem : EntitySystem
         ship.Removed = true;
         if (TerminatingOrDeleted(ship.Grid))
             return;
+
+        // Whoever it still holds goes home rather than into space with the hull's last hand gone.
+        if (ship.Abduct is { Prisoner: not null } holding && !ship.Virtual)
+            AbductRelease(ship, holding, false);
 
         if (ship.Virtual)
         {
@@ -990,12 +999,16 @@ public sealed partial class WFEncounterSystem : EntitySystem
             {
                 if (ship.Extort is { Phase: WFExtortPhase.Roam or WFExtortPhase.Close } virtualExtort && encounter.Comp.Begun)
                     Extort(encounter, key, ship, virtualExtort);
+                if (ship.Abduct is { Phase: WFAbductPhase.Roam or WFAbductPhase.Close } virtualAbduct && encounter.Comp.Begun)
+                    Abduct(encounter, key, ship, virtualAbduct);
                 continue;
             }
 
             if (ship.Flees > 0f && encounter.Comp.Begun)
                 Flee(encounter, key, ship);
-            if (ship.Extort != null && encounter.Comp.Begun)
+            if (ship.Abduct != null && encounter.Comp.Begun)
+                Abduct(encounter, key, ship, ship.Abduct);
+            else if (ship.Extort != null && encounter.Comp.Begun)
                 Extort(encounter, key, ship, ship.Extort);
             else if (ship.Hunt && encounter.Comp.Begun)
                 Hunt(ship);
