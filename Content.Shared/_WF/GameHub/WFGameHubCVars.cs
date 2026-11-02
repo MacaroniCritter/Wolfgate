@@ -16,7 +16,7 @@ public sealed class WFGameHubCVars
 
     /// <summary>Sounds per second a game may relay to nearby players.</summary>
     public static readonly CVarDef<int> MaxNoisePerSecond =
-        CVarDef.Create("wf.gamehub.max_noise_per_second", 15, CVar.SERVERONLY);
+        CVarDef.Create("wf.gamehub.max_noise_per_second", 8, CVar.SERVERONLY);
 
     /// <summary>Shortest time, in seconds, a finished level can count: both reported and since the last report.</summary>
     public static readonly CVarDef<int> MinLevelSeconds =

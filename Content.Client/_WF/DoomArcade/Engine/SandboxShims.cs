@@ -42,24 +42,39 @@ namespace Content.Client._WF.DoomArcade.Engine
         }
     }
 
-    /// <summary>Keeps save games in the player's user data; System.IO.File is not in the sandbox.</summary>
+    /// <summary>Loose files, such as demos on disk, don't exist here; System.IO.File is not in the sandbox.</summary>
     internal static class File
     {
-        private static readonly ResPath Folder = new ResPath("/wolfgate_games/doom");
+        public static bool Exists(string path) => false;
 
-        /// <summary>Set by the running session, which is the only thing that saves or loads.</summary>
-        public static IWritableDirProvider Store;
-
-        public static bool Exists(string path) => Store != null && Store.Exists(Folder / Path.GetFileName(path));
-
-        public static byte[] ReadAllBytes(string path) => Store.ReadAllBytes(Folder / Path.GetFileName(path));
+        public static byte[] ReadAllBytes(string path) => throw new System.InvalidOperationException(path);
 
         public static IEnumerable<string> ReadLines(string path) => Enumerable.Empty<string>();
+    }
 
-        public static void WriteAllBytes(string path, byte[] data, int length)
+    /// <summary>One session's save games, in the player's user data. A null store keeps none.</summary>
+    public sealed class SaveFiles
+    {
+        private readonly IWritableDirProvider store;
+        private readonly ResPath folder;
+
+        public SaveFiles(IWritableDirProvider store, ResPath folder)
         {
-            Store.CreateDir(Folder);
-            using var file = Store.OpenWrite(Folder / Path.GetFileName(path));
+            this.store = store;
+            this.folder = folder;
+        }
+
+        public bool Exists(string path) => store != null && store.Exists(folder / Path.GetFileName(path));
+
+        public byte[] ReadAllBytes(string path) => store.ReadAllBytes(folder / Path.GetFileName(path));
+
+        public void WriteAllBytes(string path, byte[] data, int length)
+        {
+            if (store == null)
+                return;
+
+            store.CreateDir(folder);
+            using var file = store.OpenWrite(folder / Path.GetFileName(path));
             file.Write(data, 0, length);
         }
     }

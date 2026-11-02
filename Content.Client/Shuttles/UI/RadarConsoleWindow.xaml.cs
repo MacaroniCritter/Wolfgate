@@ -24,6 +24,7 @@ public sealed partial class RadarConsoleWindow : FancyWindow,
         IFFDetailedToggle.Pressed = RadarScreen.ShowIFFDetailed;
         RadarScreen.WfPinDocks();
         // WOLFGATE END
+        RadarScreen.WfEnableWaypoints(RadarConsoleUiKey.Key, canFly: false); // WOLFGATE(Waypoints): a mass scanner can mark waypoints but has no autopilot.
     }
 
     public void UpdateState(NavInterfaceState scc)

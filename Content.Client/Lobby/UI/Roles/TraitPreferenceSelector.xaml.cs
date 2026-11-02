@@ -31,20 +31,6 @@ public sealed partial class TraitPreferenceSelector : Control
         }
     }
 
-    // WOLFGATE(Traits) START: greyed out while an exclusive trait is selected
-    public bool Excluded { get; private set; }
-
-    public void SetExcluded(bool excluded)
-    {
-        if (Excluded == excluded)
-            return;
-
-        Excluded = excluded;
-        TraitButton.Disabled = excluded;
-        NameLabel.FontColorOverride = excluded ? Color.Gray : null;
-    }
-    // WOLFGATE END
-
     public event Action<bool>? PreferenceChanged;
 
     public TraitPreferenceSelector(TraitPrototype trait)
@@ -145,8 +131,8 @@ public sealed partial class TraitPreferenceSelector : Control
         }
         else
         {
-            NameLabel.FontColorOverride = Excluded ? Color.Gray : null; // WOLFGATE(Traits): an excluded trait stays grey
-            TraitButton.Disabled = Excluded; // WOLFGATE(Traits): a trait blocked by an exclusive pick stays disabled
+            NameLabel.FontColorOverride = null;
+            TraitButton.Disabled = false;
 
             // Restore the appropriate background color based on selection state
             if (Preference)

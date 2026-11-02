@@ -12,6 +12,8 @@ data with its version, so a player only downloads it again when it changes.
 **Nearby sound.** The playing client reports each sound and music track. `WFGameHubSystem` passes sounds to players in
 PVS, capped by `wf.gamehub.max_noise_per_second`, and puts the track on `WFGameBroadcastComponent`. Bystanders haven't
 downloaded the game, so every client ships a small noise pack of its sound and music lumps, and renders the music itself.
+A row of cabinets stays bearable: each client plays only the nearest game's music and at most
+`WFGameHubSystem.MaxNearbyNoises` sounds at once, and active games share the volume.
 
 **Scores and prizes.** The game runs on the client, so a modified client can lie. A finished level is checked for a real
 level number, a plausible time (`wf.gamehub.min_level_seconds`) and a player within reach of the cabinet or PDA. A

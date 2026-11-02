@@ -661,6 +661,9 @@ namespace Content.Server.Database
         // WOLFGATE(EmoteVoices): the wfMessageSound prototype id, empty for the species' own.
         [Column("message_sound")] public string MessageSound { get; set; } = "";
 
+        // WOLFGATE(Voice): the voice settings as JSON, null in rows saved before voices existed.
+        [Column("speech_voice")] public string? SpeechVoice { get; set; }
+
         public int PreferenceId { get; set; }
         public Preference Preference { get; set; } = null!;
 

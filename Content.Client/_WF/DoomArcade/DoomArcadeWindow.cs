@@ -1,18 +1,20 @@
 using System.Numerics;
 using Content.Client._WF.GameHub;
+using Content.Shared._WF.GameHub;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Client._WF.DoomArcade;
 
-/// <summary>Downloads Freedoom if needed, then runs it. Opened by a cabinet or the PDA Gamehub.</summary>
-public sealed class DoomArcadeWindow : DefaultWindow
+/// <summary>Downloads a Doom-engine game if needed, then runs it. Opened by a cabinet or the PDA Gamehub.</summary>
+public sealed partial class DoomArcadeWindow : DefaultWindow
 {
-    private const string Game = WFGameHubSystem.DoomGame;
     private const float BytesPerMegabyte = 1024f * 1024f;
 
     [Dependency] private IEntitySystemManager _systems = default!;
+    [Dependency] private IPrototypeManager _protos = default!;
     [Dependency] private WFGameDataManager _data = default!;
 
     private readonly BoxContainer _downloadPanel;
@@ -21,6 +23,7 @@ public sealed class DoomArcadeWindow : DefaultWindow
     private readonly Button _retry;
     private readonly Label _failed;
     private EntityUid? _source;
+    private string _game = WFGameHubSystem.DoomGame;
     private bool _downloadStarted;
 
     public readonly DoomArcadeScreen Screen = new();
@@ -29,7 +32,6 @@ public sealed class DoomArcadeWindow : DefaultWindow
     {
         IoCManager.InjectDependencies(this);
 
-        Title = Loc.GetString("doom-arcade-window-title");
         SetSize = new Vector2(800, 680);
         MinSize = new Vector2(320, 320);
 
@@ -56,7 +58,7 @@ public sealed class DoomArcadeWindow : DefaultWindow
         };
 
         var leaderboard = new Button { Text = Loc.GetString("wf-gamehub-leaderboard"), HorizontalAlignment = HAlignment.Right };
-        leaderboard.OnPressed += _ => _systems.GetEntitySystem<WFGameHubSystem>().OpenLeaderboard(Game);
+        leaderboard.OnPressed += _ => _systems.GetEntitySystem<WFGameHubSystem>().OpenLeaderboard(_game);
 
         Contents.AddChild(new BoxContainer
         {
@@ -65,11 +67,13 @@ public sealed class DoomArcadeWindow : DefaultWindow
         });
     }
 
-    /// <summary>Starts up for the cabinet or PDA that nearby players will hear the game from.</summary>
-    public void Begin(EntityUid source)
+    /// <summary>Starts a game for the cabinet or PDA that nearby players will hear it from.</summary>
+    public void Begin(EntityUid source, string game)
     {
         _source = source;
-        _systems.GetEntitySystem<WFGameHubSystem>().RequestManifest(Game);
+        _game = game;
+        Title = Loc.GetString(_protos.Index<WFGamePrototype>(game).Name);
+        _systems.GetEntitySystem<WFGameHubSystem>().RequestManifest(game);
     }
 
     protected override void FrameUpdate(FrameEventArgs args)
@@ -79,8 +83,8 @@ public sealed class DoomArcadeWindow : DefaultWindow
         if (_source == null || Screen.Running || _failed.Visible)
             return;
 
-        var status = _data.GetStatus(Game);
-        var (received, total) = _data.GetProgress(Game);
+        var status = _data.GetStatus(_game);
+        var (received, total) = _data.GetProgress(_game);
 
         _retry.Visible = status == WFGameDataStatus.Failed;
 
@@ -107,13 +111,13 @@ public sealed class DoomArcadeWindow : DefaultWindow
     private void BeginDownload()
     {
         _downloadStarted = true;
-        _systems.GetEntitySystem<WFGameHubSystem>().StartDownload(Game);
+        _systems.GetEntitySystem<WFGameHubSystem>().StartDownload(_game);
     }
 
     private void StartGame()
     {
         _downloadPanel.Visible = false;
         Screen.Visible = true;
-        Screen.Start(_source!.Value);
+        Screen.Start(_source!.Value, _game);
     }
 }

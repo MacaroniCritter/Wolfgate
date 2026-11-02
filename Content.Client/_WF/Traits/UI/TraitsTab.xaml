@@ -1,0 +1,29 @@
+<BoxContainer xmlns="https://spacestation14.io"
+              xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+              Orientation="Vertical"
+              HorizontalExpand="True"
+              VerticalExpand="True">
+
+    <PanelContainer StyleClasses="CreatorCard" Margin="0 0 0 8">
+        <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="8">
+            <Label Text="{Loc 'trait-editor-title'}" StyleClasses="CreatorHeading" VAlign="Center" />
+            <Control HorizontalExpand="True" />
+            <controls:ConfirmButton Name="ClearButton"
+                                    Text="{Loc 'humanoid-profile-editor-clear-all-traits-button'}"
+                                    ConfirmationText="{Loc 'humanoid-profile-editor-clear-all-traits-confirm'}"
+                                    StyleClasses="LinkButton" />
+            <Label Name="SelectionLabel" StyleClasses="CreatorFieldLabel" VAlign="Center" />
+        </BoxContainer>
+    </PanelContainer>
+
+    <LineEdit Name="SearchBar"
+              PlaceHolder="{Loc 'trait-editor-search-placeholder'}"
+              HorizontalExpand="True"
+              Margin="0 0 0 8" />
+
+    <ScrollContainer Name="TraitScroll" VerticalExpand="True" HScrollEnabled="False">
+        <BoxContainer Name="CategoriesContainer"
+                      Orientation="Vertical"
+                      HorizontalExpand="True" />
+    </ScrollContainer>
+</BoxContainer>

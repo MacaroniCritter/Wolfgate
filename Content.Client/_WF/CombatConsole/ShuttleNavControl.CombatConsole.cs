@@ -35,6 +35,7 @@ public partial class ShuttleNavControl
             ConsoleTheme.Switch(_wfTerrainButton);
             Move(_wfTerrainButton, LayoutContainer.LayoutPreset.TopRight);
         }
+        WfAttachWaypointControls(parent);
 
         void Move(Control control, LayoutContainer.LayoutPreset preset)
         {
@@ -60,6 +61,7 @@ public partial class ShuttleNavControl
         {
             _radarModeButtons?.Dispose();
             _wfTerrainButton?.Dispose();
+            WfDisposeWaypointControls();
         }
         base.Dispose(disposing);
     }

@@ -48,8 +48,15 @@ public sealed partial class TraitSystem : EntitySystem
             if (_wfNewbie.TraitBlocked(traitPrototype, args.Player)) // WOLFGATE(Newbie): new players can't spawn with a kill-target trait
                 continue;
 
+            // WOLFGATE(Traits) START: a condition-gated trait is only applied when its conditions hold for this spawn
+            if (!WfTraitConditionsMet(args.Mob, args.JobId, traitPrototype))
+                continue;
+            // WOLFGATE END
+
             // Add all components required by the prototype
             EntityManager.AddComponents(args.Mob, traitPrototype.Components, false);
+
+            WfApplyTraitEffects(args.Mob, traitPrototype); // WOLFGATE(Traits): run the trait's data-driven effects
 
             // Einstein Engines - Language begin (remove this if trait system refactor)
             // Remove/Add Languages required by the prototype

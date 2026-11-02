@@ -4718,3 +4718,59 @@ Entries:
   id: 100310
   time: '2026-11-01T23:53:12.0000000+00:00'
   url: https://github.com/VanguardControl/Wolfgate/pull/446
+- author: Balls2zawall
+  changes:
+    - type: Add
+      message: Added a new T4 ship to the PDV roster, the Foxtrot-II stealth destroyer
+  id: 100311
+  time: '2026-11-02T00:54:43.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/436
+- author: Gandalf2k15
+  changes:
+    - type: Add
+      message: Radars now show the coordinates of your cursor and the scanner.
+    - type: Add
+      message: Helms and mass scanners can save, name and delete ship waypoints.
+    - type: Add
+      message: Helms can send the autopilot to typed coordinates or a saved waypoint.
+  id: 100312
+  time: '2026-11-02T01:43:40.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/448
+- author: Gandalf2k15
+  changes:
+    - type: Add
+      message: >-
+        Added Freedoom Phase 2, on PDAs and as an arcade cabinet flatpack from
+        John Wolfgate and the Wolfgate vendor.
+  id: 100313
+  time: '2026-11-02T01:49:21.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/449
+- author: Gandalf2k15
+  changes:
+    - type: Remove
+      message: Removes OwO accent.........
+  id: 100314
+  time: '2026-11-02T02:02:18.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/450
+- author: TheSlapper
+  changes:
+    - type: Add
+      message: Added voices for characters.
+  id: 100315
+  time: '2026-11-02T02:32:52.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/431
+- author: Gandalf2k15
+  changes:
+    - type: Fix
+      message: NPC crew no longer fire semi-automatic guns at machine gun speed.
+    - type: Fix
+      message: Microwaves no longer swallow an emag used on them.
+    - type: Fix
+      message: >-
+        Drifting in zero gravity no longer interrupts actions on yourself or
+        things you carry.
+    - type: Tweak
+      message: You are now told when the hourly payout cap cuts your bounty.
+  id: 100316
+  time: '2026-11-02T02:55:24.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/451

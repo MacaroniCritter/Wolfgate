@@ -821,7 +821,8 @@
     raffle:
       settings: short
   - type: GhostTakeoverAvailable
-  - type: OwOAccent
+  # WOLFGATE: OwO accent removed
+  # - type: OwOAccent
   - type: Speech
     speechSounds: Cat
     speechVerb: SmallMob

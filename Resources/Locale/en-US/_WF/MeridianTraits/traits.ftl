@@ -19,8 +19,5 @@ trait-wf-hardened-soles-desc = You're used to going barefoot. Glass shards and o
 trait-wf-canine-traits-name = Canine Traits
 trait-wf-canine-traits-desc = You act like a dog and bark now and then when you talk.
 
-trait-wf-feline-traits-name = Feline Traits
-trait-wf-feline-traits-desc = You act like a cat, and it shows in how you talk.
-
 trait-wf-avian-traits-name = Avian Traits
 trait-wf-avian-traits-desc = You act like a bird and squawk now and then when you talk.

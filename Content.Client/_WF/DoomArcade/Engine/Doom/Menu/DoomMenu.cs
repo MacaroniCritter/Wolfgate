@@ -296,7 +296,7 @@ namespace Content.Client._WF.DoomArcade.Engine
 
             selectedEpisode = 1;
 
-            saveSlots = new SaveSlots();
+            saveSlots = new SaveSlots(doom.Options);
         }
 
         public bool DoEvent(DoomEvent e)

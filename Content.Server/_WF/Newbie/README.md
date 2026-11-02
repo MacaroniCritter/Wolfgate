@@ -50,6 +50,7 @@ the icon. `Tools/_WF/Newbie/gen_newbie_icon.py` draws the plate.
 - [`Content.Client/_WF/Newbie/WFNewbieCrewWindow.xaml`](../../../Content.Client/_WF/Newbie/WFNewbieCrewWindow.xaml)
 - [`Content.Client/_WF/Newbie/WFNewbieCrewWindow.xaml.cs`](../../../Content.Client/_WF/Newbie/WFNewbieCrewWindow.xaml.cs)
 - [`Content.Client/_WF/Newbie/WFNewbieIconSystem.cs`](../../../Content.Client/_WF/Newbie/WFNewbieIconSystem.cs)
+- [`Content.Client/_WF/Newbie/WFNewbieTraitRules.cs`](../../../Content.Client/_WF/Newbie/WFNewbieTraitRules.cs)
 - [`Content.Client/_WF/Newbie/WFNewbieWelcomeSystem.cs`](../../../Content.Client/_WF/Newbie/WFNewbieWelcomeSystem.cs)
 - [`Content.Client/_WF/Newbie/WFNewbieWelcomeWindow.xaml`](../../../Content.Client/_WF/Newbie/WFNewbieWelcomeWindow.xaml)
 - [`Content.Client/_WF/Newbie/WFNewbieWelcomeWindow.xaml.cs`](../../../Content.Client/_WF/Newbie/WFNewbieWelcomeWindow.xaml.cs)

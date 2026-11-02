@@ -25,6 +25,10 @@ public sealed partial class WFGameBroadcastComponent : Component
 [RegisterComponent, NetworkedComponent]
 public sealed partial class WFGameCabinetComponent : Component
 {
+    /// <summary>The <see cref="WFGamePrototype"/> this cabinet runs.</summary>
+    [DataField]
+    public string Game = "WFGameFreedoom";
+
     [DataField]
     public string LowPrize = "PrizeTicket10";
 

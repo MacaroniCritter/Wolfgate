@@ -66,6 +66,7 @@
   - ShipVoucherKortikT3Recipe
   - ShipVoucherEuropaT3Recipe
   - ShipVoucherSaturnRecipe
+  - WFShipVoucherFoxtrotIIRecipe # WOLFGATE(Shipyard): Foxtrot-II voucher
   - SnakeletVoucherRogue
   - InertiaVoucherRogue
   - MockVoucherRogue

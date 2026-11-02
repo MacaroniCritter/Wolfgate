@@ -20,6 +20,7 @@ using Content.Shared.Construction.EntitySystems;
 using Content.Shared.Database;
 using Content.Shared.DeviceLinking.Events;
 using Content.Shared.Destructible;
+using Content.Shared.Emag.Components; // WOLFGATE: microwaves leave emags in hand
 using Content.Shared.FixedPoint;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
@@ -413,6 +414,9 @@ namespace Content.Server.Kitchen.EntitySystems
         private void OnInteractUsing(Entity<MicrowaveComponent> ent, ref InteractUsingEvent args)
         {
             if (args.Handled)
+                return;
+            // WOLFGATE: an emag is used on a machine, so it stays in hand instead of going in with the food
+            if (HasComp<EmagComponent>(args.Used))
                 return;
             if (!(TryComp<ApcPowerReceiverComponent>(ent, out var apc) && apc.Powered))
             {

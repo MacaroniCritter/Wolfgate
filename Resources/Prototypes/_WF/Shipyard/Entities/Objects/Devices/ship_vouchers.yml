@@ -19,3 +19,29 @@
     vessels:
     - Triage
     - Stubby
+
+# PDV Voucher for Foxtrot-II
+- type: entity
+  parent: BaseShipLPCRenewable
+  id: WFShipVoucherFoxtrotII
+  name: PDV Foxtrot-II LPC [T4]
+  description: A small card that authorizes the procurement of a Foxtrot-II stealth ship.
+  components:
+  - type: Sprite
+    sprite: _Mono/Objects/Misc/lpcnew.rsi
+    layers:
+    - state: icon_capital
+    - state: screen
+      color: "#1eff00"
+    - state: screen4
+      color: "#1eff00"
+      shader: unshaded
+  - type: Item
+    heldPrefix: pdv
+  - type: ShipyardVoucher
+    destroyOnEmpty: false
+    consoleType: BlackMarket
+    companyName: PDV
+    cooldown: 14400 # four hours, same as the Saturn
+    vessels:
+    - WFFoxtrotII

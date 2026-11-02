@@ -775,7 +775,6 @@ it back up to Okay after any drain, a Kelotane overdose included, before their d
   - was 3, more marking slots
   - was 6, more marking slots
   - tails are optional so players can go without one
-- [`Resources/Prototypes/Traits/speech.yml`](../../../Resources/Prototypes/Traits/speech.yml): Felionoids have it as their species accent
 - [`Resources/Prototypes/Voice/speech_emotes.yml`](../../../Resources/Prototypes/Voice/speech_emotes.yml): was the default scream action icon; this is the open-mouthed face
 - [`Resources/ServerInfo/_HL/Guidebook/Mobs/Synth.xml`](../../../Resources/ServerInfo/_HL/Guidebook/Mobs/Synth.xml): ported from HardLight
 - [`Resources/ServerInfo/_Impstation/Guidebook/Mobs/Thaven.xml`](../../../Resources/ServerInfo/_Impstation/Guidebook/Mobs/Thaven.xml): ported from HardLight

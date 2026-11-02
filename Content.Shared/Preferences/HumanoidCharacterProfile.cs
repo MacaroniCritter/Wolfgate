@@ -55,10 +55,13 @@ using Content.Shared._WF.ChatFont; // WOLFGATE(ChatFont)
 using Content.Shared._WF.TypingBubble; // WOLFGATE(TypingBubble)
 using Content.Shared._WF.BloodColour; // WOLFGATE(BloodColour)
 using Content.Shared._WF.EmoteVoices; // WOLFGATE(EmoteVoices)
+using Content.Shared._WF.Voice; // WOLFGATE(Voice)
 using Content.Shared._WF.Genitals; // WOLFGATE(Genitals)
 using Content.Shared._WF.Genitals.Migration; // WOLFGATE(Genitals)
 using Content.Shared._WF.Genitals.Profile; // WOLFGATE(Genitals)
 using Content.Shared._WF.LegStyle; // WOLFGATE(LegStyle)
+using Content.Shared._WF.Traits; // WOLFGATE(Traits)
+using Content.Shared._WF.Traits.Conditions; // WOLFGATE(Traits)
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
 using Content.Shared.Humanoid;
@@ -310,6 +313,7 @@ namespace Content.Shared.Preferences
             TypingIndicator = other.TypingIndicator; // WOLFGATE(TypingBubble)
             BloodColor = other.BloodColor; // WOLFGATE(BloodColour)
             MessageSound = other.MessageSound; // WOLFGATE(EmoteVoices)
+            SpeechVoice = other.SpeechVoice; // WOLFGATE(Voice)
         }
 
         /// <summary>Copy constructor</summary>
@@ -351,6 +355,7 @@ namespace Content.Shared.Preferences
             TypingIndicator = other.TypingIndicator; // WOLFGATE(TypingBubble)
             BloodColor = other.BloodColor; // WOLFGATE(BloodColour)
             MessageSound = other.MessageSound; // WOLFGATE(EmoteVoices)
+            SpeechVoice = other.SpeechVoice; // WOLFGATE(Voice)
         }
 
         /// <summary>
@@ -699,6 +704,7 @@ namespace Content.Shared.Preferences
             if (BloodColor != other.BloodColor) return false; // WOLFGATE(BloodColour)
             if (ScreamVoice != other.ScreamVoice || LaughVoice != other.LaughVoice) return false; // WOLFGATE(EmoteVoices)
             if (MessageSound != other.MessageSound) return false; // WOLFGATE(EmoteVoices)
+            if (!Equals(SpeechVoice, other.SpeechVoice)) return false; // WOLFGATE(Voice)
             if (!Flags.SequenceEqual(other.Flags)) return false; // Mono
             if (!Components.SequenceEqual(other.Components)) return false; // Mono
             if (!Items.SequenceEqual(other.Items)) return false; // Mono
@@ -906,6 +912,7 @@ namespace Content.Shared.Preferences
             EnsureCustomMarkingsValid(configManager); // WOLFGATE(CustomMarkings)
             EnsureValidEmoteVoices(prototypeManager); // WOLFGATE(EmoteVoices)
             MessageSound = MessageSoundRules.Sanitize(MessageSound, prototypeManager); // WOLFGATE(EmoteVoices): an unknown message sound becomes the species' own
+            SpeechVoice = (SpeechVoice ?? new SpeechVoice()).Clamped(); // WOLFGATE(Voice): out-of-range sliders come back inside their range; crafted network data can deliver null
             LegStance = LegStyleRules.Validate(Species, LegStance, prototypeManager); // WOLFGATE(LegStyle): legs the species doesn't have fall back to its own
             Biotype = WFBiotypeRules.Resolve(Biotype, speciesPrototype); // WOLFGATE(Biotype): Default and unknown values become the species' own
             EnsureAugmentsValid(prototypeManager, collection.Resolve<IComponentFactory>()); // WOLFGATE(Augments): augments the species can't take are dropped
@@ -964,6 +971,7 @@ namespace Content.Shared.Preferences
             // Track points count for each group.
             var groups = new Dictionary<string, int>();
             var result = new List<ProtoId<TraitPrototype>>();
+            var conditionCtx = new TraitConditionContext { SpeciesId = Species.Id, Proto = protoManager }; // WOLFGATE(Traits)
 
             // WOLFGATE START: count downsides first so a positive trait isn't dropped by set order
             var ordered = traits
@@ -978,6 +986,11 @@ namespace Content.Shared.Preferences
 
                 if (WFBiotypeGates.TraitBlocked(traitProto, this, protoManager)) // WOLFGATE(Biotype): a trait the effective biotype can't take is dropped
                     continue;
+
+                // WOLFGATE(Traits) START: drop a trait whose known conditions the character does not meet
+                if (!TraitConditionEvaluator.AllMet(traitProto.Conditions, conditionCtx))
+                    continue;
+                // WOLFGATE END
 
                 // WOLFGATE(MeridianTraits) START: drop a trait that excludes one already taken, in either direction
                 if (result.Any(taken => traitProto.MutuallyExclusiveTraits.Contains(taken)
@@ -1075,6 +1088,7 @@ namespace Content.Shared.Preferences
             hashCode.Add(ScreamVoice); // WOLFGATE(EmoteVoices)
             hashCode.Add(LaughVoice); // WOLFGATE(EmoteVoices)
             hashCode.Add(MessageSound); // WOLFGATE(EmoteVoices)
+            hashCode.Add(SpeechVoice); // WOLFGATE(Voice)
             return hashCode.ToHashCode();
         }
 

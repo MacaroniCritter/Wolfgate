@@ -17,6 +17,17 @@
   - type: Computer
     board: WFDoomArcadeComputerCircuitboard
 
+- type: entity
+  parent: WFDoomArcade
+  id: WFFreedoom2Arcade
+  name: freedoom phase 2 arcade
+  description: An arcade cabinet running Freedoom Phase 2.
+  components:
+  - type: WFGameCabinet
+    game: WFGameFreedoom2
+  - type: Computer
+    board: WFFreedoom2ComputerCircuitboard
+
 # Sold by John Wolfgate and the Wolfgate vendor.
 - type: entity
   parent: BaseNFFlatpack
@@ -40,3 +51,26 @@
   components:
   - type: ComputerBoard
     prototype: WFDoomArcade
+
+- type: entity
+  parent: BaseNFFlatpack
+  id: WFFreedoom2ArcadeFlatpack
+  name: freedoom phase 2 arcade flatpack
+  description: A flatpack used for constructing a freedoom phase 2 arcade cabinet.
+  components:
+  - type: Flatpack
+    entity: WFFreedoom2Arcade
+  - type: Sprite
+    layers:
+    - state: service_music
+  - type: StaticPrice
+    price: 1500
+
+- type: entity
+  parent: BaseComputerCircuitboard
+  id: WFFreedoom2ComputerCircuitboard
+  name: freedoom phase 2 arcade board
+  description: A computer printed circuit board for a freedoom phase 2 arcade cabinet.
+  components:
+  - type: ComputerBoard
+    prototype: WFFreedoom2Arcade

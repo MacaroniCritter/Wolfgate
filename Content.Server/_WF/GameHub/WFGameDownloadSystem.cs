@@ -16,7 +16,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Server._WF.GameHub;
 
 /// <summary>Streams a game's data to the players who ask for it, at a capped rate.</summary>
-public sealed class WFGameDownloadSystem : EntitySystem
+public sealed partial class WFGameDownloadSystem : EntitySystem
 {
     private const int ChunkSize = 8192;
 
@@ -57,6 +57,16 @@ public sealed class WFGameDownloadSystem : EntitySystem
             Log.Error($"Can't read the data for game {game.ID}: {e}");
             SendIfConnected(new WFGameDownloadFailedEvent(game.ID), channel);
         }
+    }
+
+    // The player may have left while the worker read the file.
+    private void SendIfConnected(EntityEventArgs message, INetChannel channel)
+    {
+        _task.RunOnMainThread(() =>
+        {
+            if (channel.IsConnected)
+                RaiseNetworkEvent(message, channel);
+        });
     }
 
     private void OnDownloadRequest(WFGameDownloadRequestEvent ev, EntitySessionEventArgs args)

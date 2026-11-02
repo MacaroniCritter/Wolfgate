@@ -3,6 +3,7 @@ using Content.Client._WF.DoomArcade.Engine;
 using Robust.Client.Audio;
 using Robust.Shared.Configuration;
 using Robust.Shared.ContentPack;
+using Robust.Shared.Utility;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace Content.Client._WF.DoomArcade;
@@ -10,7 +11,8 @@ namespace Content.Client._WF.DoomArcade;
 /// <summary>One running game: steps the engine at its fixed tic rate and renders frames. Needs no graphics device.</summary>
 public sealed class DoomArcadeSession : IDisposable
 {
-    private const string WadName = "freedoom1.wad";
+    private static readonly ResPath SavesFolder = new("/wolfgate_games");
+
     private const float TicLength = 1f / 35f;
     private const int TicsPerSecond = 35;
 
@@ -37,18 +39,17 @@ public sealed class DoomArcadeSession : IDisposable
     /// <summary>The player finished a level of a real game, not a title-screen demo.</summary>
     public event Action<DoomLevelResult>? LevelCompleted;
 
+    /// <param name="wadName">The IWAD's file name, which tells the engine which game it is.</param>
     /// <param name="wad">A seekable stream of the IWAD; the session owns it.</param>
     /// <param name="audio">Where to play sound and music; null runs silently.</param>
     /// <param name="saves">Where save games live; null keeps none.</param>
     /// <param name="args">Engine command line, such as <c>-warp 1 1</c>.</param>
-    public DoomArcadeSession(Stream wad, DoomArcadeAudio? audio, IWritableDirProvider? saves, params string[] args)
+    public DoomArcadeSession(string wadName, Stream wad, DoomArcadeAudio? audio, IWritableDirProvider? saves, params string[] args)
     {
-        Engine.File.Store = saves!;
-
         var commandLine = new CommandLineArgs(args);
         var config = new Config { video_highresolution = false };
 
-        _content = new GameContent(commandLine, WadName, wad);
+        _content = new GameContent(commandLine, wadName, wad);
         _video = new DoomArcadeVideo(config, _content);
         _input = new DoomArcadeInput(config);
 
@@ -59,6 +60,7 @@ public sealed class DoomArcadeSession : IDisposable
         }
 
         _doom = new Doom(commandLine, config, _content, _video, _sound, _music, _input);
+        _doom.Options.Saves = new SaveFiles(saves!, SavesFolder / Engine.Path.GetFileNameWithoutExtension(wadName));
     }
 
     /// <summary>Advances the game by real time.</summary>
@@ -97,7 +99,6 @@ public sealed class DoomArcadeSession : IDisposable
         _music?.Dispose();
         _sound?.Dispose();
         _content.Dispose();
-        Engine.File.Store = null!;
     }
 
     private void CheckLevelCompleted()

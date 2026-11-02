@@ -88,23 +88,9 @@
   cost: 1
   mutuallyExclusiveTraits:
   - Accentless
-  - WFFelineTraits
   - WFAvianTraits
   components:
   - type: BarkAccent
-
-- type: trait
-  id: WFFelineTraits
-  name: trait-wf-feline-traits-name
-  description: trait-wf-feline-traits-desc
-  category: SpeechTraits
-  cost: 1
-  mutuallyExclusiveTraits:
-  - Accentless
-  - WFCanineTraits
-  - WFAvianTraits
-  components:
-  - type: OwOAccent
 
 - type: trait
   id: WFAvianTraits
@@ -115,7 +101,6 @@
   mutuallyExclusiveTraits:
   - Accentless
   - WFCanineTraits
-  - WFFelineTraits
   components:
   - type: ResomiAccent
     bawkChance: 0.05

@@ -400,9 +400,10 @@
     understands:
     - Moffic
     - TauCetiBasic
-  - type: AddAccentClothing
-    accent: OwOAccent
-  - type: OwOAccent
+  # WOLFGATE: OwO accent removed
+  # - type: AddAccentClothing
+  #   accent: OwOAccent
+  # - type: OwOAccent
 
 - type: entity
   name: leopard mothroach

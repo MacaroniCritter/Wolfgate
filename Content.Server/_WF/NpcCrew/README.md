@@ -493,6 +493,7 @@ simulated counterpart of `WFPilotDockedEvent`.
 - [`Content.Server/NPC/Systems/NPCCombatSystem.Ranged.cs`](../../NPC/Systems/NPCCombatSystem.Ranged.cs)
   - no shooting while Downed, crit, stunned or asleep
   - Crew miss by their skill level.
+  - crew pull a semi-automatic's trigger at a person's pace
 - [`Content.Server/NPC/Systems/NPCSteeringSystem.Context.cs`](../../NPC/Systems/NPCSteeringSystem.Context.cs)
   - a loose crate on the node is shoved, not walked into
   - compare both bodies for every NPC; the engine helper reads the first fixtures twice.

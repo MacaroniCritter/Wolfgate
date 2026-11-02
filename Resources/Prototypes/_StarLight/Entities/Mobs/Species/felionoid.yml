@@ -60,7 +60,8 @@
   - type: Speech
     speechVerb: Felionoid
     allowedEmotes: ['Mew', 'Hiss', 'Meow', 'Growl', 'Purr', 'Trill']
-  - type: OwOAccent # HL: matches Starlight; combines with (does not override) other accents
+  # WOLFGATE: OwO accent removed
+  # - type: OwOAccent # HL: matches Starlight; combines with (does not override) other accents
   - type: DamageOnHighSpeedImpact # Landing on all fours!
     damage:
       types:

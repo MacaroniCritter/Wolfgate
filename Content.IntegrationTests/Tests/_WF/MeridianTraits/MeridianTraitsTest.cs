@@ -20,7 +20,7 @@ public sealed class MeridianTraitsTest
     private static readonly string[][] TraitSets =
     {
         new[] { "WFDeaf", "WFPseudobulbarAffect", "WFIlluminated", "WFRadFiend", "WFHardenedSoles", "WFCanineTraits" },
-        new[] { "WFFragility", "WFFelineTraits" },
+        new[] { "WFFragility" },
         new[] { "WFAvianTraits" },
     };
 

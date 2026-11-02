@@ -497,7 +497,12 @@ public sealed partial class WFEncounterRewardSystem : EntitySystem
         }
 
         if (helpers.Count == 0 && aids.Count == 0)
+        {
+            var hits = string.Join(", ", comp.Hits.Select(pair => $"{pair.Key}: {pair.Value.Values.Sum()}"));
+            _adminLog.Add(LogType.Action, LogImpact.Medium,
+                $"No helpers for {deed} {ToPrettyString(encounter):entity}. Hits by player: {hits}");
             return 0;
+        }
 
         var pool = aids.Count > 0 ? reward.Spesos / 5 : 0;
         var shares = new List<int>();
@@ -617,7 +622,15 @@ public sealed partial class WFEncounterRewardSystem : EntitySystem
         for (var i = 0; i < helpers.Count; i++)
         {
             var (session, mob) = helpers[i];
-            var paid = Capped(session.UserId, shares?[i] ?? reward.Spesos / helpers.Count, cap);
+            var share = shares?[i] ?? reward.Spesos / helpers.Count;
+            var paid = Capped(session.UserId, share, cap);
+            if (paid < share)
+            {
+                _chat.DispatchServerMessage(session, Loc.GetString("wf-encounter-reward-capped", ("name", name), ("cap", cap)));
+                _adminLog.Add(LogType.Action, LogImpact.Medium,
+                    $"{session.Name} hit the payout cap: {paid} of {share} spesos for {deed} {subject}");
+            }
+
             // A deposit that fails, with no bank account or deposits off, pays nothing and keeps the allowance.
             var cut = _companies.CutFor(session, paid);
             if (paid > 0 && !_bank.TryBankDeposit(mob, paid - cut, false))

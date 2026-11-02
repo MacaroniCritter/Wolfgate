@@ -20,7 +20,7 @@ public enum WFGameDataStatus : byte
 }
 
 /// <summary>Receives game data from the server and keeps it in the player's user data between sessions.</summary>
-public sealed class WFGameDataManager
+public sealed partial class WFGameDataManager
 {
     private static readonly ResPath Folder = new("/wolfgate_games");
 

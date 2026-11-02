@@ -64,6 +64,7 @@ public sealed partial class ShuttleConsoleWindow
 
     private void WfInitialize()
     {
+        NavContainer.WfEnableWaypoints();
         ShipContainer.CodeRequested += code => ShipCodeRequested?.Invoke(code);
         ShipContainer.GeneralQuartersRequested += active => ShipGeneralQuartersRequested?.Invoke(active);
         ShipContainer.DistressRequested += active => ShipDistressRequested?.Invoke(active);

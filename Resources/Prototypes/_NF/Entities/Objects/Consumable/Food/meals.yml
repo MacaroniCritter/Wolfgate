@@ -58,7 +58,8 @@
     description: ghost-role-information-crispy-description
     rules: ghost-role-information-Cak-rules
   - type: GhostTakeoverAvailable
-  - type: OwOAccent
+  # WOLFGATE: OwO accent removed
+  # - type: OwOAccent
   - type: Speech
     speechSounds: Cat
     speechVerb: SmallMob

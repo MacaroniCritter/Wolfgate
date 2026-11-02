@@ -19,6 +19,7 @@ using Content.Shared._WF.BloodColour; // WOLFGATE(BloodColour)
 using Content.Shared._WF.ChatFont; // WOLFGATE(ChatFont)
 using Content.Shared._WF.TypingBubble; // WOLFGATE(TypingBubble)
 using Content.Shared._WF.EmoteVoices; // WOLFGATE(EmoteVoices)
+using Content.Server._WF.Voice; // WOLFGATE(Voice)
 using Content.Shared._WF.Gags; // WOLFGATE(Gags)
 using Content.Shared._WF.CustomMarkings; // WOLFGATE(CustomMarkings)
 using Content.Shared._WF.Genitals; // WOLFGATE(Genitals)
@@ -358,6 +359,7 @@ namespace Content.Server.Database
                 ChatFont = WFChatFontRules.FromStored(profile.ChatFont), // WOLFGATE(ChatFont)
                 TypingIndicator = WFTypingBubbleRules.FromStored(profile.TypingIndicator), // WOLFGATE(TypingBubble)
                 MessageSound = MessageSoundRules.FromStored(profile.MessageSound), // WOLFGATE(EmoteVoices)
+                SpeechVoice = SpeechVoiceJson.FromStored(profile.SpeechVoice), // WOLFGATE(Voice)
             };
         }
 
@@ -407,6 +409,7 @@ namespace Content.Server.Database
             profile.ScreamVoice = EmoteVoiceRules.ToStored(humanoid.ScreamVoice); // WOLFGATE(EmoteVoices)
             profile.LaughVoice = EmoteVoiceRules.ToStored(humanoid.LaughVoice); // WOLFGATE(EmoteVoices)
             profile.MessageSound = MessageSoundRules.ToStored(humanoid.MessageSound); // WOLFGATE(EmoteVoices)
+            profile.SpeechVoice = SpeechVoiceJson.ToStored(humanoid.SpeechVoice); // WOLFGATE(Voice)
 
             // WOLFGATE(Genitals) START: anatomy JSON; an unreadable column is kept as it is until the player edits anatomy.
             if (!(existingRow && humanoid.Genitals.LoadFailed))

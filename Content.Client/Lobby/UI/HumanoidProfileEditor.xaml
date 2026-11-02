@@ -1,8 +1,11 @@
+<!-- WOLFGATE(Traits): the tr xmlns on the root tag below is for the card-based trait editor. -->
+<!-- WOLFGATE(Augments): the wfa xmlns on the root tag below is for the augment editor. -->
 <BoxContainer xmlns="https://spacestation14.io"
          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
          xmlns:humanoid="clr-namespace:Content.Client.Humanoid"
          xmlns:wfh="clr-namespace:Content.Client._WF.Humanoid"
          xmlns:wfg="clr-namespace:Content.Client._WF.Genitals.UI"
+         xmlns:tr="clr-namespace:Content.Client._WF.Traits.UI"
          xmlns:wfa="clr-namespace:Content.Client._WF.Augments.UI"
          HorizontalExpand="True"
          SeparationOverride="0">
@@ -354,10 +357,13 @@
             </BoxContainer>
             <!-- Traits -->
             <BoxContainer Orientation="Vertical" Margin="8">
-                <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                <!-- WOLFGATE(Traits): card-based trait editor; the flat upstream list stays hidden as a fallback -->
+                <tr:TraitsTab Name="TraitsTab" HorizontalExpand="True" VerticalExpand="True" />
+                <ScrollContainer Visible="False" VerticalExpand="True" HScrollEnabled="False">
                     <BoxContainer Name="TraitsList" Orientation="Vertical" />
                 </ScrollContainer>
             </BoxContainer>
+
             <!-- Company (Monolith) -->
             <BoxContainer Orientation="Vertical" Margin="8">
                 <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
@@ -406,6 +412,12 @@
             <BoxContainer Name="AugmentsTab" Orientation="Vertical" Margin="8">
                 <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
                     <wfa:WFAugmentEditor Name="AugmentEditor" HorizontalExpand="True" />
+                </ScrollContainer>
+            </BoxContainer>
+            <!-- WOLFGATE(Voice): voice tab, filled in by HumanoidProfileEditor.SpeechVoice.cs -->
+            <BoxContainer Name="VoiceTab" Orientation="Vertical" Margin="8">
+                <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                    <BoxContainer Name="SpeechVoiceContainer" Orientation="Vertical" HorizontalExpand="True" />
                 </ScrollContainer>
             </BoxContainer>
         </TabContainer>

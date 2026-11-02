@@ -23,6 +23,7 @@
   cost: 180000
   recipeUnlocks:
   - ShipVoucherSaturnRecipe
+  - WFShipVoucherFoxtrotIIRecipe
   technologyPrerequisites:
   - PdvTierThreeVouchers
   position: -2, -34

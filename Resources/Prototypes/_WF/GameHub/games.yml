@@ -9,6 +9,17 @@
   minLevel: 11
   maxLevel: 49
 
+- type: wfGame
+  id: WFGameFreedoom2
+  name: wf-gamehub-game-freedoom2-name
+  description: wf-gamehub-game-freedoom2-description
+  dataPath: /GameData/_WF/DoomArcade/freedoom2.wad
+  dataFile: freedoom2.wad
+  noisePack: /Textures/_WF/DoomArcade/freedoom2-noise.wad
+  # The engine reports episode 1 and maps 1 to 32 as 10 + map.
+  minLevel: 11
+  maxLevel: 42
+
 - type: entity
   parent: NFBasePDACartridge
   id: WFGameHubCartridge

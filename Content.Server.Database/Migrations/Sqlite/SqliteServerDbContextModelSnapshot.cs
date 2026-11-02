@@ -1063,6 +1063,10 @@ namespace Content.Server.Database.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasColumnName("species");
 
+                    b.Property<string>("SpeechVoice")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("speech_voice");
+
                     b.Property<string>("TypingIndicator")
                         .HasColumnType("TEXT")
                         .HasColumnName("typing_indicator");

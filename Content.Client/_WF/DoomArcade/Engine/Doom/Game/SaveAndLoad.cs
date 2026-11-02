@@ -61,7 +61,7 @@ namespace Content.Client._WF.DoomArcade.Engine
             var options = game.Options;
             game.InitNew(options.Skill, options.Episode, options.Map);
 
-            var lg = new LoadGame(File.ReadAllBytes(path));
+            var lg = new LoadGame(game.Options.Saves.ReadAllBytes(path));
             lg.Load(game);
         }
 
@@ -126,7 +126,7 @@ namespace Content.Client._WF.DoomArcade.Engine
 
                 data[ptr++] = 0x1d;
 
-                File.WriteAllBytes(path, data, ptr);
+                game.Options.Saves.WriteAllBytes(path, data, ptr);
             }
 
             private void PadPointer()

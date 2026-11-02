@@ -1,4 +1,4 @@
-"""Builds the small WAD of sounds and music that every client ships, from the full Freedoom WAD.
+"""Builds the small WADs of sounds and music that every client ships, from the full Freedoom WADs.
 
 Nearby players hear a game they may not have downloaded, so they need these lumps up front.
 
@@ -8,12 +8,13 @@ import struct
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-SOURCE = ROOT / "Resources/GameData/_WF/DoomArcade/freedoom1.wad"
-TARGET = ROOT / "Resources/Textures/_WF/DoomArcade/freedoom1-noise.wad"
+GAMES = ("freedoom1", "freedoom2")
 
 
-def main():
-    data = SOURCE.read_bytes()
+def build(game):
+    source = ROOT / f"Resources/GameData/_WF/DoomArcade/{game}.wad"
+    target = ROOT / f"Resources/Textures/_WF/DoomArcade/{game}-noise.wad"
+    data = source.read_bytes()
     count, table = struct.unpack("<ii", data[4:12])
 
     lumps = []
@@ -31,9 +32,10 @@ def main():
         body += lump
         offset += len(lump)
 
-    TARGET.write_bytes(b"PWAD" + struct.pack("<ii", len(lumps), offset) + body + entries)
-    print(f"{TARGET.name}: {len(lumps)} lumps, {TARGET.stat().st_size} bytes")
+    target.write_bytes(b"PWAD" + struct.pack("<ii", len(lumps), offset) + body + entries)
+    print(f"{target.name}: {len(lumps)} lumps, {target.stat().st_size} bytes")
 
 
 if __name__ == "__main__":
-    main()
+    for game in GAMES:
+        build(game)

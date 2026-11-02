@@ -17,13 +17,22 @@ using Robust.Shared.Utility;
 namespace Content.Client._WF.GameHub;
 
 /// <summary>Talks to the server for a game's data and leaderboard, opens games, and plays other players' games nearby.</summary>
-public sealed class WFGameHubSystem : EntitySystem
+public sealed partial class WFGameHubSystem : EntitySystem
 {
     public const string DoomGame = "WFGameFreedoom";
+    public const string Doom2Game = "WFGameFreedoom2";
 
     private const float NoiseVolume = -4f;
     private const float MusicVolume = -13.75f;
-    private const int MaxNearbyTracks = 2;
+
+    /// <summary>Other players' sounds playing at once, leaving the audio pool room for the rest of the game.</summary>
+    public const int MaxNearbyNoises = 12;
+
+    /// <summary>How much closer another game must be, in tiles, before its music takes over.</summary>
+    private const float TrackSwitchMargin = 2f;
+
+    /// <summary>How long a game counts as active after its last sound, when sharing out the volume.</summary>
+    private static readonly TimeSpan NoiseActiveTime = TimeSpan.FromSeconds(2);
 
     private static readonly ResPath SoundFontPath = new("/Textures/_WF/DoomArcade/TimGM6mb.sf2");
 
@@ -38,13 +47,18 @@ public sealed class WFGameHubSystem : EntitySystem
 
     private readonly Dictionary<string, Wad> _packs = new();
     private readonly Dictionary<(string Game, string Sound), AudioStream?> _clips = new();
-    private readonly Dictionary<EntityUid, NearbyTrack> _nearby = new();
+    private readonly List<EntityUid> _nearbyNoises = new();
+    private readonly Dictionary<EntityUid, TimeSpan> _noisySources = new();
+    private NearbyTrack? _nearby;
     private Task<SoundFont>? _soundFont;
     private DoomArcadeWindow? _pdaWindow;
     private TimeSpan _nextCheck;
 
     /// <summary>Other players' tracks this client is rendering or playing.</summary>
-    public int NearbyTrackCount => _nearby.Count;
+    public int NearbyTrackCount => _nearby == null ? 0 : 1;
+
+    /// <summary>The game whose music this client plays, if any.</summary>
+    public EntityUid? NearbyTrackSource => _nearby?.Source;
 
     /// <summary>A leaderboard arrived from the server.</summary>
     public event Action<WFGameLeaderboardEvent>? LeaderboardReceived;
@@ -63,12 +77,9 @@ public sealed class WFGameHubSystem : EntitySystem
     {
         base.Shutdown();
 
-        foreach (var track in _nearby.Values)
-        {
-            StopTrack(track);
-        }
-
-        _nearby.Clear();
+        StopNearbyTrack();
+        _nearbyNoises.Clear();
+        _noisySources.Clear();
 
         foreach (var clip in _clips.Values)
         {
@@ -89,16 +100,14 @@ public sealed class WFGameHubSystem : EntitySystem
     {
         base.FrameUpdate(frameTime);
 
-        foreach (var track in _nearby.Values)
-        {
-            FinishRender(track);
-        }
+        if (_nearby != null)
+            FinishRender(_nearby);
 
         if (_timing.RealTime < _nextCheck)
             return;
 
         _nextCheck = _timing.RealTime + TimeSpan.FromSeconds(1);
-        UpdateNearbyTracks();
+        UpdateNearbyTrack();
     }
 
     public void RequestManifest(string game) => RaiseNetworkEvent(new WFGameManifestRequestEvent(game));
@@ -116,13 +125,13 @@ public sealed class WFGameHubSystem : EntitySystem
     /// <summary>Opens a game from a PDA. A game added to the hub needs its window opened here.</summary>
     public void Launch(string game, EntityUid source)
     {
-        if (game != DoomGame)
+        if (game is not (DoomGame or Doom2Game))
             return;
 
         _pdaWindow?.Close();
         _pdaWindow = new DoomArcadeWindow();
         _pdaWindow.OpenCentered();
-        _pdaWindow.Begin(source);
+        _pdaWindow.Begin(source, game);
     }
 
     public void SendNoise(EntityUid source, string game, string sound, float volume)
@@ -154,17 +163,61 @@ public sealed class WFGameHubSystem : EntitySystem
             result.Seconds));
     }
 
-    /// <summary>Plays one sound of another player's game at its source.</summary>
+    /// <summary>Plays one sound of another player's game at its source, unless too many already are.</summary>
     public bool PlayNearbyNoise(EntityUid source, string game, string sound, byte volume)
     {
-        if (TerminatingOrDeleted(source) || GetClip(game, sound) is not { } clip)
+        if (TerminatingOrDeleted(source))
+            return false;
+
+        var games = CountNoisySources(source);
+
+        _nearbyNoises.RemoveAll(noise => TerminatingOrDeleted(noise));
+        if (_nearbyNoises.Count >= MaxNearbyNoises || GetClip(game, sound) is not { } clip)
             return false;
 
         var parameters = AudioParams.Default
-            .WithVolume(NoiseVolume + SharedAudioSystem.GainToVolume(MathF.Max(volume / 255f, 0.01f)))
+            .WithVolume(GetNoiseVolume(volume, games))
             .WithMaxDistance(WFGameHubProtocol.HearRange);
 
-        return _audioSystem.PlayEntity(clip, source, null, parameters) != null;
+        if (_audioSystem.PlayEntity(clip, source, null, parameters) is not { } playing)
+            return false;
+
+        _nearbyNoises.Add(playing.Entity);
+        return true;
+    }
+
+    /// <summary>
+    /// Volume in decibels of one nearby sound. Games share the loudness, so a row of cabinets
+    /// sounds about as loud as one.
+    /// </summary>
+    public static float GetNoiseVolume(byte volume, int games)
+    {
+        return NoiseVolume
+            + SharedAudioSystem.GainToVolume(MathF.Max(volume / 255f, 0.01f))
+            - 10f * MathF.Log10(Math.Max(games, 1));
+    }
+
+    private int CountNoisySources(EntityUid source)
+    {
+        var now = _timing.RealTime;
+        _noisySources[source] = now;
+
+        var count = 0;
+        var stale = new List<EntityUid>();
+        foreach (var (uid, heard) in _noisySources)
+        {
+            if (now - heard > NoiseActiveTime)
+                stale.Add(uid);
+            else
+                count++;
+        }
+
+        foreach (var uid in stale)
+        {
+            _noisySources.Remove(uid);
+        }
+
+        return count;
     }
 
     private void OnNoiseHeard(WFGameNoiseHeardEvent ev)
@@ -173,54 +226,60 @@ public sealed class WFGameHubSystem : EntitySystem
             PlayNearbyNoise(source.Value, ev.Game, ev.Sound, ev.Volume);
     }
 
-    private void UpdateNearbyTracks()
+    /// <summary>Plays the nearest game's music, staying on the current one until another is clearly closer.</summary>
+    private void UpdateNearbyTrack()
     {
-        var listener = _player.LocalEntity;
-        var seen = new HashSet<EntityUid>();
+        EntityUid? nearest = null;
+        WFGameBroadcastComponent? nearestBroadcast = null;
+        var nearestDistance = float.MaxValue;
+        float? currentDistance = null;
 
-        if (listener != null)
+        if (_player.LocalEntity is { } listener)
         {
-            var listenerPosition = _transform.GetMapCoordinates(listener.Value);
+            var listenerPosition = _transform.GetMapCoordinates(listener);
             var query = EntityQueryEnumerator<WFGameBroadcastComponent>();
             while (query.MoveNext(out var uid, out var broadcast))
             {
                 // The player's own client plays this music directly.
-                if (broadcast.Player == _player.LocalUser ||
-                    broadcast.Track == null ||
-                    !_transform.GetMapCoordinates(uid).InRange(listenerPosition, WFGameHubProtocol.HearRange))
-                {
+                if (broadcast.Player == _player.LocalUser || broadcast.Track == null)
                     continue;
-                }
 
-                seen.Add(uid);
-                if (_nearby.TryGetValue(uid, out var track))
+                var position = _transform.GetMapCoordinates(uid);
+                if (position.MapId != listenerPosition.MapId)
+                    continue;
+
+                var distance = (position.Position - listenerPosition.Position).Length();
+                if (distance > WFGameHubProtocol.HearRange)
+                    continue;
+
+                if (_nearby?.Source == uid && _nearby.Name == broadcast.Track)
+                    currentDistance = distance;
+
+                if (distance < nearestDistance)
                 {
-                    if (track.Name == broadcast.Track)
-                        continue;
-
-                    StopTrack(track);
-                    _nearby.Remove(uid);
+                    nearest = uid;
+                    nearestBroadcast = broadcast;
+                    nearestDistance = distance;
                 }
-
-                if (_nearby.Count < MaxNearbyTracks)
-                    StartTrack(uid, broadcast);
             }
         }
 
-        var stale = new List<EntityUid>();
-        foreach (var (uid, track) in _nearby)
-        {
-            if (seen.Contains(uid))
-                continue;
+        if (currentDistance is { } current && nearestDistance > current - TrackSwitchMargin)
+            return;
 
-            StopTrack(track);
-            stale.Add(uid);
-        }
+        StopNearbyTrack();
 
-        foreach (var uid in stale)
-        {
-            _nearby.Remove(uid);
-        }
+        if (nearest != null)
+            StartTrack(nearest.Value, nearestBroadcast!);
+    }
+
+    private void StopNearbyTrack()
+    {
+        if (_nearby == null)
+            return;
+
+        StopTrack(_nearby);
+        _nearby = null;
     }
 
     private void StartTrack(EntityUid uid, WFGameBroadcastComponent broadcast)
@@ -235,7 +294,7 @@ public sealed class WFGameHubSystem : EntitySystem
         var token = cancel.Token;
         var sawmill = Log;
 
-        _nearby[uid] = new NearbyTrack
+        _nearby = new NearbyTrack
         {
             Source = uid,
             Name = broadcast.Track!,

@@ -2,6 +2,8 @@ using Content.Shared.Gravity;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
+using Content.Shared.Movement.Components; // WOLFGATE: drifting doesn't interrupt work on yourself
+using Content.Shared.Movement.Systems; // WOLFGATE: drifting doesn't interrupt work on yourself
 using Content.Shared.Physics;
 using Robust.Shared.Utility;
 
@@ -167,8 +169,14 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
         if (args.Used is { } @using && !xformQuery.HasComp(@using))
             return true;
 
+        // WOLFGATE: drifting isn't moving, so it doesn't interrupt work on yourself or something you carry
+        var drifting = args.BreakOnMove
+            && (args.Target == null || args.Target == args.User || targetXform?.ParentUid == args.User)
+            && _gravity.IsWeightless(args.User)
+            && ((CompOrNull<InputMoverComponent>(args.User)?.HeldMoveButtons ?? MoveButtons.None) & MoveButtons.AnyDirection) == MoveButtons.None;
+
         // TODO: Re-use existing xform query for these calculations.
-        if (args.BreakOnMove && !(!args.BreakOnWeightlessMove && _gravity.IsWeightless(args.User)))
+        if (args.BreakOnMove && !drifting && !(!args.BreakOnWeightlessMove && _gravity.IsWeightless(args.User))) // WOLFGATE: skipped while drifting
         {
             // Whether the user has moved too much from their original position.
             if (!_transform.InRange(userXform.Coordinates, doAfter.UserPosition, args.MovementThreshold))

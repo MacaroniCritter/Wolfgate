@@ -218,8 +218,9 @@
     sprite: Clothing/Head/Hats/catears.rsi
   - type: Clothing
     sprite: Clothing/Head/Hats/catears.rsi
-  - type: AddAccentClothing
-    accent: OwOAccent
+  # WOLFGATE: OwO accent removed
+  # - type: AddAccentClothing
+  #   accent: OwOAccent
 
 - type: entity
   parent: [ClothingHeadHatCatEars, BaseToggleClothing]
@@ -240,8 +241,9 @@
     sprite: Clothing/Head/Hats/catears.rsi
   - type: Clothing
     sprite: Clothing/Head/Hats/catears.rsi
-  - type: AddAccentClothing
-    accent: OwOAccent
+  # WOLFGATE: OwO accent removed
+  # - type: AddAccentClothing
+  #   accent: OwOAccent
 
 - type: entity
   categories: [ Actions, HideSpawnMenu ]

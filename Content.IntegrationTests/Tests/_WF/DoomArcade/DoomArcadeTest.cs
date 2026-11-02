@@ -1,5 +1,6 @@
 #nullable enable
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -26,7 +27,10 @@ namespace Content.IntegrationTests.Tests._WF.DoomArcade;
 public sealed class DoomArcadeTest
 {
     private const float Tic = 1f / 35f;
+    private const string WadName = "freedoom1.wad";
     private const string WadPath = "/GameData/_WF/DoomArcade/freedoom1.wad";
+    private const string Phase2Name = "freedoom2.wad";
+    private const string Phase2Path = "/GameData/_WF/DoomArcade/freedoom2.wad";
     private const string SoundFontPath = "/Textures/_WF/DoomArcade/TimGM6mb.sf2";
 
     [Test]
@@ -38,7 +42,7 @@ public sealed class DoomArcadeTest
         await client.WaitAssertion(() =>
         {
             var resources = client.ResolveDependency<IResourceManager>();
-            using var session = new DoomArcadeSession(Read(resources, WadPath), null, null, "-warp", "1", "1");
+            using var session = new DoomArcadeSession(WadName, Read(resources, WadPath), null, null, "-warp", "1", "1");
 
             Step(session, 35);
             session.Render();
@@ -63,6 +67,88 @@ public sealed class DoomArcadeTest
     }
 
     [Test]
+    public async Task Phase2LevelRendersAndPlayerWalks()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var client = pair.Client;
+
+        await client.WaitAssertion(() =>
+        {
+            var resources = client.ResolveDependency<IResourceManager>();
+            using var session = new DoomArcadeSession(Phase2Name, Read(resources, Phase2Path), null, null, "-warp", "1");
+
+            var finished = new List<DoomLevelResult>();
+            session.LevelCompleted += finished.Add;
+
+            Step(session, 120);
+            session.Render();
+
+            Assert.That(session.Doom.State, Is.EqualTo(DoomState.Game));
+            Assert.That(session.Doom.Options.Episode * 10 + session.Doom.Options.Map, Is.EqualTo(11), "MAP01 is level 11 on the board");
+            Assert.That(session.Pixels.Distinct().Count(), Is.GreaterThan(32), "The frame looks blank");
+            Dump(session, "phase2");
+
+            var mobj = session.Doom.Game.World.ConsolePlayer.Mobj;
+            var start = (mobj.X.Data, mobj.Y.Data);
+
+            session.SetKey(DoomKey.W, true);
+            Step(session, 35);
+            session.SetKey(DoomKey.W, false);
+
+            Assert.That((mobj.X.Data, mobj.Y.Data), Is.Not.EqualTo(start), "Holding forward did not move the player");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task Phase2TitleLoopPlaysItsDemos()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var client = pair.Client;
+
+        await client.WaitAssertion(() =>
+        {
+            var resources = client.ResolveDependency<IResourceManager>();
+            using var session = new DoomArcadeSession(Phase2Name, Read(resources, Phase2Path), null, null);
+
+            for (var i = 0; i < 35 * 60; i++)
+            {
+                session.Update(Tic, out _);
+                if (i % 35 == 0)
+                    session.Render();
+            }
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task EachGameKeepsItsOwnSaves()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var client = pair.Client;
+
+        await client.WaitAssertion(() =>
+        {
+            var resources = client.ResolveDependency<IResourceManager>();
+            var saves = new VirtualWritableDirProvider();
+
+            using (var phase1 = new DoomArcadeSession(WadName, Read(resources, WadPath), null, saves, "-warp", "1", "1"))
+            {
+                Step(phase1, 120);
+                Assert.That(phase1.Doom.SaveGame(0, "PHASE ONE"));
+                Step(phase1, 120);
+            }
+
+            using var phase2 = new DoomArcadeSession(Phase2Name, Read(resources, Phase2Path), null, saves, "-warp", "1");
+            Assert.That(phase2.Doom.Menu.SaveSlots[0], Is.Null, "Phase 2 must not list Phase 1's saves");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
     public async Task SaveGamesOutliveTheSession()
     {
         await using var pair = await PoolManager.GetServerClient();
@@ -73,7 +159,7 @@ public sealed class DoomArcadeTest
             var resources = client.ResolveDependency<IResourceManager>();
             var saves = new VirtualWritableDirProvider();
 
-            using (var session = new DoomArcadeSession(Read(resources, WadPath), null, saves, "-warp", "1", "1"))
+            using (var session = new DoomArcadeSession(WadName, Read(resources, WadPath), null, saves, "-warp", "1", "1"))
             {
                 Step(session, 35);
                 Assert.That(session.Doom.SaveGame(0, "ROUND ONE"), "Saving should work in a level");
@@ -82,7 +168,7 @@ public sealed class DoomArcadeTest
                 Step(session, 120);
             }
 
-            using var next = new DoomArcadeSession(Read(resources, WadPath), null, saves, "-warp", "1", "1");
+            using var next = new DoomArcadeSession(WadName, Read(resources, WadPath), null, saves, "-warp", "1", "1");
             Assert.That(next.Doom.Menu.SaveSlots[0], Does.StartWith("ROUND ONE"), "The next round should see the save");
 
             Step(next, 120);
@@ -108,7 +194,7 @@ public sealed class DoomArcadeTest
                 Read(client.ResolveDependency<IResourceManager>(), SoundFontPath).ToArray(),
                 client.ResolveDependency<ILogManager>().GetSawmill("doom.arcade"));
 
-            using var session = new DoomArcadeSession(Read(client.ResolveDependency<IResourceManager>(), WadPath), audio, null, "-warp", "1", "1");
+            using var session = new DoomArcadeSession(WadName, Read(client.ResolveDependency<IResourceManager>(), WadPath), audio, null, "-warp", "1", "1");
 
             var timer = Stopwatch.StartNew();
             while (!session.Music!.Started && timer.Elapsed.TotalSeconds < 120)
@@ -140,7 +226,7 @@ public sealed class DoomArcadeTest
         {
             var resources = client.ResolveDependency<IResourceManager>();
             var soundFont = new SoundFont(Read(resources, SoundFontPath));
-            using var session = new DoomArcadeSession(Read(resources, WadPath), null, null);
+            using var session = new DoomArcadeSession(WadName, Read(resources, WadPath), null, null);
             var midi = session.Content.Wad.ReadLump("D_E1M1");
 
             var timer = Stopwatch.StartNew();

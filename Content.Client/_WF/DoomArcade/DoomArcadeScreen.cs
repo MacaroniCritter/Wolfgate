@@ -1,6 +1,7 @@
 using System.IO;
 using Content.Client._WF.DoomArcade.Engine;
 using Content.Client._WF.GameHub;
+using Content.Shared._WF.GameHub;
 using Robust.Client.Audio;
 using Robust.Client.Graphics;
 using Robust.Client.Input;
@@ -8,6 +9,7 @@ using Robust.Client.UserInterface;
 using Robust.Shared.Configuration;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Input;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using SixLabors.ImageSharp.PixelFormats;
@@ -15,10 +17,8 @@ using SixLabors.ImageSharp.PixelFormats;
 namespace Content.Client._WF.DoomArcade;
 
 /// <summary>Runs a Doom session while in the UI tree, draws it and takes the keyboard while focused.</summary>
-public sealed class DoomArcadeScreen : Control
+public sealed partial class DoomArcadeScreen : Control
 {
-    private const string Game = WFGameHubSystem.DoomGame;
-
     private static readonly ResPath SoundFontPath = new("/Textures/_WF/DoomArcade/TimGM6mb.sf2");
 
     // Doom's 320x200 was shown on a 4:3 screen, with tall pixels.
@@ -31,6 +31,7 @@ public sealed class DoomArcadeScreen : Control
     [Dependency] private IAudioManager _audio = default!;
     [Dependency] private IConfigurationManager _cfg = default!;
     [Dependency] private IEntitySystemManager _systems = default!;
+    [Dependency] private IPrototypeManager _protos = default!;
     [Dependency] private WFGameDataManager _data = default!;
 
     private readonly Dictionary<Keyboard.Key, DoomKey> _held = new();
@@ -38,6 +39,7 @@ public sealed class DoomArcadeScreen : Control
     private DoomArcadeSession? _session;
     private OwnedTexture? _texture;
     private EntityUid _source;
+    private string _game = WFGameHubSystem.DoomGame;
 
     /// <summary>The player quit from the game's menu.</summary>
     public event Action? Quit;
@@ -59,26 +61,27 @@ public sealed class DoomArcadeScreen : Control
         VerticalExpand = true;
     }
 
-    /// <summary>Starts the game from downloaded data, with its sound heard around <paramref name="source"/>.</summary>
-    public void Start(EntityUid source)
+    /// <summary>Starts a game from downloaded data, with its sound heard around <paramref name="source"/>.</summary>
+    public void Start(EntityUid source, string game)
     {
         if (_session != null)
             return;
 
         _source = source;
+        _game = game;
 
         try
         {
             var soundFont = ReadResource(SoundFontPath).ToArray();
             var audio = new DoomArcadeAudio(_audio, _cfg, soundFont, _sawmill);
 
-            _session = new DoomArcadeSession(_data.OpenData(Game), audio, _resources.UserData);
+            _session = new DoomArcadeSession(_protos.Index<WFGamePrototype>(game).DataFile, _data.OpenData(game), audio, _resources.UserData);
             _texture = _clyde.CreateBlankTexture<Rgba32>((_session.Width, _session.Height), "doom-arcade");
 
             var hub = _systems.GetEntitySystem<WFGameHubSystem>();
-            _session.Sound!.NoiseMade += (sound, volume) => hub.SendNoise(_source, Game, sound, volume);
-            _session.Music!.TrackChanged += (track, loop) => hub.SendMusic(_source, Game, track, loop);
-            _session.LevelCompleted += result => hub.SendLevelComplete(_source, Game, result);
+            _session.Sound!.NoiseMade += (sound, volume) => hub.SendNoise(_source, _game, sound, volume);
+            _session.Music!.TrackChanged += (track, loop) => hub.SendMusic(_source, _game, track, loop);
+            _session.LevelCompleted += result => hub.SendLevelComplete(_source, _game, result);
 
             GrabKeyboardFocus();
         }
@@ -174,7 +177,7 @@ public sealed class DoomArcadeScreen : Control
     private void Stop()
     {
         if (_session != null)
-            _systems.GetEntitySystem<WFGameHubSystem>().SendStopped(_source, Game);
+            _systems.GetEntitySystem<WFGameHubSystem>().SendStopped(_source, _game);
 
         _held.Clear();
         _session?.Dispose();

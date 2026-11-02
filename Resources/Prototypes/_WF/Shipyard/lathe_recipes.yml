@@ -1,0 +1,10 @@
+# Foxtrot-II voucher. Listed in the MonoRogueVouchersDynamic pack and WFPdvCapitalVouchers tech.
+
+- type: latheRecipe
+  parent: BaseVoucherRecipe
+  id: WFShipVoucherFoxtrotIIRecipe
+  result: WFShipVoucherFoxtrotII
+  completetime: 240
+  materialDiscountScale: 0.2
+  materials:
+    PdvComposite: 9000
