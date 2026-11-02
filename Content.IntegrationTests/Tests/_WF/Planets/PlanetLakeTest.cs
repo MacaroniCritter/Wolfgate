@@ -27,7 +27,7 @@ public sealed class PlanetLakeTest
     [TestCase("WFSurfaceAerumna", true)]
     [TestCase("WFSurfaceCarcinoma", true)]
     [TestCase("WFSurfaceFervidus", false)]
-    [TestCase("WFSurfaceThrascias", false)]
+    [TestCase("WFSurfaceThrascias", true)]
     public async Task WaterFormsLakesNotSeas(string surfaceId, bool wet)
     {
         await using var pair = await PoolManager.GetServerClient();

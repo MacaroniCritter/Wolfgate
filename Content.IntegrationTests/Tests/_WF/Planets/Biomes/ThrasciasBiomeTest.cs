@@ -36,6 +36,7 @@ public sealed class ThrasciasBiomeTest
     private const string Dirt = "WFFloorThrasciasFrozenDirt";
     private const string Crystal = "WFFloorThrasciasCrystalIce";
     private const string Lake = "WFFloorThrasciasLakeIce";
+    private const string LakeWater = "WFThrasciasLakeWater";
 
     private static readonly HashSet<string> Pines = new()
     {
@@ -150,8 +151,9 @@ public sealed class ThrasciasBiomeTest
                         IceCrystal => IceTiles.Contains(def.ID) && def.ID != Lake && def.ID != "WFFloorThrasciasClearIceSmooth",
                         _ when CrystalPlants.Contains(feature) => def.ID == Crystal,
                         "WFFaunaThrasciasTundra" => SnowTiles.Contains(def.ID) || def.ID == Dirt,
-                        "WFFaunaThrasciasIce" => IceTiles.Contains(def.ID),
+                        "WFFaunaThrasciasIce" => IceTiles.Contains(def.ID) && def.ID != Lake,
                         "WFFaunaThrasciasCrystal" => def.ID == Crystal,
+                        LakeWater => def.ID == Lake,
                         "WFFaunaThrasciasBoreal" => SnowTiles.Contains(def.ID) && inPocket,
                         _ => true,
                     };
@@ -202,7 +204,9 @@ public sealed class ThrasciasBiomeTest
             Assert.That(plasmaOffCrystal, Is.Zero, "Every plasma pool should sit in a crystal field.");
             Assert.That(featureCount.Keys.Any(id => id.Contains("PlanetmapOre")), Is.True, "Ore outcrops are missing.");
             Assert.That(featureCount.Keys.Any(id => id.Contains("Fauna")), Is.True, "Wildlife spawners are missing.");
-            Assert.That(featureCount.Keys.Any(id => id.Contains("Water")), Is.False, "Thrascias is dry; its lakes are frozen tiles.");
+            // Its lakes are real water that freezes by the air, over the lake bed tile, and nothing else stands in them.
+            Assert.That(featureCount.Keys.Where(id => id.Contains("Water")), Is.EquivalentTo(new[] { LakeWater }), "Thrascias grows only its own lake water.");
+            Assert.That(featureCount.GetValueOrDefault(LakeWater), Is.EqualTo(lake), "A lake tile has no water, or water stands off the lake.");
 
             Assert.That(Features(Tundra), Is.GreaterThan(0), "No tundra growth.");
             Assert.That(featureCount.GetValueOrDefault("WFFloraFrostbelle"), Is.GreaterThan(0), "No frostbelles.");

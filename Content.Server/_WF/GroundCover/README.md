@@ -84,9 +84,12 @@ Snow and frost go by the air over a tile, and on a planet open sky takes the pla
 city street holds its own air from when it was laid, which the climate never moves, so Crocus kept its build-day
 temperature and never took snow.
 
-Lakes and ponds freeze (`WFFreezableWater` on `MonoFloorWaterEntity`). Once a chunk's air has held at or below -2 C for
+Lakes and ponds freeze (`WFFreezableWater` on `MonoFloorWaterEntity`, and `WFThrasciasLakeWater` on Thrascias). Nothing
+about a world is hardcoded: the water reads the air its world's climate writes. The freeze and thaw points are data on the
+component (`freezeAt` -2 C and `thawAt` 0 C by default; a pool that isn't water, such as the blood lake, sets `freezeAt: 0`
+and never freezes). Once a chunk's air has held at or below its freeze point for
 three minutes, ice spreads in from the shore two tiles a minute and thickens by a degree-minute for each degree of
-frost (up to 480). Above 0 C for three minutes warmth melts that thickness first, faster the warmer it is, and only
+frost (up to 480). Above its thaw point for three minutes warmth melts that thickness first, faster the warmer it is, and only
 then thaws the ice from the shore the same way: a winter night's ice holds through a mild afternoon, and a warm
 spring day melts it through. Ice is walkable and a little slippery: the water's wading slowdown is set to none, its floor occlusion
 (the waist-deep look) and splash trigger are off and it gets friction contacts, and steps sound of ice, or crunch under
@@ -94,7 +97,9 @@ snow. Snow lies on ice and melts into open water. A pickaxe or crowbar breaks a 
 again five minutes later. Water first seen in frost is frozen already, so Thrascias stays frozen and Asclepiu's lakes
 freeze in winter and thaw in spring; warm worlds never freeze. It is worked with the snow, by the same chunks and only
 near players (`WFIceCoverComponent` on the grid: each water tile's distance to the shore and how far the ice has spread
-or thawed, caught up on from the time passed when someone comes back). Freezing toggles state on the water entity
+or thawed). A chunk nobody watched is caught up when someone comes back: a gap over ten minutes is walked in steps
+along the world's own season and hour curve (`WFPlanetClimateSystem.GetClearTemperatureAt`, shifted to the air now), so a
+lake left frozen through a winter is open after a spring and a summer, whatever the air on return. Freezing toggles state on the water entity
 rather than swapping it, so biome chunks still unload it (the unloader counts a freeze or thaw as no change) and it
 comes back with its chunk's ice. The client draws ice with `lake_ice.rsi`, the water's own shore shapes in ice, and
 hides it under snow cover so the snow shows (`WFFrozenWaterVisualsSystem`).
@@ -158,6 +163,7 @@ Entry points: `WFGroundCoverSystem.StepMap`, `UpdateChunk`, `GetDepth`, `SetDept
 - [`Content.IntegrationTests/Tests/_WF/GroundCover/GroundCoverRound12Test.cs`](../../../Content.IntegrationTests/Tests/_WF/GroundCover/GroundCoverRound12Test.cs)
 - [`Content.IntegrationTests/Tests/_WF/GroundCover/GroundCoverTest.cs`](../../../Content.IntegrationTests/Tests/_WF/GroundCover/GroundCoverTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/GroundCover/GroundCoverVehicleTest.cs`](../../../Content.IntegrationTests/Tests/_WF/GroundCover/GroundCoverVehicleTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/GroundCover/LakeClimateTest.cs`](../../../Content.IntegrationTests/Tests/_WF/GroundCover/LakeClimateTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/GroundCover/SnowInteractionsTest.cs`](../../../Content.IntegrationTests/Tests/_WF/GroundCover/SnowInteractionsTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/GroundCover/SnowMarksTest.cs`](../../../Content.IntegrationTests/Tests/_WF/GroundCover/SnowMarksTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/GroundCover/SnowWalkTest.cs`](../../../Content.IntegrationTests/Tests/_WF/GroundCover/SnowWalkTest.cs)

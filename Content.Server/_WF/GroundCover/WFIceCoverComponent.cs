@@ -19,6 +19,11 @@ public sealed class WFIceChunk
     /// <summary>Tiles from each water tile to the nearest shore: 1 at the edge, 0 where there's no water.</summary>
     public readonly byte[] Shore = new byte[WFSnowCover.ChunkArea];
 
+    /// <summary>The freeze and thaw points of the chunk's water, taken from its first water tile.</summary>
+    public float FreezeAt = WFFreezableWaterComponent.DefaultFreezeAt;
+
+    public float ThawAt = WFFreezableWaterComponent.DefaultThawAt;
+
     /// <summary>Water tiles this far from the shore or nearer are frozen, unless thawed.</summary>
     public float Front;
 

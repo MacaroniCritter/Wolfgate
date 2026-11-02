@@ -68,14 +68,26 @@
   friction: 0.05
   mobAcceleration: 0.1
 
+# The bed of a lake (WFThrasciasLakeWater): grippy, as the water over it gives the slide while frozen.
 - type: tile
   id: WFFloorThrasciasLakeIce
   parent: FloorIce
   weather: true
   indestructible: true
   isSubfloor: true
-  friction: 0.05
-  mobAcceleration: 0.1
+  friction: 1
+  mobAcceleration: 1
+
+# A lake of real water that freezes by the air, like every world's. Thrascias air is far below freezing, so it reads
+# as ice; its iceFriction and iceAcceleration are the old lake tile's.
+- type: entity
+  id: WFThrasciasLakeWater
+  parent: MonoFloorWaterEntity
+  name: lake water
+  components:
+  - type: WFFreezableWater
+    iceFriction: 0.05
+    iceAcceleration: 0.1
 
 # Frozen plasma growth: the ground round every plasma pool.
 - type: tile
@@ -310,7 +322,6 @@
     - WFFloorThrasciasRoughIce
     - WFFloorThrasciasClearIce
     - WFFloorThrasciasClearIceSmooth
-    - WFFloorThrasciasLakeIce
     entities: [WFFaunaThrasciasIce]
     threshold: 0.95
     noise: { seed: 37, noiseType: OpenSimplex2, frequency: 3 }
@@ -346,7 +357,7 @@
     threshold: 0.95
     noise: { seed: 3, noiseType: OpenSimplex2, frequency: 0.004, fractalType: Ridged, octaves: 1 }
 
-# Cracked pack ice, with rough and clear patches and clear frozen lakes in the middle.
+# Cracked pack ice, with rough and clear patches and lakes of water in the middle.
 - type: biomeTemplate
   id: WFThrasciasPackIce
   layers:
@@ -367,8 +378,14 @@
     noise: { seed: 73, noiseType: OpenSimplex2, frequency: 0.04 }
   - !type:BiomeTileLayer
     tile: WFFloorThrasciasLakeIce
-    threshold: 0.4
+    threshold: 0.6
     noise: { seed: 74, noiseType: OpenSimplex2, frequency: 0.02 }
+  # The lakes are water over that bed, frozen while the air is.
+  - !type:BiomeEntityLayer
+    allowedTiles: [WFFloorThrasciasLakeIce]
+    entities: [WFThrasciasLakeWater]
+    threshold: -1
+    noise: { seed: 0, noiseType: OpenSimplex2, frequency: 0.01 }
 
 # Pines on the snow, thick inside the pocket and nowhere outside it.
 - type: biomeTemplate
