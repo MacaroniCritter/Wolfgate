@@ -11,6 +11,7 @@ public sealed partial class WFStateRecoverySystem : EntitySystem
 {
     [Dependency] private IClientGameStateManager _gameState = default!;
     [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private WFDetachLookupSystem _detachLookup = default!;
 
     private static readonly TimeSpan Window = TimeSpan.FromSeconds(2);
     private const int FailuresPerWindow = 10;
@@ -24,6 +25,7 @@ public sealed partial class WFStateRecoverySystem : EntitySystem
     public int Requests { get; private set; }
 
     private bool _stepOpen;
+    private bool _purgeDeferred;
     private int _failures;
     private TimeSpan _windowStart;
     private TimeSpan _cooldown = MinCooldown;
@@ -63,10 +65,25 @@ public sealed partial class WFStateRecoverySystem : EntitySystem
 
         if (failures < FailuresPerWindow)
         {
+            _purgeDeferred = false;
             if (now - _lastRequest > MaxCooldown)
                 _cooldown = MinCooldown;
             return;
         }
+
+        // A deleted entity left in a lookup tree breaks the broadphase, and a full state wouldn't remove it.
+        var purged = _detachLookup.PurgeDeleted();
+        if (purged > 0)
+            Log.Warning($"{failures} physics steps failed in {Window.TotalSeconds:0}s; removed {purged} deleted entities from lookup trees.");
+
+        // Give a purge one window to work; if steps still fail, something else is wrong.
+        if (purged > 0 && !_purgeDeferred)
+        {
+            _purgeDeferred = true;
+            return;
+        }
+
+        _purgeDeferred = false;
 
         if (now < _nextRequest)
             return;
