@@ -1,7 +1,11 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Content.Client._WF.Companies;
 using Content.Client._WF.RoundSetup;
+using Content.Client._WF.ShipPreview;
+using Content.Client._WF.ShipPreview.UI;
+using Content.IntegrationTests.Tests._WF.RoundSetup;
 using Content.Server._NF.SectorServices;
 using Content.Server._WF.Companies;
 using Content.Server._WF.RoundSetup;
@@ -16,7 +20,10 @@ using Content.Shared._WF.Drydock;
 using Content.Shared._WF.RoundSetup;
 using Content.Shared.CCVar;
 using Content.Shared.Preferences;
+using Robust.Client.UserInterface;
+using Robust.Client.UserInterface.Controls;
 using Robust.Shared.GameObjects;
+using Robust.Shared.Localization;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 
@@ -291,6 +298,156 @@ public sealed partial class WFCompanyTest
             WFRoundSetupState result = null;
             await pair.Client.WaitPost(() => result = crews.State);
             return result;
+        }
+    }
+
+    /// <summary>Preview shows a held licence and the design being bought, follows the picker, and closes with the window.</summary>
+    [Test]
+    public async Task HangarPreviewShowsLicencesAndOffers()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { InLobby = true });
+        var server = pair.Server;
+        var companies = server.System<WFCompanySystem>();
+        var client = pair.Client.System<WFCompanyClientSystem>();
+        var preferences = server.ResolveDependency<IServerPreferencesManager>();
+        var maps = pair.Client.System<SharedMapSystem>();
+        var owner = pair.Player!;
+        var original = (HumanoidCharacterProfile) preferences.GetPreferences(owner.UserId).SelectedCharacter;
+        var slot = preferences.GetPreferences(owner.UserId).SelectedCharacterIndex;
+        var guppy = server.ResolveDependency<IPrototypeManager>().Index<VesselPrototype>(GuppyProto);
+        int? id = null;
+        var hands = await server.AddDummySessions(2);
+        try
+        {
+            await server.WaitPost(() => preferences.SetProfile(owner.UserId, slot, original.WithName("Ada Owner").WithBankBalance(5000)).Wait());
+            for (var i = 0; i < 300 && !(companies.Loaded && hands.All(hand => preferences.HavePreferencesLoaded(hand))); i++)
+                await pair.RunTicksSync(1);
+            var state = await Send(new(WFCompanyAction.Create) { Name = "Preview Works", Tag = "PREV" });
+            id = state.Own!.Id;
+            await server.WaitPost(() => companies.AdminAdjust(id.Value, WFCompanyPolicy.LicencePrice(guppy.Price), "Test", "seed"));
+            foreach (var hand in hands)
+            {
+                await Send(new(WFCompanyAction.Invite) { CompanyId = id.Value, TargetUser = hand.UserId });
+                await Run(() => companies.HandleRequest(new(WFCompanyAction.AcceptInvite) { CompanyId = id.Value }, hand));
+            }
+            await Send(new(WFCompanyAction.Refresh));
+            state = await Send(new(WFCompanyAction.BuyLicence) { CompanyId = id.Value, Vessel = "Guppy" });
+            Assert.That(state.Own!.Licences.Single().Vessel, Is.EqualTo("Guppy"), state.Message);
+            var offers = state.Own.LicenceOffers;
+            Assert.That(offers, Has.Length.GreaterThan(1));
+
+            HashSet<MapId> originalMaps = null!;
+            WFCompanyWindow window = null!;
+            await pair.Client.WaitPost(() =>
+            {
+                originalMaps = maps.GetAllMapIds().ToHashSet();
+                window = new WFCompanyWindow();
+                window.OpenCentered();
+            });
+            await pair.RunTicksSync(pair.SecondsToTicks(1f));
+
+            Button licencePreview = null!;
+            Button offerPreview = null!;
+            OptionButton picker = null!;
+            await pair.Client.WaitAssertion(() =>
+            {
+                var text = Loc.GetString("wf-company-hangar-preview");
+                var tabs = Descendants(window).OfType<TabContainer>().Single();
+                for (var i = 0; i < tabs.ChildCount; i++)
+                {
+                    if (Descendants(tabs.GetChild(i)).OfType<Button>().Any(button => button.Text == text))
+                        tabs.CurrentTab = i;
+                }
+                var buttons = Descendants(tabs).OfType<Button>().Where(button => button.Text == text).ToArray();
+                Assert.That(buttons, Has.Length.EqualTo(2), "One on the licence card, one beside the licence picker.");
+                licencePreview = buttons[0];
+                offerPreview = buttons[1];
+                picker = Descendants(tabs).OfType<OptionButton>().Single(option => option.ItemCount == offers.Length);
+            });
+            await pair.RunTicksSync(5);
+
+            await RoundSetupUiTest.Click(pair, licencePreview);
+            await Showing(guppy.Name);
+
+            await RoundSetupUiTest.Click(pair, offerPreview);
+            await Showing(offers[0].Name);
+
+            // A later offer: the picker swaps the open previewer without another press.
+            var chosen = offers.Skip(1).First(offer => offer.Name != offers[0].Name);
+            await RoundSetupUiTest.Click(pair, picker);
+            Button option = null!;
+            await pair.Client.WaitAssertion(() =>
+            {
+                var caption = Loc.GetString("wf-company-hangar-offer", ("name", chosen.Name),
+                    ("price", Loc.GetString("wf-company-credits", ("amount", chosen.Price))));
+                option = Descendants(picker.OptionsScroll).OfType<Button>().First(button => button.Text == caption);
+            });
+            await RoundSetupUiTest.Click(pair, option);
+            await Showing(chosen.Name);
+
+            await pair.Client.WaitAssertion(() =>
+            {
+                var ui = pair.Client.ResolveDependency<IUserInterfaceManager>();
+                Assert.That(Descendants(ui.WindowRoot).OfType<ShipPreviewWindow>().Count(), Is.EqualTo(1), "Every press reuses one previewer.");
+                window.Close();
+                Assert.That(Descendants(ui.WindowRoot).OfType<ShipPreviewWindow>(), Is.Empty, "The previewer closes with the company window.");
+                Assert.That(maps.GetAllMapIds(), Is.EquivalentTo(originalMaps), "Closing must release the preview map.");
+            });
+        }
+        finally
+        {
+            if (id is { } left)
+                await server.WaitPost(() => companies.AdminDisband(left));
+            await Run(() => companies.Flush());
+            await server.WaitPost(() => preferences.SetProfile(owner.UserId, slot, original).Wait());
+            await Run(() => companies.Flush());
+            await server.RemoveAllDummySessions();
+        }
+        await pair.RunTicksSync(2);
+        await pair.CleanReturnAsync();
+
+        async Task Showing(string name)
+        {
+            var ui = pair.Client.ResolveDependency<IUserInterfaceManager>();
+            ShipPreviewControl preview = null!;
+            await pair.Client.WaitAssertion(() =>
+            {
+                var shown = Descendants(ui.WindowRoot).OfType<ShipPreviewWindow>().Single();
+                preview = Descendants(shown).OfType<ShipPreviewControl>().Single();
+                Assert.That(Descendants(shown).OfType<Label>().Select(label => label.Text), Does.Contain(name));
+            });
+            await PoolManager.WaitUntil(pair.Client, () => preview.HasPreview, maxTicks: 180);
+            await pair.Client.WaitAssertion(() => Assert.That(preview.TileCount, Is.Positive, name));
+        }
+
+        async Task<WFCompanyState> Send(WFCompanyRequest request)
+        {
+            await pair.RunTicksSync(pair.SecondsToTicks(0.25f));
+            await pair.Client.WaitPost(() => client.Send(request));
+            await pair.RunTicksSync(pair.SecondsToTicks(0.75f));
+            WFCompanyState result = null;
+            await pair.Client.WaitPost(() => result = client.State);
+            return result;
+        }
+
+        async Task Run(System.Func<Task> start)
+        {
+            Task task = null;
+            await pair.RunTicksSync(pair.SecondsToTicks(0.25f));
+            await server.WaitPost(() => task = start());
+            for (var i = 0; i < 600 && !task.IsCompleted; i++)
+                await pair.RunTicksSync(1);
+            await task;
+        }
+
+        static IEnumerable<Control> Descendants(Control control)
+        {
+            foreach (var child in control.Children)
+            {
+                yield return child;
+                foreach (var nested in Descendants(child))
+                    yield return nested;
+            }
         }
     }
 }

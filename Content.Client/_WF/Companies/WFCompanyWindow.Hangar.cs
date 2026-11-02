@@ -1,5 +1,7 @@
 using Content.Client._WF.RoundSetup;
+using Content.Client._WF.ShipPreview.UI;
 using Content.Client.UserInterface.Controls;
+using Content.Shared._NF.Shipyard.Prototypes;
 using Content.Shared._WF.Companies;
 using Content.Shared._WF.RoundSetup;
 using Robust.Client.UserInterface;
@@ -10,6 +12,21 @@ namespace Content.Client._WF.Companies;
 public sealed partial class WFCompanyWindow
 {
     private int _licenceOffer;
+    private ShipPreviewWindow? _shipPreview;
+
+    /// <summary>Shows a design in the window's one previewer, opening it if needed.</summary>
+    private void PreviewVessel(string vessel)
+    {
+        if (!_prototypes.TryIndex<VesselPrototype>(vessel, out var prototype))
+            return;
+        if (_shipPreview is not { IsOpen: true })
+        {
+            _shipPreview = ShipPreviewWindow.Open(prototype);
+            return;
+        }
+        _shipPreview.SetVessel(prototype);
+        _shipPreview.MoveToFront();
+    }
 
     /// <summary>The company's fleet licences: launch one copy of each design per round, buy more, set the launch fee.</summary>
     private Control BuildHangar(WFCompanyDetail own)
@@ -31,7 +48,7 @@ public sealed partial class WFCompanyWindow
                 StyleClasses = { "LabelHeading" } });
             info.AddChild(new Label { Text = licence.Launched ? Text("hangar-out") : Text("hangar-ready", ("registry", Credits(registry)),
                 ("fee", Credits(own.LaunchFee))) });
-            var row = Row(info);
+            var row = Row(info, Button("hangar-preview", () => PreviewVessel(licence.Vessel), !_prototypes.HasIndex<VesselPrototype>(licence.Vessel)));
             info.HorizontalExpand = true;
             if (canLaunch)
             {
@@ -78,13 +95,15 @@ public sealed partial class WFCompanyWindow
             {
                 picker.SelectId(args.Id);
                 _licenceOffer = args.Id;
+                if (_shipPreview is { IsOpen: true })
+                    PreviewVessel(own.LicenceOffers[args.Id].Vessel);
             };
             var buy = new ConfirmButton { Text = Text("hangar-buy"), ConfirmationText = Text("confirm") };
             buy.OnPressed += _ => Send(new WFCompanyRequest(WFCompanyAction.BuyLicence)
             {
                 CompanyId = own.Id, Vessel = own.LicenceOffers[_licenceOffer].Vessel,
             });
-            owner.AddChild(Row(picker, buy));
+            owner.AddChild(Row(picker, Button("hangar-preview", () => PreviewVessel(own.LicenceOffers[_licenceOffer].Vessel)), buy));
             owner.AddChild(Paragraph(Text("hangar-buy-help", ("multiplier", WFCompanyPolicy.LicenceMultiplier),
                 ("minimum", Credits(WFCompanyPolicy.LicenceMinimum)))));
         }
