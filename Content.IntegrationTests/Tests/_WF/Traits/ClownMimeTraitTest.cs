@@ -1,6 +1,7 @@
 #nullable enable
 using System.Linq;
 using Content.Server._WF.Clown;
+using Content.Server.Atmos.Components;
 using Content.Server.Station.Systems;
 using Content.Shared._WF.ChatFont;
 using Content.Shared._WF.Clown;
@@ -48,6 +49,8 @@ public sealed class ClownMimeTraitTest
     private static EntityUid SpawnClown(IEntityManager entMan, IPrototypeManager proto, EntityCoordinates coords)
     {
         var mob = entMan.SpawnEntity("MobHuman", coords);
+        // The test map is a vacuum, and any damage ends juggling.
+        entMan.RemoveComponent<BarotraumaComponent>(mob);
         entMan.AddComponents(mob, proto.Index<TraitPrototype>(ClownProto).Components, false);
         return mob;
     }
