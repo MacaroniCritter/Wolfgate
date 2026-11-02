@@ -167,6 +167,9 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
 - [`Content.Server/GameTicking/GameTicker.Spawning.cs`](../../Content.Server/GameTicking/GameTicker.Spawning.cs): OwO accent removed
 - [`Content.Server/Ghost/Roles/Components/ToggleableGhostRoleComponent.cs`](../../Content.Server/Ghost/Roles/Components/ToggleableGhostRoleComponent.cs): a device that only carries the wipe verb (a PDA) keeps its own activation
 - [`Content.Server/Ghost/Roles/ToggleableGhostRoleSystem.cs`](../../Content.Server/Ghost/Roles/ToggleableGhostRoleSystem.cs): a device that only carries the wipe verb (a PDA) leaves using and activating it to its own UI
+- [`Content.Server/Kitchen/EntitySystems/MicrowaveSystem.cs`](../../Content.Server/Kitchen/EntitySystems/MicrowaveSystem.cs)
+  - microwaves leave emags in hand
+  - an emag is used on a machine, so it stays in hand instead of going in with the food
 - [`Content.Server/Lightning/LightningSystem.cs`](../../Content.Server/Lightning/LightningSystem.cs): restore the licence header removed by Kill Spdx
 - [`Content.Server/Mining/MiningSystem.cs`](../../Content.Server/Mining/MiningSystem.cs): restore the licence header removed by Kill Spdx
 - [`Content.Server/Movement/Systems/LagCompensationSystem.cs`](../../Content.Server/Movement/Systems/LagCompensationSystem.cs): restore the licence header removed by Kill Spdx
@@ -280,6 +283,10 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
   - another suit's piece goes back to its suit, and what it covered is kept under this one
 - [`Content.Shared/Damage/Systems/DamageableSystem.cs`](../../Content.Shared/Damage/Systems/DamageableSystem.cs): restore the licence header removed by Kill Spdx
 - [`Content.Shared/DisplacementMap/DisplacementData.cs`](../../Content.Shared/DisplacementMap/DisplacementData.cs): wizden#38042, the stencil one draws nothing in UI sprite views
+- [`Content.Shared/DoAfter/SharedDoAfterSystem.Update.cs`](../../Content.Shared/DoAfter/SharedDoAfterSystem.Update.cs)
+  - drifting doesn't interrupt work on yourself
+  - drifting isn't moving, so it doesn't interrupt work on yourself or something you carry
+  - skipped while drifting
 - [`Content.Shared/Gibbing/Systems/GibbingSystem.cs`](../../Content.Shared/Gibbing/Systems/GibbingSystem.cs)
   - bodiless giblets are skipped when flung.
   - bodiless dropped contents are skipped instead of flung.

@@ -1,7 +1,9 @@
 using Content.Server._WF.NpcCrew;
 using Content.Server._WF.NpcCrew.Components;
 using Content.Shared._WF.Wolfmed.Consciousness;
+using Content.Server.NPC.Components;
 using Content.Shared.ActionBlocker;
+using Content.Shared.Weapons.Ranged.Components;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
 
@@ -9,6 +11,9 @@ namespace Content.Server.NPC.Systems;
 
 public sealed partial class NPCCombatSystem
 {
+    /// <summary>Seconds between a crewman's semi-automatic shots. A gun's fire rate is only its upper limit.</summary>
+    public const float CrewSemiAutoInterval = 0.5f;
+
     [Dependency] private ActionBlockerSystem _blocker = default!;
 
     /// <summary>
@@ -18,6 +23,13 @@ public sealed partial class NPCCombatSystem
     public bool CanNpcShoot(EntityUid uid)
     {
         return !HasComp<WolfmedDownedComponent>(uid) && _blocker.CanAttack(uid);
+    }
+
+    /// <summary>Holds a crewman's next semi-automatic shot back, so a pistol doesn't fire at its full rate like a machine gun.</summary>
+    public void PaceCrewFire(EntityUid uid, GunComponent gun, NPCRangedCombatComponent combat)
+    {
+        if (gun.SelectedMode == SelectiveFire.SemiAuto && HasComp<WFCrewComponent>(uid))
+            combat.ShootAccumulator = combat.ShootDelay - CrewSemiAutoInterval;
     }
 
     /// <summary>Where a crewman's shot actually goes: the aim point, swung off by up to his skill's error.</summary>
