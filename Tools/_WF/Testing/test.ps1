@@ -84,10 +84,14 @@ function Get-TestArgs([string] $project, [string] $name, [string] $whereExpr, [i
     return $list
 }
 
-# The test count from a run's summary line, or 0 when the adapter found no test to run.
-function Get-TestCount([string] $log) {
-    $m = Get-Content $log | Select-String -Pattern 'Total:\s+(\d+)' | Select-Object -Last 1
-    if ($m) { [int] $m.Matches[0].Groups[1].Value } else { 0 }
+# The number of tests a run executed, from the NUnit XML it wrote (the console summary is localized). A run that
+# selected nothing writes no XML.
+function Get-TestCount([string] $dir) {
+    $total = 0
+    foreach ($file in Get-ChildItem $dir -Filter '*.xml' -File) {
+        $total += [int] ([xml] (Get-Content $file.FullName -Raw)).'test-run'.total
+    }
+    return $total
 }
 
 function Format-Arg([string] $a) {
@@ -100,7 +104,7 @@ function Invoke-Suite([string] $name, [string[]] $testArgs) {
     $log = Join-Path $results "$name.log"
     & dotnet @testArgs | Tee-Object -FilePath $log | Where-Object { $_ -match '^\s*Failed\b|^(Passed|Failed)!' } | ForEach-Object { Write-Host "[$name] $_" }
     $ok = $LASTEXITCODE -eq 0
-    $script:testsRun += Get-TestCount $log
+    $script:testsRun += Get-TestCount (Join-Path $results $name)
     Write-Host ("{0}: {1:n0} s" -f $name, $sw.Elapsed.TotalSeconds)
     return $ok
 }
