@@ -88,7 +88,7 @@ public sealed partial class CEZLevelsSystem
         if (!WfIsPlanetFlight(grid))
             return Loc.GetString("wf-liftoff-not-planet");
 
-        if (HasComp<FTLComponent>(grid))
+        if (HasComp<FTLComponent>(grid) || HasComp<Content.Server._WF.Planets.Hop.WFPlanetHopComponent>(grid))
             return Loc.GetString("wf-flight-busy");
 
         foreach (var member in transitSet)
