@@ -378,7 +378,7 @@
     noise: { seed: 73, noiseType: OpenSimplex2, frequency: 0.04 }
   - !type:BiomeTileLayer
     tile: WFFloorThrasciasLakeIce
-    threshold: 0.4
+    threshold: 0.6
     noise: { seed: 74, noiseType: OpenSimplex2, frequency: 0.02 }
   # The lakes are water over that bed, frozen while the air is.
   - !type:BiomeEntityLayer
