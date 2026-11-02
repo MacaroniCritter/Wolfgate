@@ -11,7 +11,7 @@ itself away before you see it.
   radii. The first `nearGate` (2) spots go within 70 tiles past the centre's clearance, where the gate comes down.
   Kinds are picked by weight up to their `limits` (the miner camp, the Echo and the Lamplighter one each, surveyors
   and trapped miners four each). Nothing spawns until a player comes within 48 tiles on the cavern; then the spot, or the nearest of 24 shifts of it up to 30 tiles away, is checked (`Fits`): clear of
-  every mouth, climb point and slime grotto, nothing pinned under it on either map (sites, cellars, stairs, mouth
+  every mouth, cut stairs and slime grotto, nothing pinned under it on either map (sites, cellars, stairs, mouth
   pads, other rooms), nothing built in it, and open tunnel just past its edge. The room's tiles are laid from the
   cavern's noise, what the biome grew there removed and the tiles pinned, and the layout spawned
   (`wfCavernEncounter`: entries of prototypes, counts and distances from the centre). An encounter with no room is

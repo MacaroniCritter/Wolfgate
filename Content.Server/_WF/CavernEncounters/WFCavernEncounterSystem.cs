@@ -53,7 +53,7 @@ public sealed partial class WFCavernEncounterSystem : EntitySystem
     /// <summary>No spot within this of the planet centre, where the gate mouth comes down.</summary>
     public const float CentreClearance = 40f;
 
-    /// <summary>Tiles between a room's edge and any mouth's hole or climb point.</summary>
+    /// <summary>Tiles between a room's edge and any mouth's hole or cut stairs.</summary>
     public const float MouthClearance = 12f;
 
     /// <summary>Tiles between a room's edge and a slime grotto's patch, which the grotto spreads past.</summary>
@@ -282,7 +282,7 @@ public sealed partial class WFCavernEncounterSystem : EntitySystem
     }
 
     /// <summary>
-    /// Whether a room of this radius may go here: inside the world, clear of every mouth, climb point, slime grotto and
+    /// Whether a room of this radius may go here: inside the world, clear of every mouth, cut stairs, slime grotto and
     /// anything pinned on either map (other rooms, mouth pads, stairs, sites and their cellars), with nothing built in
     /// it, and opening onto the tunnels.
     /// </summary>
@@ -310,7 +310,7 @@ public sealed partial class WFCavernEncounterSystem : EntitySystem
                     return false;
             }
 
-            foreach (var climb in cavernGround.ClimbPoints.Keys)
+            foreach (var climb in cavernGround.Stairways.Keys)
             {
                 if (Vector2.Distance(middle, new Vector2(climb.X + 0.5f, climb.Y + 0.5f)) < radius + MouthClearance)
                     return false;

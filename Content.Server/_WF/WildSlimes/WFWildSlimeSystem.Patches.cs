@@ -189,7 +189,7 @@ public sealed partial class WFWildSlimeSystem
 
     /// <summary>
     /// Opens one ground tile as a shaft into the grotto, as a shovel would: the cavern hole queue pins it and gives it
-    /// its landing, shade and climb point, on ground that isn't loaded too.
+    /// its landing, shade and stairs, on ground that isn't loaded too.
     /// </summary>
     private void OpenShaft(Entity<BiomeComponent, MapGridComponent> ground, WFCavernGroundComponent cavern, Vector2i index)
     {

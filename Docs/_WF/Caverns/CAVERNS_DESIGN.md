@@ -1,5 +1,9 @@
 # Caverns: design
 
+Note: the climb points, the climb verbs and `WFCavernClimbSystem` described below were replaced by walkable stairs cut under
+every hole (`WFCavernGroundComponent.Stairways`, `stairs` and `stairsSide` in the mouth spec). The sections on climbing are
+history; see `Content.Server/_WF/Caverns/README.md` for what stands.
+
 Design for the `Caverns` module on `planet-caverns`. It starts from the traversal design (the judges' pick), grafts the
 best ideas of the geology and ecology designs onto it, and fixes every flaw the judges found. Engine claims were
 re-checked against this branch; section 2.1 lists them with file references. Where this document and a candidate

@@ -160,10 +160,10 @@ public sealed partial class WFCavernMouthSystem : EntitySystem
             return false;
         }
 
-        // Another mouth's hole or climb point in the footprint, or its pinned pad under ours, which the stamp would overwrite.
+        // Another mouth's hole or stairs in the footprint, or its pinned pad under ours, which the stamp would overwrite.
         var levelBiome = (context.Level.Owner, context.Level.Comp1);
         if (Offset(origin, shape.Hole.Concat(shape.Ring))
-                .Any(index => ground.Comp.Shades.ContainsKey(index) || ground.Comp.ClimbPoints.ContainsKey(index))
+                .Any(index => ground.Comp.Shades.ContainsKey(index) || ground.Comp.Stairways.ContainsKey(index))
             || Offset(origin, shape.Pad(context.Spec.PadRadius)).Any(index => _biome.WfIsPinned(levelBiome, index)))
         {
             refusal = "mouth";

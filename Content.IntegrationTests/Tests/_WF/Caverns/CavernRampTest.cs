@@ -392,15 +392,17 @@ public sealed class CavernRampTest
                 }
             });
 
-            // The same parachute does open over a drop.
-            await server.WaitPost(() => maps.SetTile(world.Ground, entMan.GetComponent<MapGridComponent>(world.Ground), hole, Tile.Empty));
+            // The same parachute does open over a drop: the second tile of a two-tile hole, whose first carries the cut stairs.
+            var drop = hole + new Vector2i(1, 0);
+            await server.WaitPost(() => maps.SetTiles(world.Ground, entMan.GetComponent<MapGridComponent>(world.Ground),
+                new List<(Vector2i, Tile)> { (hole, Tile.Empty), (drop, Tile.Empty) }));
             await server.WaitRunTicks(3);
 
-            var faller = await SpawnSettled(pair, world.Ground, TileCentre(hole + new Vector2i(0, 1)));
+            var faller = await SpawnSettled(pair, world.Ground, TileCentre(drop + new Vector2i(0, 1)));
             await server.WaitPost(() =>
             {
                 entMan.AddComponent<WFParachutedComponent>(faller);
-                transform.SetWorldPosition(faller, TileCentre(hole));
+                transform.SetWorldPosition(faller, TileCentre(drop));
             });
             await server.WaitRunTicks(pair.SecondsToTicks(3f));
 
@@ -495,10 +497,10 @@ public sealed class CavernRampTest
 
     /// <summary>
     /// On loaded ground the stairs' hole is pinned and shaded and takes what the biome grew at their top with it, but
-    /// gets no landing and no climb point: the rock beside the stairs stays. Once the stairs go, the hole gets both.
+    /// gets no landing and no cut stairs: the rock beside the stairs stays. Once the stairs go, the hole gets both.
     /// </summary>
     [Test]
-    public async Task StairsStandInForTheLandingAndClimb()
+    public async Task StairsStandInForTheLandingAndCutStairs()
     {
         await using var pair = await PoolManager.GetServerClient();
         var server = pair.Server;
@@ -537,7 +539,7 @@ public sealed class CavernRampTest
 
                 rock = maps.GetAnchoredEntities(world.Cavern, levelGrid, rockAt).FirstOrDefault();
                 floor = maps.GetTileRef(world.Cavern, levelGrid, index).Tile;
-                climbs = entMan.GetComponent<WFCavernGroundComponent>(world.Ground).ClimbPoints.Count;
+                climbs = entMan.GetComponent<WFCavernGroundComponent>(world.Ground).Stairways.Count;
             });
 
             Assert.That(grown, Is.True, "Precondition: the biome grew nothing at the top of the stairs.");
@@ -556,7 +558,7 @@ public sealed class CavernRampTest
                 {
                     Assert.That(maps.GetAnchoredEntities(world.Ground, groundGrid, exit).Any(), Is.False,
                         "What the biome grew at the top of the stairs is still in the way.");
-                    Assert.That(ground.ClimbPoints, Has.Count.EqualTo(climbs), "The stairs' hole was given a climb point.");
+                    Assert.That(ground.Stairways, Has.Count.EqualTo(climbs), "The stairs' hole was given cut stairs.");
                     Assert.That(ground.Shades.TryGetValue(index, out var shade) && entMan.GetComponent<WFCavernShaftComponent>(shade).Plain, Is.True,
                         "The stairs' hole is dressed as a sinkhole.");
                     Assert.That(entMan.Deleted(rock), Is.False, "The rock beside the stairs was cleared for a landing.");
@@ -584,8 +586,8 @@ public sealed class CavernRampTest
                         "The hole kept its stairwell look once its stairs went.");
                     Assert.That(below.IsEmpty ? string.Empty : tileDefs[below.TypeId].ID, Is.EqualTo(landing),
                         "The hole got no landing once its stairs went.");
-                    Assert.That(ground.ClimbPoints.Keys.Any(climb => Chebyshev(climb, index) <= 1), Is.True,
-                        "The hole got no climb point once its stairs went.");
+                    Assert.That(ground.Stairways.Keys.Any(climb => Chebyshev(climb, index) <= 1), Is.True,
+                        "The hole got no cut stairs once its stairs went.");
                     Assert.That(biomes.WfIsPinned((world.Cavern, entMan.GetComponent<BiomeComponent>(world.Cavern)), index), Is.True,
                         "The landing under the hole is not pinned.");
                 }
@@ -601,7 +603,7 @@ public sealed class CavernRampTest
 
     /// <summary>
     /// A map's own stairway, a ladder in a basement under a gap in the floor above, is a stairwell: its hole gets a
-    /// plain shade and neither a landing nor a climb point. A hole dug beside it is a sinkhole with both, turns plain
+    /// plain shade and neither a landing nor cut stairs. A hole dug beside it is a sinkhole with both, turns plain
     /// when stairs are built under it and is dressed again when they go.
     /// </summary>
     [Test]
@@ -643,7 +645,7 @@ public sealed class CavernRampTest
                 maps.SetTiles(world.Ground, groundGrid, house);
                 maps.SetTiles(world.Cavern, levelGrid, house);
                 entMan.SpawnAttachedTo(MappedStairs, new EntityCoordinates(world.Cavern, TileCentre(stairwell)));
-                climbs = entMan.GetComponent<WFCavernGroundComponent>(world.Ground).ClimbPoints.Count;
+                climbs = entMan.GetComponent<WFCavernGroundComponent>(world.Ground).Stairways.Count;
 
                 maps.SetTile(world.Ground, groundGrid, stairwell, Tile.Empty);
                 maps.SetTile(world.Ground, groundGrid, dug, Tile.Empty);
@@ -661,9 +663,9 @@ public sealed class CavernRampTest
                         Is.True, "The mapped stairwell has no shade, or a sinkhole's.");
                     Assert.That(ground.Shades.TryGetValue(dug, out var dugShade) && !entMan.GetComponent<WFCavernShaftComponent>(dugShade).Plain,
                         Is.True, "The dug hole has no shade, or a plain one.");
-                    Assert.That(ground.ClimbPoints.Keys.Any(climb => Chebyshev(climb, stairwell) <= 1), Is.False,
-                        "The mapped stairwell was given a climb point.");
-                    Assert.That(ground.ClimbPoints, Has.Count.EqualTo(climbs + 1), "The dug hole got no climb point of its own.");
+                    Assert.That(ground.Stairways.Keys.Any(climb => Chebyshev(climb, stairwell) <= 1), Is.False,
+                        "The mapped stairwell was given cut stairs.");
+                    Assert.That(ground.Stairways, Has.Count.EqualTo(climbs + 1), "The dug hole got no cut stairs of its own.");
                     Assert.That(tileDefs[maps.GetTileRef(world.Cavern, levelGrid, stairwell).Tile.TypeId].ID, Is.EqualTo(BuiltFloor),
                         "The basement floor under the stairwell was relaid as a landing.");
                 }
