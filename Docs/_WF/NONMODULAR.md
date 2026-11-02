@@ -134,6 +134,7 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
 - [`Content.Server/_NF/Contraband/Systems/ContrabandTurnInSystem.cs`](../../Content.Server/_NF/Contraband/Systems/ContrabandTurnInSystem.cs): an executed heretic's body is what the Sultanate pays for
 - [`Content.Server/_NF/PublicTransit/PublicTransitSystem.cs`](../../Content.Server/_NF/PublicTransit/PublicTransitSystem.cs): announce the departure, as FTLToDock now flies and OnShuttleArrival announces the stop
 - [`Content.Server/_RMC14/Weapons/Ranged/Prediction/GunPredictionSystem.cs`](../../Content.Server/_RMC14/Weapons/Ranged/Prediction/GunPredictionSystem.cs): restore the licence header removed by Kill Spdx
+- [`Content.Server/Administration/Systems/AdminVerbSystem.Smites.cs`](../../Content.Server/Administration/Systems/AdminVerbSystem.Smites.cs): OwO accent removed
 - [`Content.Server/Administration/Systems/BwoinkSystem.cs`](../../Content.Server/Administration/Systems/BwoinkSystem.cs)
   - a mention in an embed never pings; it goes in the content below
   - only message content pings, and the payload suppresses every mention unless roles are allowed
@@ -163,6 +164,7 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
   - a freed tile is never scheduled earlier than the current iteration.
   - a blocker never clears earlier than the current iteration.
 - [`Content.Server/Explosion/EntitySystems/TriggerSystem.cs`](../../Content.Server/Explosion/EntitySystems/TriggerSystem.cs): restore the licence header removed by Kill Spdx
+- [`Content.Server/GameTicking/GameTicker.Spawning.cs`](../../Content.Server/GameTicking/GameTicker.Spawning.cs): OwO accent removed
 - [`Content.Server/Ghost/Roles/Components/ToggleableGhostRoleComponent.cs`](../../Content.Server/Ghost/Roles/Components/ToggleableGhostRoleComponent.cs): a device that only carries the wipe verb (a PDA) keeps its own activation
 - [`Content.Server/Ghost/Roles/ToggleableGhostRoleSystem.cs`](../../Content.Server/Ghost/Roles/ToggleableGhostRoleSystem.cs): a device that only carries the wipe verb (a PDA) leaves using and activating it to its own UI
 - [`Content.Server/Lightning/LightningSystem.cs`](../../Content.Server/Lightning/LightningSystem.cs): restore the licence header removed by Kill Spdx
@@ -370,6 +372,7 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
 - [`Resources/Prototypes/_Mono/Catalogs/tsfmc_uplink_catalog.yml`](../../Resources/Prototypes/_Mono/Catalogs/tsfmc_uplink_catalog.yml): PDV pack, price 125->175
 - [`Resources/Prototypes/_Mono/Catalogs/VendingMachines/Inventories/ussp.yml`](../../Resources/Prototypes/_Mono/Catalogs/VendingMachines/Inventories/ussp.yml): the loaded magazine is class-3 contraband worth 10 FMC since Monolith#4816
 - [`Resources/Prototypes/_Mono/Claws/reptilian.yml`](../../Resources/Prototypes/_Mono/Claws/reptilian.yml): huge claws never stop a lizard shooting; they take the worst spread instead
+- [`Resources/Prototypes/_Mono/Entities/Mobs/NPCs/mothroaches.yml`](../../Resources/Prototypes/_Mono/Entities/Mobs/NPCs/mothroaches.yml): OwO accent removed
 - [`Resources/Prototypes/_Mono/Entities/Objects/Devices/Circuitboards/Machine/turrets.yml`](../../Resources/Prototypes/_Mono/Entities/Objects/Devices/Circuitboards/Machine/turrets.yml): restore the licence header removed by Kill Spdx
 - [`Resources/Prototypes/_Mono/Entities/Objects/Devices/flatpack.yml`](../../Resources/Prototypes/_Mono/Entities/Objects/Devices/flatpack.yml): restore the licence header removed by Kill Spdx
 - [`Resources/Prototypes/_Mono/Entities/Objects/Economy/components.yml`](../../Resources/Prototypes/_Mono/Entities/Objects/Economy/components.yml): Monolith#4805 commented the price out with the flash, leaving 300 for a good made from 1800
@@ -424,6 +427,7 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
 - [`Resources/Prototypes/_Mono/Traits/physical.yml`](../../Resources/Prototypes/_Mono/Traits/physical.yml): restore the licence header removed by Kill Spdx
 - [`Resources/Prototypes/_Mono/Turf/plating.yml`](../../Resources/Prototypes/_Mono/Turf/plating.yml): restore the licence header removed by Kill Spdx
 - [`Resources/Prototypes/_NF/Catalog/VendingMachines/Inventories/engivend.yml`](../../Resources/Prototypes/_NF/Catalog/VendingMachines/Inventories/engivend.yml): radiation suits buyable from the EngiVend
+- [`Resources/Prototypes/_NF/Entities/Objects/Consumable/Food/meals.yml`](../../Resources/Prototypes/_NF/Entities/Objects/Consumable/Food/meals.yml): OwO accent removed
 - [`Resources/Prototypes/_NF/Entities/Objects/Weapons/Guns/Ammunition/Projectiles/misc.yml`](../../Resources/Prototypes/_NF/Entities/Objects/Weapons/Guns/Ammunition/Projectiles/misc.yml): a flare that lands inside a wall still lights the room
 - [`Resources/Prototypes/_NF/Entities/Objects/Weapons/Guns/expedition_guns.yml`](../../Resources/Prototypes/_NF/Entities/Objects/Weapons/Guns/expedition_guns.yml): was WeaponSubMachineGunTypewriter, class-3 contraband since Monolith#4816
 - [`Resources/Prototypes/_NF/Entities/Structures/Machines/Computers/computers_tabletop.yml`](../../Resources/Prototypes/_NF/Entities/Structures/Machines/Computers/computers_tabletop.yml): Medical Dispatch staff are Colonial since Monolith#4807
@@ -435,13 +439,16 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
   - PDV pack, TSF pod report 2 min later
   - PDV pack, tighter PDV pod coordinates
 - [`Resources/Prototypes/_Obelisk/Species/hydrakin.yml`](../../Resources/Prototypes/_Obelisk/Species/hydrakin.yml): hydrakin is not selectable in character creation
+- [`Resources/Prototypes/_StarLight/Entities/Mobs/Species/felionoid.yml`](../../Resources/Prototypes/_StarLight/Entities/Mobs/Species/felionoid.yml): OwO accent removed
 - [`Resources/Prototypes/Catalog/VendingMachines/Inventories/engivend.yml`](../../Resources/Prototypes/Catalog/VendingMachines/Inventories/engivend.yml): radiation suits buyable from the EngiVend
 - [`Resources/Prototypes/Damage/modifier_sets.yml`](../../Resources/Prototypes/Damage/modifier_sets.yml): restore the licence header removed by Kill Spdx
 - [`Resources/Prototypes/Entities/Clothing/Head/hoods.yml`](../../Resources/Prototypes/Entities/Clothing/Head/hoods.yml): radiation hood blocks more radiation (was 0.65)
+- [`Resources/Prototypes/Entities/Clothing/Head/misc.yml`](../../Resources/Prototypes/Entities/Clothing/Head/misc.yml): OwO accent removed
 - [`Resources/Prototypes/Entities/Clothing/OuterClothing/suits.yml`](../../Resources/Prototypes/Entities/Clothing/OuterClothing/suits.yml)
   - radiation suit blocks more radiation (was 0.1)
   - vend price for the EngiVend, instead of its scrap value
 - [`Resources/Prototypes/Entities/Mobs/base.yml`](../../Resources/Prototypes/Entities/Mobs/base.yml): restore the licence header removed by Kill Spdx
+- [`Resources/Prototypes/Entities/Objects/Consumable/Food/Baked/cake.yml`](../../Resources/Prototypes/Entities/Objects/Consumable/Food/Baked/cake.yml): OwO accent removed
 - [`Resources/Prototypes/Entities/Objects/Devices/pda.yml`](../../Resources/Prototypes/Entities/Objects/Devices/pda.yml): E and Z open the PDA instead of searching for a player to control it
 - [`Resources/Prototypes/Entities/Objects/Misc/identification_cards.yml`](../../Resources/Prototypes/Entities/Objects/Misc/identification_cards.yml): the universal card opens the Underground Black Market too
 - [`Resources/Prototypes/Entities/Objects/Tools/access_configurator.yml`](../../Resources/Prototypes/Entities/Objects/Tools/access_configurator.yml): Monolith#4816 added the level without a way to hand it out

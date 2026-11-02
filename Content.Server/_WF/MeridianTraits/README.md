@@ -2,7 +2,7 @@
 
 Character traits ported from Meridian Rift's quirks, picked in the character editor like any other trait. This first
 set only covers quirks that run on components Wolfgate already has: Deaf, Pseudobulbar Affect, Illuminated, Fragility,
-Rad Fiend, Hardened Soles and the Canine, Feline and Avian speech traits.
+Rad Fiend, Hardened Soles and the Canine and Avian speech traits.
 
 Entry points: the trait prototypes in `Resources/Prototypes/_WF/MeridianTraits/traits.yml`, and
 `WFPermanentDeafSystem`, which puts `DeafComponent` back after a knockout or a deaf status removes it.

@@ -291,11 +291,13 @@ namespace Content.Server.GameTicking
                 }
             }
 
+            // WOLFGATE START: OwO accent removed
             // who tf is perma oWo
-            if (player.UserId == new Guid("{e887eb93-f503-4b65-95b6-2f282c014192}"))
-            {
-                EntityManager.AddComponent<OwOAccentComponent>(mob);
-            }
+            // if (player.UserId == new Guid("{e887eb93-f503-4b65-95b6-2f282c014192}"))
+            // {
+            //     EntityManager.AddComponent<OwOAccentComponent>(mob);
+            // }
+            // WOLFGATE END
 
             _stationJobs.TryAssignJob(station, jobPrototype, player.UserId);
 

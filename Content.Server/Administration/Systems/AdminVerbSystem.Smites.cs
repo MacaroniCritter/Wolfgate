@@ -947,7 +947,7 @@ public sealed partial class AdminVerbSystem
                 EnsureComp<LizardAccentComponent>(args.Target);
                 EnsureComp<MobsterAccentComponent>(args.Target);
                 EnsureComp<MothAccentComponent>(args.Target);
-                EnsureComp<OwOAccentComponent>(args.Target);
+                // EnsureComp<OwOAccentComponent>(args.Target); // WOLFGATE: OwO accent removed
                 EnsureComp<SkeletonAccentComponent>(args.Target);
                 EnsureComp<SouthernAccentComponent>(args.Target);
                 EnsureComp<SpanishAccentComponent>(args.Target);
