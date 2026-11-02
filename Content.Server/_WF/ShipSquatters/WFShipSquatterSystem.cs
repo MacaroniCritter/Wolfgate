@@ -296,9 +296,10 @@ public sealed partial class WFShipSquatterSystem : EntitySystem
             || Transform(comp.Ship).MapID != xform.MapID)
             return;
 
+        comp.WanderUntil = null;
         if (TryComp(ent, out NPCSteeringComponent? steering))
         {
-            if (steering.Status == SteeringStatus.Moving)
+            if (steering.Status == SteeringStatus.Moving && steering.Coordinates.Equals(comp.Bed))
                 return;
             _steering.Unregister(ent, steering);
         }

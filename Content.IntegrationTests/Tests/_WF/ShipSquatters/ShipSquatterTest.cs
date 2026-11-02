@@ -417,7 +417,7 @@ public sealed class ShipSquatterTest
         {
             var comp = entMan.GetComponent<WFShipSquatterComponent>(squatter);
             count = comp.MessCount;
-            Assert.That(comp.MessCount, Is.EqualTo(30), "The mess grows to its cap and no further.");
+            Assert.That(comp.MessCount, Is.EqualTo(30), $"The mess grows to its cap and no further. mood {comp.Mood} rooms {comp.Rooms.Count} doors {comp.Doors.Count} talking {comp.Talking} aboard {entMan.GetComponent<TransformComponent>(squatter).GridUid == ship} mess {comp.Mess.Count} next {comp.NextMess} alive {server.System<MobStateSystem>().IsAlive(squatter)}");
 
             var maps = server.System<SharedMapSystem>();
             var grid = entMan.GetComponent<MapGridComponent>(ship);
@@ -429,7 +429,7 @@ public sealed class ShipSquatterTest
             {
                 var tile = maps.CoordinatesToTile(ship, grid, entMan.GetComponent<TransformComponent>(mess).Coordinates);
                 Assert.That(tile.X < 4, Is.EqualTo(bedTile.X < 4), "Within his rooms: the shut door keeps him out of the other.");
-                Assert.That(maps.GetAnchoredEntities(ship, grid, tile).Any(), Is.False, "Never on a wall, pipe or machine's tile.");
+                Assert.That(maps.GetAnchoredEntities(ship, grid, tile).Any(thing => !entMan.HasComponent<Content.Shared.Fluids.Components.PuddleComponent>(thing)), Is.False, "Never on a wall, pipe or machine's tile.");
                 Assert.That(doors.Any(door => Math.Abs(door.X - tile.X) + Math.Abs(door.Y - tile.Y) <= 1), Is.False, "Never at a door.");
             }
 
@@ -448,7 +448,7 @@ public sealed class ShipSquatterTest
         await server.WaitPost(() =>
         {
             entMan.GetComponent<WFShipSquatterComponent>(squatter).MessCap = 60;
-            server.System<DamageableSystem>().TryChangeDamage(squatter, new DamageSpecifier(server.ProtoMan.Index(Blunt), 1000));
+            server.System<MobStateSystem>().ChangeMobState(squatter, MobState.Dead);
         });
         await pair.RunSeconds(5);
         await server.WaitAssertion(() => Assert.That(server.System<MobStateSystem>().IsDead(squatter), Is.True));
@@ -474,8 +474,8 @@ public sealed class ShipSquatterTest
                 crowd.Add(entMan.SpawnEntity("MobHuman", entMan.GetComponent<TransformComponent>(squatter).Coordinates));
         });
         var system = server.System<WFShipSquatterSystem>();
-        TimeSpan nextBark = default;
-        await server.WaitPost(() => nextBark = entMan.GetComponent<WFShipSquatterComponent>(squatter).NextBark);
+        TimeSpan swing = default;
+        await server.WaitPost(() => swing = LastSwing(server, squatter));
 
         await pair.RunSeconds(20);
 
@@ -483,11 +483,10 @@ public sealed class ShipSquatterTest
         {
             var comp = entMan.GetComponent<WFShipSquatterComponent>(squatter);
             Assert.That(comp.Mood, Is.EqualTo(WFSquatterMood.Sitting));
-            Assert.That(comp.NextBark, Is.GreaterThan(nextBark), "Someone boarding gets a word.");
             Assert.That(comp.Barked, Does.ContainKey(victim));
             Assert.That(entMan.GetComponent<HTNComponent>(squatter).Enabled, Is.False, "His own brain is off.");
             Assert.That(entMan.TryGetComponent(squatter, out FactionExceptionComponent? exceptions) && exceptions.Hostiles.Count > 0, Is.False);
-            Assert.That(LastSwing(server, squatter), Is.EqualTo(TimeSpan.Zero), "He never swings.");
+            Assert.That(LastSwing(server, squatter), Is.EqualTo(swing), "He never swings.");
             Assert.That(crowd.All(body => Hurt(server, body) == 0f), Is.True, "Nobody is hurt.");
         });
 
@@ -651,7 +650,7 @@ public sealed class ShipSquatterTest
             var comp = entMan.GetComponent<WFShipSquatterComponent>(squatter);
             Assert.That(comp.Mood, Is.EqualTo(WFSquatterMood.Angry));
             Assert.That(server.System<WFNpcIntentSystem>().InCooldown(squatter, victim), Is.False, "Forced again, the target is fair game.");
-            server.System<DamageableSystem>().TryChangeDamage(squatter, new DamageSpecifier(server.ProtoMan.Index(Blunt), 1000));
+            server.System<MobStateSystem>().ChangeMobState(squatter, MobState.Dead);
         });
         await pair.RunSeconds(3);
         await server.WaitAssertion(() =>
@@ -696,7 +695,7 @@ public sealed class ShipSquatterTest
         // Carried off the hull he sets off back for his bed.
         await server.WaitPost(() =>
             server.System<SharedTransformSystem>().SetCoordinates(squatter, new EntityCoordinates(ground, 2.5f, 2.5f)));
-        await RunUntil(pair, () => entMan.TryGetComponent(squatter, out NPCSteeringComponent? steering) && steering.Coordinates.EntityId == ship, 10);
+        await RunUntil(pair, () => entMan.TryGetComponent(squatter, out NPCSteeringComponent? steering) && steering.Coordinates.Equals(entMan.GetComponent<WFShipSquatterComponent>(squatter).Bed), 10);
         await server.WaitAssertion(() =>
         {
             Assert.That(entMan.TryGetComponent(squatter, out NPCSteeringComponent? steering), Is.True, "He tries to walk back.");

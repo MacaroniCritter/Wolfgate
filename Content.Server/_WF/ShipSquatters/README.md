@@ -41,6 +41,10 @@ Entry points: `WFShipSquatterSystem` (`.Spawn.cs` idle watch and placement, `.Me
 
 - [`Content.Shared/_WF/ShipSquatters/WFShipSquatterCVars.cs`](../../../Content.Shared/_WF/ShipSquatters/WFShipSquatterCVars.cs)
 
+### Integration tests
+
+- [`Content.IntegrationTests/Tests/_WF/ShipSquatters/ShipSquatterTest.cs`](../../../Content.IntegrationTests/Tests/_WF/ShipSquatters/ShipSquatterTest.cs)
+
 ### Prototypes
 
 - [`Resources/Prototypes/_WF/ShipSquatters/dialogue.yml`](../../../Resources/Prototypes/_WF/ShipSquatters/dialogue.yml)
