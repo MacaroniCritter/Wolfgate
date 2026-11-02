@@ -19,8 +19,11 @@ namespace Content.Server.Parallax;
 // first, a few milliseconds' worth a pass, in the 16-tile blocks the grid is sent in, so no block is sent twice.
 public sealed partial class BiomeSystem
 {
-    /// <summary>How many chunks round a player's own body load in the pass they come into range.</summary>
-    public const int WfLoadNowRing = 2;
+    /// <summary>How many chunks round a player's own body load in the pass they come into range, by default.</summary>
+    public const int WfLoadNowRing = 0;
+
+    /// <summary>How many tiles round a player's own body load in the pass they come into range, by default.</summary>
+    public const float WfLoadNowPad = 2f;
 
     /// <summary>
     /// How many chunks round an eye load in the pass they come into range. An eye looks down a hole, or at the ground
@@ -38,20 +41,39 @@ public sealed partial class BiomeSystem
     private GameTick _wfHullTick;
 
     /// <summary>Per biome: the chunk each of this pass's loaders is in, and how many chunks round it load at once.</summary>
-    private readonly Dictionary<BiomeComponent, List<(Vector2i Chunk, int Ring)>> _wfLoaders = new();
+    private readonly Dictionary<BiomeComponent, List<WfLoader>> _wfLoaders = new();
 
     /// <summary>Per planet network: the bounds of every hull on its layers and in the gaps between them.</summary>
     private readonly Dictionary<NetEntity, List<Box2>> _wfHullBounds = new();
 
-    private readonly Stack<List<(Vector2i Chunk, int Ring)>> _wfLoaderPool = new();
+    private readonly Stack<List<WfLoader>> _wfLoaderPool = new();
     private readonly HashSet<Vector2i> _wfNearBlocks = new();
     private readonly List<(int Distance, Vector2i Block, Vector2i Chunk)> _wfPending = new();
     private readonly Stopwatch _wfLoadWatch = new();
     private BiomeComponent? _wfLoadFor;
-    private List<(Vector2i Chunk, int Ring)>? _wfLoadLoaders;
+    private List<WfLoader>? _wfLoadLoaders;
+    private GameTick _wfBodySettingsTick;
+    private int _wfBodyRing = WfLoadNowRing;
+    private float _wfBodyPad = WfLoadNowPad;
+
+    /// <summary>A loader: its chunk, its position, and how much round it loads at once (whole chunks, and tiles).</summary>
+    private readonly record struct WfLoader(Vector2i Chunk, Vector2 Pos, int Ring, float Pad);
+
+    /// <summary>Notes a player's body as a loader; only the chunk it stands in and the tiles round it load at once.</summary>
+    private void WfNoteBodyLoader(BiomeComponent biome, Vector2 worldPos)
+    {
+        if (_wfBodySettingsTick != _wfTiming.CurTick)
+        {
+            _wfBodySettingsTick = _wfTiming.CurTick;
+            _wfBodyRing = _configManager.GetCVar(PlanetCVars.TerrainLoadNowRing);
+            _wfBodyPad = _configManager.GetCVar(PlanetCVars.TerrainLoadNowPad);
+        }
+
+        WfNoteLoader(biome, worldPos, _wfBodyRing, _wfBodyPad);
+    }
 
     /// <summary>Notes where a loader is, and how much round it must load at once, as its load area is added.</summary>
-    private void WfNoteLoader(BiomeComponent biome, Vector2 worldPos, int ring)
+    private void WfNoteLoader(BiomeComponent biome, Vector2 worldPos, int ring, float pad = 0f)
     {
         var tick = _wfTiming.CurTick;
 
@@ -69,9 +91,9 @@ public sealed partial class BiomeSystem
         }
 
         if (!_wfLoaders.TryGetValue(biome, out var loaders))
-            _wfLoaders[biome] = loaders = _wfLoaderPool.TryPop(out var pooled) ? pooled : new List<(Vector2i, int)>();
+            _wfLoaders[biome] = loaders = _wfLoaderPool.TryPop(out var pooled) ? pooled : new List<WfLoader>();
 
-        loaders.Add((SharedMapSystem.GetChunkIndices(worldPos, ChunkSize) * ChunkSize, ring));
+        loaders.Add(new WfLoader(SharedMapSystem.GetChunkIndices(worldPos, ChunkSize) * ChunkSize, worldPos, ring, pad));
     }
 
     /// <summary>Whether a chunk of a planet layer's load area is put off to <see cref="WfLoadDeferred"/>, or never loads at all.</summary>
@@ -120,12 +142,23 @@ public sealed partial class BiomeSystem
 
         try
         {
-            foreach (var (loader, ring) in loaders)
+            foreach (var (loader, pos, ring, pad) in loaders)
             {
                 for (var x = -ring; x <= ring; x++)
                 for (var y = -ring; y <= ring; y++)
                 {
                     _wfNearBlocks.Add(WfBlockOf(loader + new Vector2i(x, y) * ChunkSize));
+                }
+
+                // The blocks within a few steps of a body: ground it could walk onto before the next pass.
+                if (pad > 0f)
+                {
+                    var blocks = new ChunkIndicesEnumerator(Box2.CenteredAround(pos, new Vector2(pad * 2f)), WfLoadBlock);
+
+                    while (blocks.MoveNext(out var index))
+                    {
+                        _wfNearBlocks.Add(index.Value * WfLoadBlock);
+                    }
                 }
             }
 
@@ -218,17 +251,16 @@ public sealed partial class BiomeSystem
         return SharedMapSystem.GetChunkIndices(chunk, WfLoadBlock) * WfLoadBlock;
     }
 
-    /// <summary>How many chunks lie between a block and the nearest loader's chunk.</summary>
-    private static int WfBlockDistance(Vector2i block, List<(Vector2i Chunk, int Ring)> loaders)
+    /// <summary>How many tiles lie between a block and the nearest loader.</summary>
+    private static int WfBlockDistance(Vector2i block, List<WfLoader> loaders)
     {
         var nearest = int.MaxValue;
-        var far = block + new Vector2i(WfLoadBlock - ChunkSize, WfLoadBlock - ChunkSize);
 
-        foreach (var (loader, _) in loaders)
+        foreach (var loader in loaders)
         {
-            var x = Math.Max(Math.Max(block.X - loader.X, loader.X - far.X), 0);
-            var y = Math.Max(Math.Max(block.Y - loader.Y, loader.Y - far.Y), 0);
-            nearest = Math.Min(nearest, Math.Max(x, y) / ChunkSize);
+            var x = Math.Max(Math.Max(block.X - loader.Pos.X, loader.Pos.X - (block.X + WfLoadBlock)), 0f);
+            var y = Math.Max(Math.Max(block.Y - loader.Pos.Y, loader.Pos.Y - (block.Y + WfLoadBlock)), 0f);
+            nearest = Math.Min(nearest, (int) Math.Max(x, y));
         }
 
         return nearest;

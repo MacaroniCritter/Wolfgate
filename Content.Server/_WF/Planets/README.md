@@ -82,7 +82,10 @@ almost none of it: untouched biome entities go with their chunk, and the ground 
 loaded by hand stays. Ground that is only unloaded still holds up whatever was left on it. `BiomeSystem.WFRoll`
 makes a planet's rock spawner rolls in the loader, seeded from the tile, so surface rock unloads too and the same
 rock comes back. `BiomeSystem.WFLoad` puts off the far part of a planet load area and loads it nearest first over
-the next passes, so an arrival or a flight does not load it all in one tick. A hull that sets down flattens what is
+the next passes, so an arrival or a flight does not load it all in one tick. Round a player's body only the 16-tile
+block it stands in and the blocks within `wf.planet_terrain_load_now_pad` (2) tiles load at once; the six by six chunks
+round it, `wf.planet_terrain_load_now_ring` 2, was thirty-six chunks in a pass, over a tenth of a second in a cavern.
+Unloaded ground is still ground to z-physics (`WfUnloadedGround`), so a body that lands on it does not fall. A hull that sets down flattens what is
 under it as an FTL arrival does, breaks the trees and rock it would rest against (`WfClearLandingObstacles`), and
 hurts a mob under it and shoves it clear instead of gibbing it (`ShuttleSystem.WFSetDown`). Only walls, windows and doors hold a landing off; trees, rocks, furniture, machines, tables and grilles under the footprint are flattened (`WFLandingSurveySystem.IsCrushable`). A hull is kept inside a world's circle by the middle of its bounds, not its origin, on every layer including orbit: it is pushed back in the last tiles and put back inside, docked grids and all, if it reaches the circle. One entering orbit from further out comes in over the edge on its own side, or further in if another ship is parked there. Every layer of a network has a name (`WFPlanetLayerNameSystem`) and the shuttle map labels sector space, surfaces and levels (`WFMapLabelSystem`).
 Every world is a circle (`radius` on its `wfPlanetSurface`, 256 tiles unless the prototype or `wf.planet_radius` says
@@ -482,6 +485,7 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Content.IntegrationTests/Tests/_WF/Planets/SectorBodyPinTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/SectorBodyPinTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/SetDownTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/SetDownTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/StructuralCrashTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/StructuralCrashTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/Planets/TerrainArrivalLoadTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/TerrainArrivalLoadTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/TerrainAtmosphereTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/TerrainAtmosphereTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/TerrainLoadTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/TerrainLoadTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/TerrainUnloadTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/TerrainUnloadTest.cs)

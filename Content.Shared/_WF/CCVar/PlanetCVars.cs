@@ -36,6 +36,27 @@ public sealed class PlanetCVars
         CVarDef.Create("wf.planet_terrain_load_budget", 4f, CVar.SERVERONLY);
 
     /// <summary>
+    /// Chunks round a player's body that load in the pass the body comes into range, on top of its own 16-tile block
+    /// and the tiles of <see cref="TerrainLoadNowPad"/>. Two was the old setting: thirty-six chunks in one pass.
+    /// </summary>
+    public static readonly CVarDef<int> TerrainLoadNowRing =
+        CVarDef.Create("wf.planet_terrain_load_now_ring", 0, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Tiles round a player's body whose 16-tile blocks load in the pass the body comes into range. The rest of the
+    /// area loads nearest first over the passes after, from ground a body walks onto last.
+    /// </summary>
+    public static readonly CVarDef<float> TerrainLoadNowPad =
+        CVarDef.Create("wf.planet_terrain_load_now_pad", 2f, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Tiles a site must have before its ground is laid a few chunks a tick ahead of the grid merge instead of in the
+    /// merge's one call. Zero merges every site in one call, as upstream does.
+    /// </summary>
+    public static readonly CVarDef<int> MergeSliceTiles =
+        CVarDef.Create("wf.planet_merge_slice_tiles", 2048, CVar.SERVERONLY);
+
+    /// <summary>
     /// Whether worlds are bounded to the circle their surface prototype gives: terrain outside it never loads, a
     /// boundary keeps mobs in, hulls can't descend outside it and the radar shows nothing there.
     /// </summary>
