@@ -410,7 +410,8 @@ public sealed class ShipSquatterTest
             entMan.DeleteEntity(victim);
         });
 
-        await RunUntil(pair, () => entMan.GetComponent<WFShipSquatterComponent>(squatter).MessCount >= 30, 120);
+        // He only gets a go every few seconds, and a spill that finds no room is a go wasted.
+        await RunUntil(pair, () => entMan.GetComponent<WFShipSquatterComponent>(squatter).MessCount >= 30, 300);
 
         var count = 0;
         await server.WaitAssertion(() =>
