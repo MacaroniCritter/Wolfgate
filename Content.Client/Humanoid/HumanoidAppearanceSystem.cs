@@ -378,6 +378,7 @@ public sealed partial class HumanoidAppearanceSystem : SharedHumanoidAppearanceS
                 continue;
             }
 
+            targetLayer = _legStyle.MarkingAnchor((uid, sprite), layerSlot, targetLayer); // WOLFGATE(LegStyle): side views overlap the limb pair, so its markings draw above both
             var slotOffset = slotOffsets.TryGetValue(layerSlot, out var o) ? o : 0;
             slotOffsets[layerSlot] = slotOffset + 1;
             // WOLFGATE END
