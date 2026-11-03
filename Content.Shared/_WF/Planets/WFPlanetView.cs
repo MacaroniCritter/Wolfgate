@@ -14,6 +14,16 @@ public static class WFPlanetView
     /// <summary>Each planet layer below the observer is drawn this much smaller, as every z-level was before Monolith set the factor to 1.</summary>
     public const float LayerShrink = 0.85f;
 
+    /// <summary>The smallest a lower layer is drawn; past it the ground from orbit would fill the view with five screens of terrain.</summary>
+    public const float MinLayerScale = 0.6f;
+
+    /// <summary>The eye scale of a pass <paramref name="depth"/> levels from the observer, negative below, for a layer of this shrink.</summary>
+    public static float LayerScale(float shrink, float depth)
+    {
+        var scale = MathF.Pow(shrink, -depth);
+        return shrink < 1f ? MathF.Max(scale, MinLayerScale) : scale;
+    }
+
     /// <summary>
     /// The per-level scale for a map: a planet layer's or a mapping level with Depth perspective on, or the transit map
     /// between two, else the renderer's own. A <paramref name="viewer"/> inside a building, under a roof on a planet's

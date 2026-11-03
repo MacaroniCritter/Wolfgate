@@ -395,6 +395,7 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Content.Client/_WF/Planets/Forecast/WFWeatherForecastBoundUserInterface.cs`](../../../Content.Client/_WF/Planets/Forecast/WFWeatherForecastBoundUserInterface.cs)
 - [`Content.Client/_WF/Planets/Forecast/WFWeatherForecastWindow.cs`](../../../Content.Client/_WF/Planets/Forecast/WFWeatherForecastWindow.cs)
 - [`Content.Client/_WF/Planets/Parachute/WFParachuteVisualsSystem.cs`](../../../Content.Client/_WF/Planets/Parachute/WFParachuteVisualsSystem.cs)
+- [`Content.Client/_WF/Planets/ScalingViewport.Planets.cs`](../../../Content.Client/_WF/Planets/ScalingViewport.Planets.cs)
 - [`Content.Client/_WF/Planets/ShuttleMapControl.PlanetBackground.cs`](../../../Content.Client/_WF/Planets/ShuttleMapControl.PlanetBackground.cs)
 - [`Content.Client/_WF/Planets/ShuttleNavControl.Terrain.cs`](../../../Content.Client/_WF/Planets/ShuttleNavControl.Terrain.cs)
 - [`Content.Client/_WF/Planets/StencilOverlay.Planets.cs`](../../../Content.Client/_WF/Planets/StencilOverlay.Planets.cs)
@@ -677,7 +678,9 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 ## Non-modular edits
 
 - [`Content.Client/_CE/ZLevels/Core/Overlays/CEZLevelShadowOverlay.cs`](../../../Content.Client/_CE/ZLevels/Core/Overlays/CEZLevelShadowOverlay.cs): orbit is above the atmosphere, not a storey up.
-- [`Content.Client/_CE/ZLevels/Core/ScalingViewport.CEZLevels.cs`](../../../Content.Client/_CE/ZLevels/Core/ScalingViewport.CEZLevels.cs): a planet's layers keep the perspective Monolith turned off, aboard a ship
+- [`Content.Client/_CE/ZLevels/Core/ScalingViewport.CEZLevels.cs`](../../../Content.Client/_CE/ZLevels/Core/ScalingViewport.CEZLevels.cs)
+  - an empty air layer under orbit is skipped, each pass being a whole render
+  - a planet's layers keep the perspective Monolith turned off, aboard a ship
 - [`Content.Client/_FarHorizons/StarSystem/PlanetOverlay.cs`](../../../Content.Client/_FarHorizons/StarSystem/PlanetOverlay.cs): public (was private), so the planet approach can draw the very same body over the orbit hop.
 - [`Content.Client/_Mono/Audio/AudioEchoSystem.cs`](../../../Content.Client/_Mono/Audio/AudioEchoSystem.cs)
   - a ray from a non-finite position is not cast, since a NaN crashes the client.
