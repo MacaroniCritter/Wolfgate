@@ -132,6 +132,15 @@ with the prisoner uncuffed, its crew standing down, no clamps and its door locks
 prisoner still aboard at the end is sent home. With its crew dead the cell door stands open. Crew carry batons, not guns. Only
 hulls with the chair work, which `AbductorHullsHaveACell` checks.
 
+A ship with `disablers:` has those guns mounted on its hardpoints at spawn (`WFPirateRetrofitSystem.Mount`: the
+smallest that fits, an empty one first, else in place of the gun there) and stops a ship before it docks.
+`WFShipDisablerSystem` fires them itself, four times a second, with no gunner: the ion disruptor from 800 m until the
+target's engines are down, then the hacking harpoon from 200 m (or the harpoon regardless after 16 s of failed
+disruption), reloading the dart after a miss. The target is an abductor's mark from closing until the grab is over, or a
+hunter's or boarding extorter's prey while it docks and loots; when it is cleared the cable is let go. The abductors
+and extorters carry `[ WFIonDisruptor, WFHackHarpoonGunRaider ]`. While the cable is out, the raider's own guns are
+locked, as for any hacker.
+
 A ship with an `extort:` block is an extorter (`WFEncounterSystem.Extort.cs`, state in `WFExtortState`). It roams on
 its wander legs, flown about the nearest player ship it has no business with yet. Every few minutes (`markMin` to
 `markMax`) it picks the nearest ship with a player aboard inside `reach`, closes to `standoff` and keeps station, and
@@ -151,8 +160,8 @@ with nobody left aboard they are its crew and stay on it. Extorters share what t
 leaving alone, has as its mark or is boarding is not gone for by another. Extorter encounters are
 `lifetime: Persistent`: no clock, no jump out, no share of the budget, and the scheduler's one-of-a-kind rule keeps at
 most one of each prototype alive. `extorters.yml` has three tiers flying as the Reavers with a warrant on the crew: light
-(Hazel, Green, 6000 toll, 15000 base), medium (Metis or Mudskipper, Regular, 15000 toll, 40000 base) and heavy (Kalisto
-or Scallywag, Veteran, four guards, 40000 toll, 90000 base). The admin window and `wf_encounter list` show what each
+(Hazel, Green, 25000 toll, 15000 base), medium (Metis or Mudskipper, Regular, 60000 toll, 40000 base) and heavy (Kalisto
+or Scallywag, Veteran, four guards, 150000 toll, 90000 base). The admin window and `wf_encounter list` show what each
 extorter is doing (roaming, closing on a ship, hailing with the attempt, waiting for an answer, boarding) and what any
 warrant pays now.
 
@@ -224,6 +233,7 @@ stops. Extorters weigh the four nearest crewed ships and go for the richest hold
 - [`Content.Server/_WF/Encounters/Components/WFEncounterGridComponent.cs`](Components/WFEncounterGridComponent.cs)
 - [`Content.Server/_WF/Encounters/Components/WFExtortState.cs`](Components/WFExtortState.cs)
 - [`Content.Server/_WF/Encounters/Components/WFSalvageClaimComponent.cs`](Components/WFSalvageClaimComponent.cs)
+- [`Content.Server/_WF/Encounters/Components/WFShipDisablerComponent.cs`](Components/WFShipDisablerComponent.cs)
 - [`Content.Server/_WF/Encounters/Systems/BountyContractSystem.Warrants.cs`](Systems/BountyContractSystem.Warrants.cs)
 - [`Content.Server/_WF/Encounters/Systems/DockingSystem.Clamps.cs`](Systems/DockingSystem.Clamps.cs)
 - [`Content.Server/_WF/Encounters/Systems/ShuttleConsoleSystem.Clamps.cs`](Systems/ShuttleConsoleSystem.Clamps.cs)
@@ -245,6 +255,7 @@ stops. Extorters weigh the four nearest crewed ships and go for the richest hold
 - [`Content.Server/_WF/Encounters/Systems/WFEncounterSystem.cs`](Systems/WFEncounterSystem.cs)
 - [`Content.Server/_WF/Encounters/Systems/WFEncounterSystem.Deed.cs`](Systems/WFEncounterSystem.Deed.cs)
 - [`Content.Server/_WF/Encounters/Systems/WFEncounterSystem.Derelict.cs`](Systems/WFEncounterSystem.Derelict.cs)
+- [`Content.Server/_WF/Encounters/Systems/WFEncounterSystem.Disable.cs`](Systems/WFEncounterSystem.Disable.cs)
 - [`Content.Server/_WF/Encounters/Systems/WFEncounterSystem.Extort.cs`](Systems/WFEncounterSystem.Extort.cs)
 - [`Content.Server/_WF/Encounters/Systems/WFEncounterSystem.Fugitive.cs`](Systems/WFEncounterSystem.Fugitive.cs)
 - [`Content.Server/_WF/Encounters/Systems/WFEncounterSystem.Hunt.cs`](Systems/WFEncounterSystem.Hunt.cs)
@@ -256,6 +267,7 @@ stops. Extorters weigh the four nearest crewed ships and go for the richest hold
 - [`Content.Server/_WF/Encounters/Systems/WFEncounterZoneSystem.cs`](Systems/WFEncounterZoneSystem.cs)
 - [`Content.Server/_WF/Encounters/Systems/WFPirateRetrofitSystem.cs`](Systems/WFPirateRetrofitSystem.cs)
 - [`Content.Server/_WF/Encounters/Systems/WFSalvageClaimSystem.cs`](Systems/WFSalvageClaimSystem.cs)
+- [`Content.Server/_WF/Encounters/Systems/WFShipDisablerSystem.cs`](Systems/WFShipDisablerSystem.cs)
 - [`Content.Server/_WF/Encounters/WFEncounterEvents.cs`](WFEncounterEvents.cs)
 
 ### Shared
@@ -296,6 +308,7 @@ stops. Extorters weigh the four nearest crewed ships and go for the richest hold
 - [`Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.Conduct.cs`](../../../Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.Conduct.cs)
 - [`Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.Deed.cs`](../../../Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.Deed.cs)
+- [`Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.Disable.cs`](../../../Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.Disable.cs)
 - [`Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.Extort.cs`](../../../Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.Extort.cs)
 - [`Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.FriendlyFire.cs`](../../../Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.FriendlyFire.cs)
 - [`Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.Fuel.cs`](../../../Content.IntegrationTests/Tests/_WF/Encounters/WFEncounterTest.Fuel.cs)

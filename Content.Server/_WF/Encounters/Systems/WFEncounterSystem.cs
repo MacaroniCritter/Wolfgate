@@ -688,6 +688,7 @@ public sealed partial class WFEncounterSystem : EntitySystem
             Hunt = ship.Hunt || ship.Extort != null || ship.Abduct != null,
             Extort = ship.Extort is { } extort ? NewExtort(extort) : null,
             Abduct = ship.Abduct is { } abduct ? NewAbduct(abduct) : null,
+            Disablers = ship.Disablers,
             Distress = ship.Distress,
             Evades = ship.Evades,
             Flees = ship.Flees,
@@ -1016,6 +1017,8 @@ public sealed partial class WFEncounterSystem : EntitySystem
                 Extort(encounter, key, ship, ship.Extort);
             else if (ship.Hunt && encounter.Comp.Begun)
                 Hunt(ship);
+            if (ship.Hunt && ship.Disablers.Count > 0)
+                AimDisablers(ship, encounter.Comp.Begun);
             else if (encounter.Comp.Leash > 0f && ship.HasOrders)
                 Recall(encounter.Comp, ship);
 

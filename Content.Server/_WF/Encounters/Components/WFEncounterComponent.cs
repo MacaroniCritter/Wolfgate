@@ -295,6 +295,10 @@ public sealed partial class WFEncounterShipState
     [DataField]
     public EntityUid? Prey;
 
+    /// <summary>Guns mounted at spawn to stop the ship it means to board.</summary>
+    [DataField]
+    public List<EntProtoId> Disablers = new();
+
     /// <summary>Set on an extorter: where it is in its round of tolls.</summary>
     public WFExtortState? Extort;
 

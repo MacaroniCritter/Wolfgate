@@ -13,3 +13,4 @@ wf-boarding-helm-release = Release cable
 
 wf-boarding-gunner-locked = Ship guns locked: hacking cable out.
 wf-boarding-gunner-lockout = Guns locked out: that line crosses the ship hacking you.
+wf-boarding-engines-disrupted = ION STRIKE: engines and gyroscopes down!
