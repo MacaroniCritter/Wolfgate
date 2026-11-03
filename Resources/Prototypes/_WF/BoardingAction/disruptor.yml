@@ -3,7 +3,6 @@
 
 - type: entity
   id: WFIonDisruptorBolt
-  name: ion disruptor bolt
   parent: BaseBullet
   categories: [ HideSpawnMenu ]
   components:
@@ -31,10 +30,8 @@
 
 - type: entity
   id: WFIonDisruptor
-  name: SHRIKE ion disruptor
   parent: WeaponTurretM220
   suffix: Small, Raider
-  description: Fires an ion bolt that knocks out every thruster and gyroscope on the ship it hits for twenty seconds. Shields stop it.
   components:
   - type: Gun
     fireRate: 0.125

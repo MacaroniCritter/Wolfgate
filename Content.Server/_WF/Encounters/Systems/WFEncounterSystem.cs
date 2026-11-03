@@ -760,6 +760,7 @@ public sealed partial class WFEncounterSystem : EntitySystem
         foreach (var ship in encounter.Comp.Ships.Values)
         {
             EndAbduction(ship);
+            _disablers.SetTarget(ship.Grid, null);
         }
         if (resolution is WFEncounterResolution.Completed or WFEncounterResolution.Expired
             && encounter.Comp.Lifetime == WFEncounterLifetime.Transient && !encounter.Comp.Pinned)
