@@ -73,8 +73,12 @@ public sealed class WFFeedbackBatch1102bTest
             var page = new GuideMedicalGroupEmbed();
             var sources = WFCockpitLease.Descendants(page).OfType<GuideMedicalSource>().ToList();
             Assert.That(sources, Is.Not.Empty, "The medical recipes page is empty.");
-            Assert.That(WFCockpitLease.Descendants(page).OfType<RichTextLabel>().Any(label => label.GetMessage()?.Contains(pen) == true),
-                $"No recipe on the page names its {pen}.");
+
+            var made = client.ProtoMan.Index<EntityPrototype>("CombatMedipen").Name;
+            var labels = sources
+                .Select(source => WFCockpitLease.Descendants(source).OfType<RichTextLabel>().Select(label => label.GetMessage() ?? string.Empty).ToList())
+                .Single(texts => texts.Any(text => text.Contains(made)));
+            Assert.That(labels.Any(text => text.Contains(pen)), $"The {made} recipe doesn't name its {pen}.");
         });
 
         await pair.CleanReturnAsync();

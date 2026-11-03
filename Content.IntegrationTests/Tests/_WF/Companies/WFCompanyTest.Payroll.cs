@@ -38,6 +38,8 @@ public sealed partial class WFCompanyTest
         var slot = preferences.GetPreferences(owner.UserId).SelectedCharacterIndex;
         var spawnedSlots = (Dictionary<NetUserId, int>) typeof(WFCompanySystem)
             .GetField("_spawnedSlots", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(companies)!;
+        var spawnedMinds = (Dictionary<NetUserId, EntityUid>) typeof(WFCompanySystem)
+            .GetField("_spawnedMinds", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(companies)!;
         var nextSample = typeof(WFCompanySystem).GetField("_nextSample", BindingFlags.Instance | BindingFlags.NonPublic)!;
         await server.WaitPost(() =>
         {
@@ -78,7 +80,11 @@ public sealed partial class WFCompanyTest
 
             // Lobby time never counts; only a living body spawned from the member character does.
             await server.WaitPost(() => companies.SamplePayroll(WFCompanyPolicy.PayrollHourSeconds));
-            await server.WaitAssertion(() => Assert.That(companies.GetBalance(id.Value), Is.EqualTo(1000)));
+            await server.WaitAssertion(() =>
+            {
+                Assert.That(companies.GetBalance(id.Value), Is.EqualTo(1000));
+                Assert.That(companies.CutFor(worker, 1000), Is.Zero, "No cut from someone who never spawned the member character.");
+            });
             var workerBody = EntityUid.Invalid;
             var workerMind = EntityUid.Invalid;
             await server.WaitPost(() =>
@@ -89,6 +95,7 @@ public sealed partial class WFCompanyTest
                 workerMind = minds.CreateMind(worker.UserId, "Dee Worker");
                 minds.TransferTo(workerMind, body);
                 spawnedSlots[worker.UserId] = preferences.GetPreferences(worker.UserId).SelectedCharacterIndex;
+                spawnedMinds[worker.UserId] = workerMind;
                 // Dummy sessions send no input, so mark the worker active.
                 server.ResolveDependency<IAfkManager>().PlayerDidAction(worker);
             });
@@ -103,12 +110,9 @@ public sealed partial class WFCompanyTest
                 Assert.That(WorkerBank(), Is.EqualTo(300));
             });
 
-            // A ghost role takes a new mind, and that body is no part of the company: no wage for it.
-            var spawnedMinds = (Dictionary<NetUserId, EntityUid>) typeof(WFCompanySystem)
-                .GetField("_spawnedMinds", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(companies)!;
+            // A ghost role takes a new mind, and that body is no part of the company: no wage or cut for it.
             await server.WaitPost(() =>
             {
-                spawnedMinds[worker.UserId] = workerMind;
                 var minds = server.System<SharedMindSystem>();
                 minds.TransferTo(minds.CreateMind(worker.UserId, "ADS unit"), em.SpawnEntity("MobHuman", map.GridCoords));
             });
@@ -119,6 +123,7 @@ public sealed partial class WFCompanyTest
                 Assert.That(worker.AttachedEntity, Is.Not.EqualTo(workerBody));
                 Assert.That(companies.GetBalance(id.Value), Is.EqualTo(700), "A ghost role drew a company wage.");
                 Assert.That(WorkerBank(), Is.EqualTo(300), "A ghost role drew a company wage.");
+                Assert.That(companies.CutFor(worker, 1000), Is.Zero, "The company took a cut of a ghost role's earnings.");
             });
             await server.WaitPost(() =>
             {

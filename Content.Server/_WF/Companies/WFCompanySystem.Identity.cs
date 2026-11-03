@@ -189,9 +189,9 @@ public sealed partial class WFCompanySystem
         return "wf-company-error-failed";
     }
 
-    /// <summary>Whether a session still plays the mind it spawned with. A ghost role takes a new mind, so its body is not the member's character.</summary>
+    /// <summary>Whether a session spawned a character and still plays its mind. A ghost role takes a new mind, so its body is not the member's character.</summary>
     private bool PlaysSpawnedCharacter(ICommonSession session) =>
-        !_spawnedMinds.TryGetValue(session.UserId, out var spawned) ||
+        _spawnedMinds.TryGetValue(session.UserId, out var spawned) &&
         _minds.TryGetMind(session, out var mind, out _) && mind == spawned;
 
     /// <summary>The body a session plays as its member character, alive or critical, AFK or not.</summary>
