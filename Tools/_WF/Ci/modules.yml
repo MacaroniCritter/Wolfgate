@@ -16,6 +16,24 @@ external:
 # Edits outside _WF that can't hold a WOLFGATE marker: JSON, images, audio, rich-text .txt and map files.
 # Each entry has a path (a file, a folder or a glob), the module it serves (null for a standalone edit) and a reason.
 unmarked:
+  - path: Resources/Maps/Shuttles/dart.yml
+    module: Cloning
+    reason: Mapped a genetic database and a body scanner console, linked to the scanner and pod.
+  - path: Resources/Maps/Shuttles/emergency_raven.yml
+    module: Cloning
+    reason: Mapped a genetic database and a body scanner console, linked to the scanner and pod.
+  - path: Resources/Maps/_Mono/Outpost/caelestinus_central.yml
+    module: Cloning
+    reason: Mapped a genetic database and a body scanner console, linked to the scanner and pod.
+  - path: Resources/Maps/_Mono/ShuttleEvent/asakim_medium.yml
+    module: Cloning
+    reason: Mapped a genetic database and a body scanner console, linked to the scanner and pod.
+  - path: Resources/Maps/_Mono/ShuttleEvent/asakim_small.yml
+    module: Cloning
+    reason: Mapped a genetic database and a body scanner console, linked to the scanner and pod.
+  - path: Resources/Maps/centcomm.yml
+    module: Cloning
+    reason: Mapped a genetic database and a body scanner console, linked to the scanner and pod.
   - path: Resources/Maps/_Mono/POI/pdvhelios.yml
     module: LiveFixes
     reason: Removed saved configurator lists that held invalid entity references.

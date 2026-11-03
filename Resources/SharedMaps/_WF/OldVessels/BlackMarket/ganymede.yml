@@ -5,7 +5,7 @@ meta:
   forkId: ""
   forkVersion: ""
   time: 06/30/2026 11:24:00
-  entityCount: 1569
+  entityCount: 1571
 maps: []
 grids:
 - 1
@@ -4105,6 +4105,25 @@ entities:
     - type: Transform
       pos: 1.5,-11.5
       parent: 1
+- proto: computerBodyScanner
+  entities:
+  - uid: 1570
+    components:
+    - type: Transform
+      pos: 1.5,-5.5
+      parent: 1
+    - type: DeviceLinkSource
+      linkedPorts:
+        953:
+        - - MedicalScannerSender
+          - MedicalScannerReceiver
+- proto: GeneticDatabaseServer
+  entities:
+  - uid: 1571
+    components:
+    - type: Transform
+      pos: 0.5,-6.5
+      parent: 1
 - proto: HardpointBallisticHeavy
   entities:
   - uid: 1555
@@ -4328,6 +4347,11 @@ entities:
       rot: -1.5707963267948966 rad
       pos: 3.5,-6.5
       parent: 1
+    - type: DeviceLinkSource
+      linkedPorts:
+        527:
+        - - CloningPodSender
+          - CloningPodReceiver
     - type: ApcPowerReceiver
       powerLoad: 5
     - type: Battery

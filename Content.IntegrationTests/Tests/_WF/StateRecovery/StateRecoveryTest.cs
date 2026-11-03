@@ -101,6 +101,104 @@ public sealed class StateRecoveryTest
         await pair.CleanReturnAsync();
     }
 
+    [Test]
+    public async Task FailedStepsPurgeDeletedLookupEntry()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, Dirty = true });
+        var client = pair.Client;
+        var cEntMan = client.EntMan;
+
+        var map = await pair.CreateTestMap();
+        var netMap = pair.Server.EntMan.GetNetEntity(map.MapUid);
+        await RunFor(pair, TimeSpan.FromSeconds(3));
+        var recovery = cEntMan.System<WFStateRecoverySystem>();
+        var requests = recovery.Requests;
+
+        // Same broken state as live: a map's sundries tree holds an entity that no longer exists.
+        DynamicTree<EntityUid> tree = default!;
+        var stale = EntityUid.Invalid;
+        await client.WaitPost(() =>
+        {
+            tree = cEntMan.GetComponent<BroadphaseComponent>(cEntMan.GetEntity(netMap)).SundriesTree;
+            stale = cEntMan.SpawnEntity(null, MapCoordinates.Nullspace);
+            tree.Add(stale, new Box2(5000f, 5000f, 5001f, 5001f));
+            cEntMan.DeleteEntity(stale);
+
+            for (var i = 0; i < 15; i++)
+            {
+                var ev = new PhysicsUpdateBeforeSolveEvent(false, 0f);
+                cEntMan.EventBus.RaiseEvent(EventSource.Local, ref ev);
+            }
+        });
+
+        // The purge logs a warning on purpose.
+        var failureLevel = pair.ClientLogHandler.FailureLevel;
+        pair.ClientLogHandler.FailureLevel = LogLevel.Error;
+        try
+        {
+            await RunFor(pair, TimeSpan.FromSeconds(3));
+        }
+        finally
+        {
+            pair.ClientLogHandler.FailureLevel = failureLevel;
+        }
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tree.Contains(stale), Is.False, "the deleted entity is still in the tree");
+            Assert.That(recovery.Requests, Is.EqualTo(requests), "the purge should have made a full state unnecessary");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task PurgesCannotPostponeFullStateForever()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, Dirty = true });
+        var client = pair.Client;
+        var cEntMan = client.EntMan;
+
+        var map = await pair.CreateTestMap();
+        var netMap = pair.Server.EntMan.GetNetEntity(map.MapUid);
+        await RunFor(pair, TimeSpan.FromSeconds(3));
+        var recovery = cEntMan.System<WFStateRecoverySystem>();
+        var requests = recovery.Requests;
+
+        // Steps keep failing and every window finds a new deleted entry to purge.
+        var failureLevel = pair.ClientLogHandler.FailureLevel;
+        pair.ClientLogHandler.FailureLevel = LogLevel.Error;
+        try
+        {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            while (watch.Elapsed < TimeSpan.FromSeconds(7))
+            {
+                await client.WaitPost(() =>
+                {
+                    var tree = cEntMan.GetComponent<BroadphaseComponent>(cEntMan.GetEntity(netMap)).SundriesTree;
+                    var stale = cEntMan.SpawnEntity(null, MapCoordinates.Nullspace);
+                    tree.Add(stale, new Box2(5000f, 5000f, 5001f, 5001f));
+                    cEntMan.DeleteEntity(stale);
+
+                    for (var i = 0; i < 5; i++)
+                    {
+                        var ev = new PhysicsUpdateBeforeSolveEvent(false, 0f);
+                        cEntMan.EventBus.RaiseEvent(EventSource.Local, ref ev);
+                    }
+                });
+
+                await RunFor(pair, TimeSpan.FromSeconds(0.25));
+            }
+        }
+        finally
+        {
+            pair.ClientLogHandler.FailureLevel = failureLevel;
+        }
+
+        Assert.That(recovery.Requests, Is.GreaterThan(requests), "purges kept postponing the full state");
+        await pair.CleanReturnAsync();
+    }
+
     // The detector windows on real time, which pooled ticks outrun.
     private static async Task RunFor(TestPair pair, TimeSpan time)
     {

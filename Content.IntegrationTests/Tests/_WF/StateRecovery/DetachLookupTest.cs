@@ -47,6 +47,37 @@ public sealed class DetachLookupTest
         await pair.CleanReturnAsync();
     }
 
+    [Test]
+    public async Task ChildOfDetachedParentLeavesMapTree()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, Dirty = true });
+        var server = pair.Server;
+        var em = server.EntMan;
+        var map = await pair.CreateTestMap();
+        var root = EntityUid.Invalid;
+        var nets = new List<NetEntity>();
+        await server.WaitPost(() =>
+        {
+            root = em.SpawnEntity(null, new EntityCoordinates(map.MapUid, new Vector2(50.5f, 50.5f)));
+            var middle = em.SpawnEntity(null, new EntityCoordinates(root, Vector2.Zero));
+            var child = em.SpawnEntity(null, new EntityCoordinates(middle, Vector2.Zero));
+            nets.Add(em.GetNetEntity(middle));
+            nets.Add(em.GetNetEntity(child));
+            nets.Add(em.GetNetEntity(root));
+        });
+        await pair.RunTicksSync(5);
+        await AssertClean(pair, "before detaching");
+
+        // Middle first: by the time the child detaches, its parent is already in null-space.
+        await pair.Client.WaitPost(() => pair.Client.ResolveDependency<IClientGameStateManager>().DetachImmediate(nets));
+        await AssertClean(pair, "after detaching");
+
+        await server.WaitPost(() => em.DeleteEntity(root));
+        await pair.RunTicksSync(5);
+        await AssertClean(pair, "after the server deleted them");
+        await pair.CleanReturnAsync();
+    }
+
     private static async Task AssertClean(TestPair pair, string when)
     {
         var problems = new List<string>();
