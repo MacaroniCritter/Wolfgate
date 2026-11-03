@@ -32,39 +32,32 @@ public sealed partial class WFPlanetDragSystem : EntitySystem
     {
         base.Update(frameTime);
 
-        // Only hulls directly on a planet layer can need dragging, which spares the walk of every grid in space.
-        var layers = EntityQueryEnumerator<WFPlanetLayerComponent, TransformComponent>();
-        while (layers.MoveNext(out _, out var layerXform))
+        // Walk the grids, not the layers' children: a planet's ground is itself a grid, so every mob and item on it is a
+        // child of the layer.
+        var grids = EntityQueryEnumerator<MapGridComponent, PhysicsComponent, TransformComponent>();
+        while (grids.MoveNext(out var uid, out _, out var body, out var xform))
         {
-            var children = layerXform.ChildEnumerator;
-            while (children.MoveNext(out var uid))
+            if (xform.ParentUid != xform.MapUid || xform.MapUid is not { } map || map == uid)
+                continue;
+
+            // The gaps between layers have no layer marker, and turn hulls back as well.
+            if (HasComp<CEZTransitMapComponent>(map))
             {
-                if (!HasComp<MapGridComponent>(uid) || !TryComp<PhysicsComponent>(uid, out var body))
-                    continue;
-
-                var xform = Transform(uid);
-
-                // Every layer of a bounded world turns hulls back at its edge, the ground too.
                 TurnBack(uid, body, xform);
-
-                if (!TryGetLimits(uid, xform, out var maxSpeed, out var damping))
-                    continue;
-
-                Hold(uid, body, damping);
-                Clamp(uid, body, maxSpeed);
+                continue;
             }
-        }
 
-        // The gaps between layers have no layer marker, and turn hulls back as well.
-        var gaps = EntityQueryEnumerator<CEZTransitMapComponent, TransformComponent>();
-        while (gaps.MoveNext(out _, out var gapXform))
-        {
-            var children = gapXform.ChildEnumerator;
-            while (children.MoveNext(out var uid))
-            {
-                if (HasComp<MapGridComponent>(uid) && TryComp<PhysicsComponent>(uid, out var body))
-                    TurnBack(uid, body, Transform(uid));
-            }
+            if (!HasComp<WFPlanetLayerComponent>(map))
+                continue;
+
+            // Every layer of a bounded world turns hulls back at its edge, the ground too.
+            TurnBack(uid, body, xform);
+
+            if (!TryGetLimits(uid, xform, out var maxSpeed, out var damping))
+                continue;
+
+            Hold(uid, body, damping);
+            Clamp(uid, body, maxSpeed);
         }
 
         // A hull that has left its layer gets its own damping back.

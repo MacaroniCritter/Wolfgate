@@ -47,7 +47,10 @@ public sealed class WFBirdSystem : EntitySystem
     [Dependency] private RoofSystem _roof = default!;
 
     private static readonly TimeSpan ThinkInterval = TimeSpan.FromSeconds(0.25);
+    private static readonly TimeSpan IdleThinkInterval = TimeSpan.FromSeconds(2);
     private static readonly TimeSpan RetireDelay = TimeSpan.FromSeconds(120);
+    /// <summary>Metres from a player past which a perched bird only checks in now and then.</summary>
+    private const float IdleRange = 40f;
     private const float RetireRange = 96f;
     private const float ArriveDistance = 0.2f;
     private const float StrikeRange = 0.9f;
@@ -56,6 +59,7 @@ public sealed class WFBirdSystem : EntitySystem
     private readonly HashSet<Entity<MobStateComponent>> _mobs = new();
     private readonly List<(MapId Map, Vector2 Position)> _playerPositions = new();
     private TimeSpan _nextRetire;
+    private TimeSpan _nextPlayerScan;
 
     public override void Initialize()
     {
@@ -152,6 +156,12 @@ public sealed class WFBirdSystem : EntitySystem
             RetireMembers(now);
         }
 
+        if (now >= _nextPlayerScan)
+        {
+            _nextPlayerScan = now + TimeSpan.FromSeconds(1);
+            ScanPlayers();
+        }
+
         var query = EntityQueryEnumerator<WFBirdComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var bird, out var xform))
         {
@@ -163,8 +173,40 @@ public sealed class WFBirdSystem : EntitySystem
 
             if (now < bird.NextThink)
                 continue;
+
+            // A settled bird nobody can see has nothing to decide; its range checks are most of this system's cost.
+            if (bird.State == WFBirdState.Perched && !bird.Moving && !NearPlayer(xform, IdleRange))
+            {
+                bird.NextThink = now + IdleThinkInterval;
+                continue;
+            }
+
             bird.NextThink = now + ThinkInterval;
             Think(uid, bird, xform, now);
+        }
+    }
+
+    /// <summary>Whether any player is within <paramref name="range"/> of the bird, as of the last scan.</summary>
+    private bool NearPlayer(TransformComponent xform, float range)
+    {
+        var position = _transform.GetWorldPosition(xform);
+        foreach (var (map, player) in _playerPositions)
+        {
+            if (map == xform.MapID && (player - position).LengthSquared() <= range * range)
+                return true;
+        }
+
+        return false;
+    }
+
+    private void ScanPlayers()
+    {
+        _playerPositions.Clear();
+        foreach (var session in _players.Sessions)
+        {
+            if (session.AttachedEntity is not { } player || !TryComp(player, out TransformComponent? xform))
+                continue;
+            _playerPositions.Add((xform.MapID, _transform.GetWorldPosition(xform)));
         }
     }
 
@@ -709,13 +751,7 @@ public sealed class WFBirdSystem : EntitySystem
     /// <summary>Flock members spawned beside a leader leave once no player has been near them for a while.</summary>
     private void RetireMembers(TimeSpan now)
     {
-        _playerPositions.Clear();
-        foreach (var session in _players.Sessions)
-        {
-            if (session.AttachedEntity is not { } player || !TryComp(player, out TransformComponent? xform))
-                continue;
-            _playerPositions.Add((xform.MapID, _transform.GetWorldPosition(xform)));
-        }
+        ScanPlayers();
 
         var query = EntityQueryEnumerator<WFBirdComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var bird, out var xform))

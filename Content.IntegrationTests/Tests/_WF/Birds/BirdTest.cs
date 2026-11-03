@@ -106,18 +106,23 @@ public sealed class BirdTest
     [Test]
     public async Task TakesOffWhenSomeoneRunsNearAndLandsAgain()
     {
-        await using var pair = await PoolManager.GetServerClient();
+        // A player, since a perched bird nobody is near only checks in now and then.
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true });
         var server = pair.Server;
         var entMan = server.EntMan;
         var map = await Rig(pair);
         var bird = await SpawnLoneBird(pair, map, "WFMobBirdVerdaSongbird", new Vector2(0.5f, 0.5f));
         var birds = server.System<WFBirdSystem>();
+        var session = server.PlayerMan.GetSessionById(pair.Client.Session!.UserId);
+        var mindSys = entMan.System<SharedMindSystem>();
         EntityUid human = default;
         int groundMask = 0;
 
         await server.WaitPost(() =>
         {
+            mindSys.WipeMind(session.ContentData()?.Mind);
             human = entMan.SpawnEntity("MobHuman", new EntityCoordinates(map.Grid.Owner, 4.5f, 0.5f));
+            mindSys.TransferTo(mindSys.CreateMind(session.UserId).Owner, human);
             groundMask = Mask(entMan, bird);
         });
         await pair.RunSeconds(1f);
