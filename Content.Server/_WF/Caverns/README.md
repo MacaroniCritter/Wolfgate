@@ -162,6 +162,7 @@ and leaves anything airborne to the server. The design, including what is still 
 
 - [`Content.Client/_WF/Caverns/CEClientZLevelsSystem.Caverns.cs`](../../../Content.Client/_WF/Caverns/CEClientZLevelsSystem.Caverns.cs)
 - [`Content.Client/_WF/Caverns/ScalingViewport.Caverns.cs`](../../../Content.Client/_WF/Caverns/ScalingViewport.Caverns.cs)
+- [`Content.Client/_WF/Caverns/WFCavernShadeVisualsSystem.Covered.cs`](../../../Content.Client/_WF/Caverns/WFCavernShadeVisualsSystem.Covered.cs)
 - [`Content.Client/_WF/Caverns/WFCavernShadeVisualsSystem.cs`](../../../Content.Client/_WF/Caverns/WFCavernShadeVisualsSystem.cs)
 - [`Content.Client/_WF/Caverns/WFCavernShadeVisualsSystem.Floors.cs`](../../../Content.Client/_WF/Caverns/WFCavernShadeVisualsSystem.Floors.cs)
 - [`Content.Client/_WF/Caverns/WFCavernStairsSystem.cs`](../../../Content.Client/_WF/Caverns/WFCavernStairsSystem.cs)

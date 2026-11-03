@@ -303,6 +303,10 @@ public sealed partial class PathfindingSystem
         {
             var aabb = _lookup.GetAABBNoContainer(ev.Sender, ev.NewPosition.Position, ev.NewRotation);
             DirtyChunkArea(gridUid.Value, aabb);
+            // WOLFGATE(Vehicles) START: a vehicle leaving a chunk frees the tiles its hull blocked there
+            if (oldGridUid == gridUid && WfCoversTiles(ev.Sender))
+                DirtyChunkArea(gridUid.Value, _lookup.GetAABBNoContainer(ev.Sender, ev.OldPosition.Position, ev.OldRotation));
+            // WOLFGATE END
         }
     }
 
@@ -464,7 +468,7 @@ public sealed partial class PathfindingSystem
                     var xform = _xformQuery.GetComponent(ent);
 
                     if (xform.ParentUid != grid.Owner ||
-                        _maps.LocalToTile(grid.Owner, grid.Comp, xform.Coordinates) != tilePos)
+                        _maps.LocalToTile(grid.Owner, grid.Comp, xform.Coordinates) != tilePos && !WfCoversTiles(ent)) // WOLFGATE(Vehicles): a vehicle blocks every tile under its hull
                     {
                         continue;
                     }

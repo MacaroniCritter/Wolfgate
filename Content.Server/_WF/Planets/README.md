@@ -445,7 +445,9 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Content.IntegrationTests/Tests/_WF/Planets/GroundContactTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/GroundContactTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/KyphrusPlanetsTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/KyphrusPlanetsTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/LandingCrushTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/LandingCrushTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/Planets/LandingHoldTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/LandingHoldTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/LiftoffTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/LiftoffTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/Planets/MerakHeatTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/MerakHeatTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/OrbitalMobFallTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/OrbitalMobFallTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/OrbitArrivalTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/OrbitArrivalTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Planets/OrbitBeaconPinTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Planets/OrbitBeaconPinTest.cs)
@@ -710,6 +712,7 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
   - sets level with each other met on an earlier tick.
   - partial landing-thruster lift slows the sink, and this is where lift lost begins.
   - the sink uses the lift-adjusted gravity.
+  - only a held descend sets a hull down on a planet's ground.
   - no setting down on walls or rock.
   - a gentle set-down onto walls or rock holds just above them; a crash still comes down.
   - planetary landings can clear, land hard, break up or skid instead of only crashing.
@@ -740,8 +743,11 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
   - a held climb pops out into a planet's orbit layer instead of pinning under it.
   - a descending convoy lands on the ground instead of hopping below it.
   - a hull that sets down breaks the trees and rocks it would rest against
+  - whatever else the hull came down wedged on goes too, however it got there
 - [`Content.Server/_CE/ZLevels/Core/CEZLevelsSystem.View.cs`](../../_CE/ZLevels/Core/CEZLevelsSystem.View.cs): a planet's lower layers are drawn smaller, so their eyes see wider
-- [`Content.Server/_CE/ZLevels/Core/CEZLevelsSystem.WallCollision.cs`](../../_CE/ZLevels/Core/CEZLevelsSystem.WallCollision.cs): a skidding hull flattens obstacles instead of bouncing.
+- [`Content.Server/_CE/ZLevels/Core/CEZLevelsSystem.WallCollision.cs`](../../_CE/ZLevels/Core/CEZLevelsSystem.WallCollision.cs)
+  - a skidding hull flattens obstacles instead of bouncing.
+  - pinned between walls an axis has no way out; pushing by the difference swaps the overlaps and shakes the hull forever.
 - [`Content.Server/_FarHorizons/StarSystem/StarSystemMapSystem.cs`](../../_FarHorizons/StarSystem/StarSystemMapSystem.cs)
   - keep the star off hulls that arrive on top of it.
   - register sector bodies that have a Wolfgate surface.

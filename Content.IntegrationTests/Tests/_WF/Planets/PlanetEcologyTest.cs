@@ -160,7 +160,7 @@ public sealed class PlanetEcologyTest
                     var ambient = name switch
                     {
                         "Fervidus" => 373.15f,
-                        "Merak" => 318.15f,
+                        "Merak" => 305.15f,
                         "Aerumna" => 285.15f,
                         "Thrascias" => 180f,
                         "Carcinoma" => 310.15f,

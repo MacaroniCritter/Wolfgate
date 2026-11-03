@@ -20,6 +20,18 @@ public static class WFPlanetMapMesh
     /// <summary>A batch of triangles of one ground, with the box that holds them for culling.</summary>
     public readonly record struct Patch(WFPlanetMapGround Ground, Box2 Bounds, Vector2[] Triangles);
 
+    /// <summary>A world box's corners through a view that may be turned, in order round the box.</summary>
+    public static Vector2[] BoxCorners(Vector2 min, Vector2 max, Matrix3x2 worldToView)
+    {
+        return new[]
+        {
+            Vector2.Transform(min, worldToView),
+            Vector2.Transform(new Vector2(max.X, min.Y), worldToView),
+            Vector2.Transform(max, worldToView),
+            Vector2.Transform(new Vector2(min.X, max.Y), worldToView),
+        };
+    }
+
     /// <summary>Marching squares over the cell centres, one ground at a time, so each patch has smooth edges.</summary>
     public static List<Patch> Terrain(WFPlanetMapTerrain terrain)
     {

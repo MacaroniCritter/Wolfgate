@@ -15,8 +15,8 @@ using static Content.IntegrationTests.Tests._WF.Planets.PlanetFixture;
 namespace Content.IntegrationTests.Tests._WF.Planets;
 
 /// <summary>
-/// A hull settling onto a planet is only held off by what it can't crush: trees, rocks, furniture, machines, tables
-/// and grilles are flattened as it lands, while walls, windows and doors still refuse the landing.
+/// A hull settling onto a planet is only held off by what it can't crush: trees, rock, furniture, machines, tables
+/// and grilles are flattened as it lands, while built walls, windows and doors still refuse the landing.
 /// </summary>
 [TestFixture]
 [TestOf(typeof(CEZLevelsSystem))]
@@ -33,6 +33,7 @@ public sealed class LandingCrushTest
         ("CrateGenericSteel", new Vector2(1.5f, 1.5f)),
         ("TableWood", new Vector2(3.5f, 1.5f)),
         ("Grille", new Vector2(4.5f, 3.5f)),
+        ("WallRock", new Vector2(0.5f, 2.5f)),
     };
 
     [Test]
@@ -106,7 +107,6 @@ public sealed class LandingCrushTest
     }
 
     [TestCase("WallSolid")]
-    [TestCase("WallRock")]
     [TestCase("Window")]
     public async Task WallsWindowsAndDoorsStillRefuseTheLanding(string proto)
     {

@@ -187,8 +187,9 @@ public partial class ShuttleNavControl
         {
             var a = MathF.Tau * i / segments;
             var b = MathF.Tau * (i + 1) / segments;
-            handle.DrawLine(centre + new Vector2(MathF.Cos(a), MathF.Sin(a)) * radius,
-                centre + new Vector2(MathF.Cos(b), MathF.Sin(b)) * radius, WfMapLandingColour);
+            // Through the view, so the dashes turn with the ground under them.
+            handle.DrawLine(Vector2.Transform(map.Centre + new Vector2(MathF.Cos(a), MathF.Sin(a)) * map.LandingRadius, worldToView),
+                Vector2.Transform(map.Centre + new Vector2(MathF.Cos(b), MathF.Sin(b)) * map.LandingRadius, worldToView), WfMapLandingColour);
         }
 
         if (scale < WfMapLabelScale / 2f)
@@ -212,15 +213,18 @@ public partial class ShuttleNavControl
 
             if (site.Kind == WFPlanetMapSiteKind.City)
             {
-                var a = Vector2.Transform(site.Bounds.BottomLeft, worldToView);
-                var b = Vector2.Transform(site.Bounds.TopRight, worldToView);
-                var box = new UIBox2(Vector2.Min(a, b), Vector2.Max(a, b));
-                if (box.Intersects(bounds))
+                // The radar turns with the ship, so the box is four corners and not a screen rectangle.
+                var corners = WFPlanetMapMesh.BoxCorners(site.Bounds.BottomLeft, site.Bounds.TopRight, worldToView);
+                var min = Vector2.Min(Vector2.Min(corners[0], corners[1]), Vector2.Min(corners[2], corners[3]));
+                var max = Vector2.Max(Vector2.Max(corners[0], corners[1]), Vector2.Max(corners[2], corners[3]));
+                if (new UIBox2(min, max).Intersects(bounds))
                 {
-                    handle.DrawRect(box, WfMapCityFill);
-                    handle.DrawRect(box, colour, false);
+                    handle.DrawPrimitives(DrawPrimitiveTopology.TriangleList,
+                        new[] { corners[0], corners[1], corners[2], corners[0], corners[2], corners[3] }, WfMapCityFill);
+                    for (var i = 0; i < corners.Length; i++)
+                        handle.DrawLine(corners[i], corners[(i + 1) % corners.Length], colour);
                 }
-                point = box.Center;
+                point = (corners[0] + corners[2]) / 2f;
             }
 
             if (!bounds.Contains(point))

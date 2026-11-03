@@ -4,6 +4,7 @@ using Content.Shared._CE.ZLevels.Core.EntitySystems;
 using Content.Shared._WF.Caverns;
 using Content.Shared._WF.Planets;
 using Content.Shared.Doors.Components;
+using Content.Shared.Mining.Components;
 using Content.Shared.Physics;
 using Content.Shared.Shuttles.Components;
 using Content.Shared.Tag;
@@ -60,13 +61,13 @@ public sealed partial class WFLandingSurveySystem : EntitySystem
     }
 
     /// <summary>
-    /// Whether a solid thing is one a landing hull flattens, as an FTL arrival does: trees, rocks, furniture, machines,
-    /// tables and grilles. Walls, windows, doors and what is immune to the smash are not.
+    /// Whether a solid thing is one a landing hull flattens, as an FTL arrival does: trees, rocks and rock walls,
+    /// furniture, machines, tables and grilles. Built walls, windows, doors and what is immune to the smash are not.
     /// </summary>
     public bool IsCrushable(EntityUid uid)
     {
         return !_immuneQuery.HasComp(uid) && !_doorQuery.HasComp(uid)
-               && !_tags.HasAnyTag(uid, WallTag, WindowTag, DiagonalTag);
+               && (HasComp<MiningScannerViewableComponent>(uid) || !_tags.HasAnyTag(uid, WallTag, WindowTag, DiagonalTag));
     }
 
     /// <summary>Whether an entity is still there, solid and not something a landing hull crushes: it holds a hull off.</summary>

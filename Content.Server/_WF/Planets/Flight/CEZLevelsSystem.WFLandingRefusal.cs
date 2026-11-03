@@ -20,9 +20,10 @@ public sealed partial class CEZLevelsSystem
     /// True when a hull setting down gently would come to rest on something solid, such as rock or a building's walls:
     /// it holds just above instead, and its pilots are told to find clear ground. A crash still comes down regardless.
     /// </summary>
-    private bool WfHoldsOffObstacles(EntityUid grid, HashSet<EntityUid> transitSet, EntityUid ground)
+    /// <param name="fresh">Look again whatever the last look said: the hull may have slid over something since.</param>
+    private bool WfHoldsOffObstacles(EntityUid grid, HashSet<EntityUid> transitSet, EntityUid ground, bool fresh = false)
     {
-        if (_wfLandingChecks.TryGetValue(grid, out var cached) && _timing.CurTime < cached.Until)
+        if (!fresh && _wfLandingChecks.TryGetValue(grid, out var cached) && _timing.CurTime < cached.Until)
             return cached.Blocked;
 
         var blocked = false;
@@ -47,6 +48,12 @@ public sealed partial class CEZLevelsSystem
             }
         }
         return blocked;
+    }
+
+    /// <summary>Whether a hull with lift holds its height over this plane until its pilot holds descend: a planet's ground.</summary>
+    private bool WfHoldsOverGround(EntityUid grid, EntityUid plane)
+    {
+        return WfIsGroundLayer(plane) && WfIsPlanetFlight(grid);
     }
 
     /// <summary>Whether anything hard and anchored on the ground below stands under one of the hull's real tiles.</summary>

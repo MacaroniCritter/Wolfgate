@@ -151,6 +151,7 @@ The seat HUD also hosts hull and component health, vehicle switches, weapon sele
 - [`Content.Server/_WF/Vehicles/Hardpoint/VehicleHardpointVisualsSystem.cs`](Hardpoint/VehicleHardpointVisualsSystem.cs)
 - [`Content.Server/_WF/Vehicles/Npc/NPCCombatSystem.Vehicles.cs`](Npc/NPCCombatSystem.Vehicles.cs)
 - [`Content.Server/_WF/Vehicles/Npc/NPCUtilitySystem.Vehicles.cs`](Npc/NPCUtilitySystem.Vehicles.cs)
+- [`Content.Server/_WF/Vehicles/Npc/PathfindingSystem.Vehicles.cs`](Npc/PathfindingSystem.Vehicles.cs)
 - [`Content.Server/_WF/Vehicles/Npc/VehicleOccupantFactionSystem.cs`](Npc/VehicleOccupantFactionSystem.cs)
 - [`Content.Server/_WF/Vehicles/Npc/WFNpcBoardingSystem.cs`](Npc/WFNpcBoardingSystem.cs)
 - [`Content.Server/_WF/Vehicles/NPCSystem.Vehicles.cs`](NPCSystem.Vehicles.cs)
@@ -377,6 +378,7 @@ The seat HUD also hosts hull and component health, vehicle switches, weapon sele
 - [`Content.IntegrationTests/Tests/_WF/Vehicles/VehicleIgnitionTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Vehicles/VehicleIgnitionTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Vehicles/VehicleInteriorTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Vehicles/VehicleInteriorTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Vehicles/VehicleNpcAttackTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Vehicles/VehicleNpcAttackTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/Vehicles/VehiclePathfindingTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Vehicles/VehiclePathfindingTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Vehicles/VehicleRigs.cs`](../../../Content.IntegrationTests/Tests/_WF/Vehicles/VehicleRigs.cs)
 - [`Content.IntegrationTests/Tests/_WF/Vehicles/VehicleRosterTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Vehicles/VehicleRosterTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Vehicles/VehicleRunoverTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Vehicles/VehicleRunoverTest.cs)
@@ -1022,6 +1024,9 @@ The seat HUD also hosts hull and component health, vehicle switches, weapon sele
   - a listener may see the speech bubble on another entity
   - bubbleSource in place of source
   - BubbleSource, the entity this listener sees the bubble on
+- [`Content.Server/NPC/Pathfinding/PathfindingSystem.Grid.cs`](../../NPC/Pathfinding/PathfindingSystem.Grid.cs)
+  - a vehicle leaving a chunk frees the tiles its hull blocked there
+  - a vehicle blocks every tile under its hull
 - [`Content.Server/NPC/Systems/NPCCombatSystem.Melee.cs`](../../NPC/Systems/NPCCombatSystem.Melee.cs): a vehicle is in reach once its hull is.
 - [`Content.Server/NPC/Systems/NPCSystem.cs`](../../NPC/Systems/NPCSystem.cs)
   - an NPC in a vehicle's cabin is where the vehicle is too, as players are, or he sleeps on boarding.

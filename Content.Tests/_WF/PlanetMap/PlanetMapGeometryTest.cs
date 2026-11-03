@@ -137,4 +137,16 @@ public sealed class PlanetMapGeometryTest
         Assert.That(points.All(point => point.X is >= 8f and <= 16f && point.Y is >= 8f and <= 16f), Is.True);
         Assert.That(points, Does.Contain(new Vector2(12f, 12f)));
     }
+
+    /// <summary>A box seen through a turned view keeps its size and turns with the view, as a screen rectangle can't.</summary>
+    [Test]
+    public void BoxCornersTurnWithTheView()
+    {
+        var view = Matrix3x2.CreateRotation(0.175f) * Matrix3x2.CreateScale(2f);
+        var corners = WFPlanetMapMesh.BoxCorners(Vector2.Zero, new Vector2(30f, 10f), view);
+
+        Assert.That((corners[1] - corners[0]).Length(), Is.EqualTo(60f).Within(0.01f));
+        Assert.That((corners[2] - corners[1]).Length(), Is.EqualTo(20f).Within(0.01f));
+        Assert.That(corners[1].Y - corners[0].Y, Is.Not.EqualTo(0f).Within(1f), "The bottom edge stayed level on a turned view.");
+    }
 }

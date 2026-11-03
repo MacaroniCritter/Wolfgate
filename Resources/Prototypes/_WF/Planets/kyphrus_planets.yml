@@ -92,7 +92,8 @@
     mixture:
       volume: 2500
       immutable: true
-      temperature: 318.15
+      # 32 C: the climate's afternoon swing, dust season and sandstorms add 18, short of where animals burn (MerakHeatTest).
+      temperature: 305.15
       moles: [21.824879, 82.10312]
   groundComponents:
   - type: CEZLevelRoof
@@ -115,7 +116,7 @@
   atmosphere:
     volume: 2500
     immutable: true
-    temperature: 318.15
+    temperature: 305.15
     moles: [21.824879, 82.10312]
 
 - type: biomeTemplate

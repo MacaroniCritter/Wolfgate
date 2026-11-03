@@ -75,6 +75,66 @@ public sealed class CavernPitFloorTest
         await pair.CleanReturnAsync();
     }
 
+    /// <summary>A hull over a hole hides its lip, which would otherwise lie across the deck; it shows again once the hull has gone.</summary>
+    [Test]
+    public async Task LipHidesUnderAHull()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true });
+        var server = pair.Server;
+        var client = pair.Client;
+        var mapSys = server.System<SharedMapSystem>();
+        var asphalt = server.ResolveDependency<ITileDefinitionManager>()[Asphalt].TileId;
+        EntityUid shade = default;
+        EntityUid ground = default;
+        EntityUid hull = default;
+
+        await server.WaitPost(() =>
+        {
+            ground = mapSys.CreateMap(out var mapId);
+            var groundGrid = server.EntMan.EnsureComponent<MapGridComponent>(ground);
+            for (var dx = -1; dx <= 1; dx++)
+            {
+                for (var dy = -1; dy <= 1; dy++)
+                {
+                    mapSys.SetTile(ground, groundGrid, new Vector2i(dx, dy), dx == 0 && dy == 0 ? Tile.Empty : new Tile(asphalt));
+                }
+            }
+
+            shade = server.EntMan.SpawnEntity(Shade, new EntityCoordinates(ground, 0.5f, 0.5f));
+
+            var created = mapSys.CreateGridEntity(mapId);
+            hull = created.Owner;
+            mapSys.SetTile(hull, created.Comp, Vector2i.Zero, new Tile(asphalt));
+            server.System<SharedTransformSystem>().SetCoordinates(hull, new EntityCoordinates(ground, 40f, 40f));
+        });
+        await pair.RunTicksSync(30);
+
+        await AssertShown(pair, shade, true);
+
+        await server.WaitPost(() => server.System<SharedTransformSystem>().SetCoordinates(hull, new EntityCoordinates(ground, 0f, 0f)));
+        await pair.RunTicksSync(30);
+
+        await AssertShown(pair, shade, false);
+
+        await server.WaitPost(() => server.System<SharedTransformSystem>().SetCoordinates(hull, new EntityCoordinates(ground, 40f, 40f)));
+        await pair.RunTicksSync(30);
+
+        await AssertShown(pair, shade, true);
+
+        await server.WaitPost(() => server.EntMan.DeleteEntity(ground));
+        await pair.CleanReturnAsync();
+    }
+
+    private static async Task AssertShown(Pair.TestPair pair, EntityUid serverShade, bool shown)
+    {
+        var client = pair.Client;
+        await client.WaitAssertion(() =>
+        {
+            var sprite = client.EntMan.GetComponent<SpriteComponent>(pair.ToClientUid(serverShade));
+            Assert.That(sprite.Visible, Is.EqualTo(shown), shown ? "A lip clear of the hull is hidden." : "A lip under the hull still shows.");
+        });
+    }
+
     /// <summary>On the client the shade picked the floor and each of its four corner floor layers shows it.</summary>
     private static async Task AssertFloor(Pair.TestPair pair, ITileDefinitionManager clientDefs, EntityUid serverShade, string expected)
     {

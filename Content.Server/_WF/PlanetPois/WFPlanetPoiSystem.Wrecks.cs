@@ -290,16 +290,34 @@ public sealed partial class WFPlanetPoiSystem
             _roof.SetRoof((ship.Owner, ship.Comp, null), tile.GridIndices, true);
     }
 
-    /// <summary>Deck under walls and solid machines; cables and pipes under the deck don't count.</summary>
-    private HashSet<Vector2i> SolidTiles(Entity<MapGridComponent> ship)
+    /// <summary>
+    /// Deck under walls and solid machines, every tile a big one such as a ship gun covers; cables and pipes under the
+    /// deck don't count.
+    /// </summary>
+    internal HashSet<Vector2i> SolidTiles(Entity<MapGridComponent> ship)
     {
+        // Slightly inside a fixture's edge, so a wall's box doesn't claim the tiles beside it.
+        const float inset = 0.05f;
         var solid = new HashSet<Vector2i>();
         var enumerator = Transform(ship.Owner).ChildEnumerator;
         while (enumerator.MoveNext(out var child))
         {
-            if (Transform(child).Anchored && TryComp(child, out FixturesComponent? fixtures)
-                && fixtures.Fixtures.Values.Any(f => f.Hard && (f.CollisionLayer & (int) CollisionGroup.MidImpassable) != 0))
-                solid.Add(Transform(child).LocalPosition.Floored());
+            var xform = Transform(child);
+            if (!xform.Anchored || !TryComp(child, out FixturesComponent? fixtures))
+                continue;
+
+            var pose = new Robust.Shared.Physics.Transform(xform.LocalPosition, xform.LocalRotation);
+            foreach (var fixture in fixtures.Fixtures.Values)
+            {
+                if (!fixture.Hard || (fixture.CollisionLayer & (int) CollisionGroup.MidImpassable) == 0)
+                    continue;
+
+                solid.Add(xform.LocalPosition.Floored());
+                var box = fixture.Shape.ComputeAABB(pose, 0);
+                for (var x = (int) MathF.Floor(box.Left + inset); x <= (int) MathF.Floor(box.Right - inset); x++)
+                for (var y = (int) MathF.Floor(box.Bottom + inset); y <= (int) MathF.Floor(box.Top - inset); y++)
+                    solid.Add(new Vector2i(x, y));
+            }
         }
         return solid;
     }

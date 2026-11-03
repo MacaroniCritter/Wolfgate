@@ -136,8 +136,10 @@ payment, sells a few, and eats whoever is left dead in his inn.
 ### Integration tests
 
 - [`Content.IntegrationTests/Tests/_WF/PlanetPois/AncientTempleTest.cs`](../../../Content.IntegrationTests/Tests/_WF/PlanetPois/AncientTempleTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/PlanetPois/CampDeckTest.cs`](../../../Content.IntegrationTests/Tests/_WF/PlanetPois/CampDeckTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/PlanetPois/CarcinomaPoiTest.cs`](../../../Content.IntegrationTests/Tests/_WF/PlanetPois/CarcinomaPoiTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/PlanetPois/GreenhouseTest.cs`](../../../Content.IntegrationTests/Tests/_WF/PlanetPois/GreenhouseTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/PlanetPois/PdvCacheLootTest.cs`](../../../Content.IntegrationTests/Tests/_WF/PlanetPois/PdvCacheLootTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/PlanetPois/PlanetCampTest.cs`](../../../Content.IntegrationTests/Tests/_WF/PlanetPois/PlanetCampTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/PlanetPois/PlanetHiveCampTest.cs`](../../../Content.IntegrationTests/Tests/_WF/PlanetPois/PlanetHiveCampTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/PlanetPois/PlanetPoiContentTest.cs`](../../../Content.IntegrationTests/Tests/_WF/PlanetPois/PlanetPoiContentTest.cs)
@@ -156,12 +158,14 @@ payment, sells a few, and eats whoever is left dead in his inn.
 - [`Content.IntegrationTests/Tests/_WF/PlanetPois/PlanetVehicleSpawnTest.cs`](../../../Content.IntegrationTests/Tests/_WF/PlanetPois/PlanetVehicleSpawnTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/PlanetPois/PlanetWreckTest.cs`](../../../Content.IntegrationTests/Tests/_WF/PlanetPois/PlanetWreckTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/PlanetPois/RoadsideSitesTest.cs`](../../../Content.IntegrationTests/Tests/_WF/PlanetPois/RoadsideSitesTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/PlanetPois/SettledHullLiftoffTest.cs`](../../../Content.IntegrationTests/Tests/_WF/PlanetPois/SettledHullLiftoffTest.cs)
 
 ### Prototypes
 
 - [`Resources/Prototypes/_WF/PlanetPois/camps.yml`](../../../Resources/Prototypes/_WF/PlanetPois/camps.yml)
 - [`Resources/Prototypes/_WF/PlanetPois/dungeons.yml`](../../../Resources/Prototypes/_WF/PlanetPois/dungeons.yml)
 - [`Resources/Prototypes/_WF/PlanetPois/entities.yml`](../../../Resources/Prototypes/_WF/PlanetPois/entities.yml)
+- [`Resources/Prototypes/_WF/PlanetPois/pdv_cache.yml`](../../../Resources/Prototypes/_WF/PlanetPois/pdv_cache.yml)
 - [`Resources/Prototypes/_WF/PlanetPois/road_dressing.yml`](../../../Resources/Prototypes/_WF/PlanetPois/road_dressing.yml)
 - [`Resources/Prototypes/_WF/PlanetPois/road_props.yml`](../../../Resources/Prototypes/_WF/PlanetPois/road_props.yml)
 - [`Resources/Prototypes/_WF/PlanetPois/tables.yml`](../../../Resources/Prototypes/_WF/PlanetPois/tables.yml)
