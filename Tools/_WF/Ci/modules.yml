@@ -2815,6 +2815,18 @@ unmarked:
   - path: Resources/Textures/_NF/Clothing/Head/Hardsuits/nfsd.rsi/
     module: null
     reason: Licence and credit set as in HardLight 0fc067be74.
+  - path: Resources/Maps/Dungeon/haunted.yml
+    module: null
+    reason: Removed every chasm.
+  - path: Resources/Maps/Dungeon/mineshaft.yml
+    module: null
+    reason: Removed every chasm.
+  - path: Resources/Maps/_Mono/Crocus/jianghui_industrial_0.yml
+    module: null
+    reason: Removed every chasm.
+  - path: Resources/Maps/_Mono/Crocus/jianghui_industrial_1.yml
+    module: null
+    reason: Removed every chasm.
   - path: Resources/Textures/_NF/Clothing/Head/Hardsuits/nfsd_combat.rsi/
     module: null
     reason: Licence and credit set as in HardLight 0fc067be74.
