@@ -37,9 +37,6 @@ public sealed partial class WFAbductCellSystem : EntitySystem
     [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private WFCrewPlannerSystem _planner = default!;
 
-    /// <summary>Tries at finding safe deck on a ship a prisoner is sent back to.</summary>
-    private const int HomeTries = 64;
-
     private readonly HashSet<Entity<AirlockComponent>> _doorsNear = new();
     private readonly HashSet<Entity<WFCrewComponent>> _crewNear = new();
 
@@ -191,22 +188,26 @@ public sealed partial class WFAbductCellSystem : EntitySystem
             return false;
 
         var tiles = _maps.GetAllTiles(grid, gridComp).Select(tile => tile.GridIndices).ToList();
-        if (tiles.Count == 0)
-            return false;
-
-        // Any deck will do on a ship with no safe air left to offer: being home beats being held.
-        var at = tiles[0];
         _random.Shuffle(tiles);
-        foreach (var tile in tiles.Take(HomeTries))
-        {
-            if (!_planner.IsSafePost(grid, tile, gridComp))
-                continue;
 
-            at = tile;
-            break;
+        // Any open deck will do on a ship with no safe air left to offer: being home beats being held. Never inside a wall.
+        Vector2i? at = null;
+        foreach (var tile in tiles)
+        {
+            if (_planner.IsSafePost(grid, tile, gridComp))
+            {
+                at = tile;
+                break;
+            }
+
+            if (at == null && _planner.IsStandable(grid, tile, gridComp))
+                at = tile;
         }
 
-        _transform.SetCoordinates(mob, new EntityCoordinates(grid, new Vector2(at.X + 0.5f, at.Y + 0.5f)));
+        if (at is not { } spot)
+            return false;
+
+        _transform.SetCoordinates(mob, new EntityCoordinates(grid, new Vector2(spot.X + 0.5f, spot.Y + 0.5f)));
         // They left a ship under way: none of its speed comes with them.
         if (TryComp<PhysicsComponent>(mob, out var physics))
             _physics.ResetDynamics(mob, physics);
