@@ -1,5 +1,6 @@
 using System.Linq;
 using Content.Server._WF.NpcCrew.Components;
+using Content.Server.Power.EntitySystems;
 using Content.Shared.Buckle;
 using Content.Shared.Buckle.Components;
 using Content.Shared.CombatMode;
@@ -9,11 +10,14 @@ using Content.Shared.Damage.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Inventory;
+using Content.Shared.Item.ItemToggle;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Systems;
+using Content.Shared.Power.Components;
 using Content.Shared.Stunnable;
 using Content.Shared.Weapons.Melee;
+using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Map;
 using Robust.Shared.Timing;
 
@@ -25,8 +29,10 @@ namespace Content.Server._WF.NpcCrew.Systems;
 /// </summary>
 public sealed partial class WFCrewGrabberSystem : EntitySystem
 {
+    [Dependency] private BatterySystem _battery = default!;
     [Dependency] private IGameTiming _timing = default!;
     [Dependency] private InventorySystem _inventory = default!;
+    [Dependency] private ItemToggleSystem _toggle = default!;
     [Dependency] private MobStateSystem _mobs = default!;
     [Dependency] private PullingSystem _pulling = default!;
     [Dependency] private SharedBuckleSystem _buckle = default!;
@@ -51,6 +57,22 @@ public sealed partial class WFCrewGrabberSystem : EntitySystem
     private static readonly TimeSpan CuffRetry = TimeSpan.FromSeconds(4);
 
     private static readonly string[] CuffSlots = { "pocket1", "pocket2" };
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        SubscribeLocalEvent<WFCrewNonLethalComponent, MeleeAttackEvent>(OnMeleeAttack);
+    }
+
+    /// <summary>Their batons never run flat, wielded by them: one looted off a body is an ordinary baton.</summary>
+    private void OnMeleeAttack(Entity<WFCrewNonLethalComponent> ent, ref MeleeAttackEvent args)
+    {
+        if (!TryComp<BatteryComponent>(args.Weapon, out var battery))
+            return;
+
+        _battery.SetCharge(args.Weapon, battery.MaxCharge, battery);
+        _toggle.TryActivate(args.Weapon, predicted: false);
+    }
 
     /// <summary>Sends a crewman after someone.</summary>
     public void Order(EntityUid mob, EntityUid target, EntityUid chair)

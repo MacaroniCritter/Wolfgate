@@ -99,7 +99,7 @@
     anchored: true
   - type: WFAbductCell
 
-# Their batons come out switched on, an NPC doesn't stop to thumb the switch, and do no harm even if they run flat.
+# Their batons come out switched on, an NPC doesn't stop to thumb the switch, and do no harm. WFCrewGrabberSystem keeps them charged in crew hands.
 - type: entity
   parent: Stunbaton
   id: WFCrewAbductorBaton

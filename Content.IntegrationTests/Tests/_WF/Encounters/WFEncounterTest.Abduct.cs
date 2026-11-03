@@ -189,6 +189,35 @@ public sealed partial class WFEncounterTest
         });
     }
 
+    /// <summary>A baton all but flat is full and switched on again after a swing in an abductor's hands.</summary>
+    [Test]
+    public async Task AbductorBatonsNeverRunFlat()
+    {
+        var (_, ship, _, _) = await StartAbductor(new Vector2(9000f, -9000f));
+        await Server.WaitAssertion(() =>
+        {
+            EntityUid mob = default;
+            var crew = SEntMan.EntityQueryEnumerator<WFCrewComponent, WFCrewNonLethalComponent>();
+            while (crew.MoveNext(out var uid, out var member, out _))
+            {
+                if (member.Group == ship.Group)
+                    mob = uid;
+            }
+
+            Assert.That(mob.IsValid(), Is.True, "The crew are non-lethal.");
+            var baton = SEntMan.SpawnEntity("WFCrewAbductorBaton", SEntMan.GetComponent<TransformComponent>(mob).Coordinates);
+            var battery = SEntMan.GetComponent<Content.Shared.Power.Components.BatteryComponent>(baton);
+            Server.System<Content.Server.Power.EntitySystems.BatterySystem>().SetCharge(baton, 1f, battery);
+            var toggle = Server.System<Content.Shared.Item.ItemToggle.ItemToggleSystem>();
+            Assert.That(toggle.IsActivated(baton), Is.False, "Too flat to stay on.");
+
+            var swing = new Content.Shared.Weapons.Melee.Events.MeleeAttackEvent(baton);
+            SEntMan.EventBus.RaiseLocalEvent(mob, ref swing);
+            Assert.That(battery.CurrentCharge, Is.EqualTo(battery.MaxCharge));
+            Assert.That(toggle.IsActivated(baton), Is.True);
+        });
+    }
+
     /// <summary>An admin's board order drops what the abductor was flying, and its crew fly to the ship and dock with it.</summary>
     [Test]
     public async Task AdminBoardOrderFliesAnAbductorToTheShip()
