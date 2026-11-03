@@ -127,7 +127,9 @@ public sealed class WFMappingMenuLayoutTest
             ship.Selected = true;
         });
 
-        for (var i = 0; i < 300 && window.ReferencePreview.Preview == null; i++)
+        // The window asks after a delay in real time, which a fast runner can tick past.
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        while (watch.Elapsed < TimeSpan.FromSeconds(30) && window.ReferencePreview.Preview == null)
         {
             await pair.RunTicksSync(1);
         }
