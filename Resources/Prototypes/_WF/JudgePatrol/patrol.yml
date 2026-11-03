@@ -51,6 +51,7 @@
   skills: [ Elite ]
   forgivesOwn: true
   strayHits: 40
+  sparesCrewedShips: true
   loadouts:
     WFCrewDeckhand: [ WFCrewJudge ]
     WFCrewEngineer: [ WFCrewJudge ]

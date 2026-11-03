@@ -189,6 +189,116 @@ public sealed partial class WFEncounterTest
         });
     }
 
+    /// <summary>
+    /// A ransom paid over the hail leaves the prisoner free aboard, the crew standing down and the doors unlocked, and
+    /// the ship waits till they are off it. The scanner shows a hostage until then.
+    /// </summary>
+    [Test]
+    public async Task HailPaidRansomHoldsTheShipForCollection()
+    {
+        var (encounter, ship, abduct, cell) = await StartAbductor(new Vector2(-9000f, 9000f));
+        var mob = default(EntityUid);
+        await Server.WaitAssertion(() =>
+        {
+            mob = SEntMan.SpawnEntity("MobHuman", SEntMan.GetComponent<TransformComponent>(cell).Coordinates);
+            SEntMan.EnsureComponent<BankAccountComponent>(SPlayer);
+            var bank = Server.System<BankSystem>();
+            bank.TryGetBalance(SPlayer, out var balance);
+            if (balance < AbductRansomAmount * 2)
+                bank.TryBankDeposit(SPlayer, AbductRansomAmount * 2 - balance, false);
+
+            Assert.That(Server.System<Content.Shared.Buckle.SharedBuckleSystem>().TryBuckle(mob, mob, cell, popup: false), Is.True);
+            abduct.Prisoner = mob;
+            abduct.Cell = cell;
+            abduct.Phase = WFAbductPhase.Grab;
+            abduct.PhaseSince = Server.ResolveDependency<Robust.Shared.Timing.IGameTiming>().CurTime;
+        });
+
+        await WaitUntilServer(() => abduct.Phase == WFAbductPhase.Ransom, 200);
+        await Server.WaitAssertion(() =>
+        {
+            var shuttles = Server.System<Content.Shared.Shuttles.Systems.SharedShuttleSystem>();
+            Assert.That(shuttles.GetIFFLabel(ship.Grid), Does.Contain("HOSTAGE"), "The scanner says so.");
+
+            var comp = SEntMan.GetComponent<WFEncounterComponent>(encounter);
+            Assert.That(Server.System<WFEncounterSystem>().AbductPayRansom((encounter, comp), ship, abduct, SPlayer, handover: true), Is.True);
+            Assert.That(abduct.Phase, Is.EqualTo(WFAbductPhase.Handover));
+            Assert.That(SEntMan.GetComponent<BuckleComponent>(mob).BuckledTo, Is.Null, "Out of the chair.");
+            Assert.That(SEntMan.GetComponent<TransformComponent>(mob).GridUid, Is.EqualTo(ship.Grid), "Still aboard, not sent home.");
+
+            var crew = SEntMan.EntityQueryEnumerator<WFCrewComponent>();
+            while (crew.MoveNext(out var member))
+            {
+                if (member.Group == ship.Group)
+                    Assert.That(member.Engagement, Is.EqualTo(Content.Shared._WF.NpcCrew.WFCrewEngagement.Never), "The crew stand down.");
+            }
+
+            Assert.That(abduct.Unlocked, Is.Not.Empty, "The doors are unlocked.");
+        });
+
+        await RunTicks(120);
+        await Server.WaitAssertion(() =>
+        {
+            Assert.That(abduct.Phase, Is.EqualTo(WFAbductPhase.Handover), "It waits while they are aboard.");
+            Server.System<SharedTransformSystem>().SetCoordinates(mob, new EntityCoordinates(MapData.MapUid, new Vector2(-9000f, 9500f)));
+            abduct.HandoverEnds = Server.ResolveDependency<Robust.Shared.Timing.IGameTiming>().CurTime;
+        });
+
+        await WaitUntilServer(() => abduct.Phase == WFAbductPhase.Roam, 300);
+        await Server.WaitAssertion(() =>
+        {
+            var shuttles = Server.System<Content.Shared.Shuttles.Systems.SharedShuttleSystem>();
+            Assert.That(shuttles.GetIFFLabel(ship.Grid) ?? string.Empty, Does.Not.Contain("HOSTAGE"));
+            Assert.That(abduct.Unlocked, Is.Empty);
+            Assert.That(abduct.Truce, Is.Empty);
+            var crew = SEntMan.EntityQueryEnumerator<WFCrewComponent>();
+            while (crew.MoveNext(out var member))
+            {
+                if (member.Group == ship.Group)
+                    Assert.That(member.Engagement, Is.Not.EqualTo(Content.Shared._WF.NpcCrew.WFCrewEngagement.Never));
+            }
+        });
+    }
+
+    /// <summary>A crew flagged to spare crewed ships holds fire on a ship with a player aboard, and on one docked to it.</summary>
+    [Test]
+    public async Task CrewSparingCrewedShipsHoldsFireOnThem()
+    {
+        EntityUid judge = default, player = default, reaver = default;
+        await Server.WaitAssertion(() =>
+        {
+            var spawner = Server.System<Content.Server._WF.Administration.Systems.AdminVesselSpawnSystem>();
+            var vessel = Server.ResolveDependency<IPrototypeManager>().Index<VesselPrototype>("Hazel");
+            Assert.That(spawner.TrySpawnVessel(vessel, MapData.MapId, new Vector2(30000f, 30000f), null, out var first), Is.True);
+            Assert.That(spawner.TrySpawnVessel(vessel, MapData.MapId, new Vector2(30200f, 30000f), null, out var second), Is.True);
+            Assert.That(spawner.TrySpawnVessel(vessel, MapData.MapId, new Vector2(30400f, 30000f), null, out var third), Is.True);
+            judge = first!.Value;
+            player = second!.Value;
+            reaver = third!.Value;
+            SEntMan.EnsureComponent<WFCrewShipProfileComponent>(judge).Profile = "WFCrewProfileJudge";
+            SEntMan.EnsureComponent<WFCrewShipProfileComponent>(reaver).Profile = "WFCrewProfileAbductor";
+
+            var spared = Server.System<WFCrewSparedSystem>();
+            Assert.That(spared.HoldsFireOn(judge, player), Is.False, "Nobody aboard.");
+            Assert.That(spared.HoldsFireOn(reaver, player), Is.False, "Only a flagged crew holds fire.");
+
+            var docking = Server.System<Content.Server.Shuttles.Systems.DockingSystem>();
+            docking.Dock(docking.GetDocks(reaver)[0], docking.GetDocks(player)[0]);
+            Assert.That(spared.HoldsFireOn(judge, reaver), Is.False, "Docked to an empty ship.");
+            Server.System<SharedTransformSystem>().SetCoordinates(SPlayer, Transform(player, new Vector2(4.5f, -3.5f)));
+        });
+
+        await RunTicks(2);
+        await Server.WaitAssertion(() =>
+        {
+            var spared = Server.System<WFCrewSparedSystem>();
+            Assert.That(spared.HoldsFireOn(judge, player), Is.True, "A player aboard.");
+            Assert.That(spared.HoldsFireOn(judge, reaver), Is.True, "Docked to a ship with a player aboard.");
+            Assert.That(spared.HoldsFireOn(reaver, player), Is.False, "Only a flagged crew holds fire.");
+            Server.System<SharedTransformSystem>().SetCoordinates(SPlayer, new EntityCoordinates(MapData.MapUid, Vector2.Zero));
+        });
+    }
+
     /// <summary>A baton all but flat is full and switched on again after a swing in an abductor's hands.</summary>
     [Test]
     public async Task AbductorBatonsNeverRunFlat()

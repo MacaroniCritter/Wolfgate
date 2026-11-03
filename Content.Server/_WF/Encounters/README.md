@@ -125,9 +125,12 @@ A ship with an `abduct:` block is an abductor (`WFEncounterSystem.Abduct.cs`, st
 picks the ship with the fewest players aboard in `reach`, up to `maxCrew`, and docks with it under clamps. Its guards hold the
 port and its `grabbers` deckhands (`WFCrewGrabberSystem`, in `NpcCrew`) stun, cuff and drag someone to the `WFAbductCellChair`.
 It then casts off, bolts the cell (`WFAbductCellSystem`), adds `ransom` to its warrant, announces the abduction and comes out on
-the sector map. The prisoner pays from an alt verb on the chair, or whoever answers its hail aboard their ship pays there; paid,
-or after `holdTime`, they go back aboard their own ship or the nearest station with the cuffs off. With its crew dead the cell
-door stands open. Crew carry batons, not guns. Only hulls with the chair work, which `AbductorHullsHaveACell` checks.
+the sector map. While it holds someone it shows magenta on the mass scanner with `HOSTAGE ABOARD` on its label
+(`WFHostageShipComponent`, read in `GetIFFLabel`). The prisoner pays from an alt verb on the chair and is sent home, as they are
+after `holdTime`. Anyone who hails it, or answers its hail, can pay there instead: it then holds still for 10 minutes (`Handover`)
+with the prisoner uncuffed, its crew standing down, no clamps and its door locks off, for someone to dock and walk them off. A
+prisoner still aboard at the end is sent home. With its crew dead the cell door stands open. Crew carry batons, not guns. Only
+hulls with the chair work, which `AbductorHullsHaveACell` checks.
 
 A ship with an `extort:` block is an extorter (`WFEncounterSystem.Extort.cs`, state in `WFExtortState`). It roams on
 its wander legs, flown about the nearest player ship it has no business with yet. Every few minutes (`markMin` to
@@ -263,6 +266,7 @@ stops. Extorters weigh the four nearest crewed ships and go for the richest hold
 - [`Content.Shared/_WF/Encounters/WFEncounterMarkers.cs`](../../../Content.Shared/_WF/Encounters/WFEncounterMarkers.cs)
 - [`Content.Shared/_WF/Encounters/WFEncounterPresetPrototype.cs`](../../../Content.Shared/_WF/Encounters/WFEncounterPresetPrototype.cs)
 - [`Content.Shared/_WF/Encounters/WFEncounterPrototype.cs`](../../../Content.Shared/_WF/Encounters/WFEncounterPrototype.cs)
+- [`Content.Shared/_WF/Encounters/WFHostageShipComponent.cs`](../../../Content.Shared/_WF/Encounters/WFHostageShipComponent.cs)
 - [`Content.Shared/_WF/Encounters/WFPirateRetrofitPrototype.cs`](../../../Content.Shared/_WF/Encounters/WFPirateRetrofitPrototype.cs)
 - [`Content.Shared/_WF/Encounters/WFStandingPrototype.cs`](../../../Content.Shared/_WF/Encounters/WFStandingPrototype.cs)
 
@@ -365,6 +369,7 @@ stops. Extorters weigh the four nearest crewed ships and go for the richest hold
 - [`Content.Server/Shuttles/Systems/DockingSystem.cs`](../../Shuttles/Systems/DockingSystem.cs): a raider's docking clamps hold the ship until released at its helm.
 - [`Content.Server/Shuttles/Systems/ShuttleConsoleSystem.cs`](../../Shuttles/Systems/ShuttleConsoleSystem.cs): docking screens show clamped ports.
 - [`Content.Shared/Shuttles/BUIStates/DockingPortState.cs`](../../../Content.Shared/Shuttles/BUIStates/DockingPortState.cs): the raider grid whose docking clamps hold this port's joint.
+- [`Content.Shared/Shuttles/Systems/SharedShuttleSystem.IFF.cs`](../../../Content.Shared/Shuttles/Systems/SharedShuttleSystem.IFF.cs): a ship holding someone says so on the scanner
 - [`Resources/Prototypes/_Goobstation/Entities/Objects/Devices/pda.yml`](../../../Resources/Prototypes/_Goobstation/Entities/Objects/Devices/pda.yml): warrants reach every PDA
 - [`Resources/Prototypes/_Mono/Entities/Objects/Devices/pda.yml`](../../../Resources/Prototypes/_Mono/Entities/Objects/Devices/pda.yml): warrants reach every PDA
 - [`Resources/Prototypes/Entities/Objects/Devices/pda.yml`](../../../Resources/Prototypes/Entities/Objects/Devices/pda.yml): warrants reach every PDA

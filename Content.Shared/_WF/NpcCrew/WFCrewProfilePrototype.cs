@@ -56,6 +56,10 @@ public sealed partial class WFCrewProfilePrototype : IPrototype
     [DataField]
     public int? StrayHits;
 
+    /// <summary>Whether its ships hold fire on any ship with a living player aboard, or docked to one, even under fire: a station's guard doesn't wreck people's ships to hit whoever is alongside them.</summary>
+    [DataField]
+    public bool SparesCrewedShips;
+
     /// <summary>Titles its crews carry in place of a role's own, by role: an automaton is a Helm Unit, not a First Officer.</summary>
     [DataField]
     public Dictionary<ProtoId<WFCrewRolePrototype>, LocId> Titles = new();

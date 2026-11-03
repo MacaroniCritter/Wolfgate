@@ -1,10 +1,13 @@
 using Content.Server._WF.NpcCrew.Components;
+using Content.Server.Shuttles.Systems;
 using Content.Shared._Mono.Company;
 using Content.Shared.Cuffs.Components;
+using Content.Shared.Ghost;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Shuttles.Components;
 using Content.Shared._WF.NpcCrew;
 using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Server._WF.NpcCrew.Systems;
@@ -18,9 +21,13 @@ public sealed partial class WFCrewSparedSystem : EntitySystem
 {
     [Dependency] private IGameTiming _timing = default!;
     [Dependency] private MobStateSystem _mobs = default!;
+    [Dependency] private DockingSystem _docking = default!;
+    [Dependency] private IPrototypeManager _prototypes = default!;
 
     private readonly Dictionary<EntityUid, HashSet<string>> _aboard = new();
     private GameTick _aboardTick;
+    private readonly HashSet<EntityUid> _manned = new();
+    private GameTick _mannedTick;
 
     /// <summary>Whether the crew of <paramref name="grid"/> takes the player vessel <paramref name="target"/> for its own side.</summary>
     public bool Spared(EntityUid grid, EntityUid target)
@@ -45,6 +52,46 @@ public sealed partial class WFCrewSparedSystem : EntitySystem
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Whether the crew of <paramref name="grid"/> holds fire on <paramref name="target"/> because of who is on it or
+    /// alongside it: only a <see cref="WFCrewProfilePrototype.SparesCrewedShips"/> crew does.
+    /// </summary>
+    public bool HoldsFireOn(EntityUid grid, EntityUid target)
+    {
+        if (grid == target || !TryComp<WFCrewShipProfileComponent>(grid, out var own)
+            || !_prototypes.TryIndex(own.Profile, out var profile) || !profile.SparesCrewedShips)
+            return false;
+
+        if (Manned(target))
+            return true;
+
+        foreach (var dock in _docking.GetDocks(target))
+        {
+            if (dock.Comp.DockedWith is { } mate && Transform(mate).GridUid is { } alongside && Manned(alongside))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>Whether a living player stands on a grid, prisoners included; gathered once a tick.</summary>
+    private bool Manned(EntityUid grid)
+    {
+        if (_mannedTick != _timing.CurTick)
+        {
+            _mannedTick = _timing.CurTick;
+            _manned.Clear();
+            var players = EntityQueryEnumerator<ActorComponent, TransformComponent>();
+            while (players.MoveNext(out var uid, out _, out var xform))
+            {
+                if (xform.GridUid is { } on && !HasComp<GhostComponent>(uid) && !_mobs.IsDead(uid))
+                    _manned.Add(on);
+            }
+        }
+
+        return _manned.Contains(grid);
     }
 
     private string Company(EntityUid uid)

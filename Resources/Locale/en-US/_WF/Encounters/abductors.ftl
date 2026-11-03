@@ -16,10 +16,14 @@ wf-encounter-abduct-prisoner-short = You can't cover the {$ransom} spesos.
 wf-encounter-abduct-released-paid = Paid. The Reavers put you back aboard.
 wf-encounter-abduct-released-free = The Reavers are done waiting and send you back.
 wf-encounter-abduct-verb-pay = Pay ransom ({$ransom} spesos)
+wf-encounter-abduct-handover-told = Your ransom is paid. The doors are open. Someone is coming to dock and collect you.
+
+# On the mass scanner, for a ship holding someone.
+wf-encounter-abduct-iff-label = HOSTAGE ABOARD - {$name}
 
 # Said down the hail to whoever answers aboard the prisoner's ship.
 wf-encounter-abduct-demand = We have {$name}. {$ransom} spesos and they come home in one piece.
-wf-encounter-abduct-paid = Pleasure doing business. They are on their way.
+wf-encounter-abduct-handover = Paid. Dock with us and collect {$name}. Nobody aboard will touch you. You have {$minutes} minutes.
 wf-encounter-abduct-short = You don't have {$ransom} spesos. Call back when you do.
 wf-encounter-abduct-refused = Your choice. They stay here.
 wf-encounter-abduct-option-pay = Pay {$ransom} spesos
@@ -30,5 +34,6 @@ wf-encounter-abduct-status-close = closing on {$ship}
 wf-encounter-abduct-status-dock = docking with {$ship}
 wf-encounter-abduct-status-grab = taking someone off {$ship}
 wf-encounter-abduct-status-ransom = holding {$name} for ransom
+wf-encounter-abduct-status-handover = paid, waiting for the prisoner to be collected
 wf-encounter-admin-order-abduct-unreachable = That ship is berthed at a station or hidden.
 wf-encounter-admin-order-abduct-nobody = There is nobody aboard that ship to take.

@@ -1,4 +1,5 @@
 using Content.Shared._WF.Encounters;
+using Content.Shared._WF.NpcCrew;
 
 namespace Content.Server._WF.Encounters.Components;
 
@@ -19,6 +20,9 @@ public enum WFAbductPhase : byte
 
     /// <summary>Clear of the mark with someone in its cell.</summary>
     Ransom,
+
+    /// <summary>Paid over the hail: holding still with the doors open and its crew standing down until the prisoner is collected.</summary>
+    Handover,
 }
 
 /// <summary>An abductor's round: its mark, its prisoner, its ransom and the ships it leaves alone.</summary>
@@ -51,6 +55,18 @@ public sealed class WFAbductState
 
     /// <summary>When it gives up on the ransom. Null until someone is in the cell.</summary>
     public TimeSpan? RansomEnds;
+
+    /// <summary>When a paid-for prisoner still aboard is sent home instead of collected.</summary>
+    public TimeSpan HandoverEnds;
+
+    /// <summary>What its crew's rules were before a handover, to put back after.</summary>
+    public Dictionary<EntityUid, (WFCrewEngagement Engagement, WFCrewSecurityResponse Boarding, WFCrewSecurityResponse Docking)> Truce = new();
+
+    /// <summary>Door locks a handover switched off, to switch back on after.</summary>
+    public List<EntityUid> Unlocked = new();
+
+    /// <summary>The scanner colour it showed before it took someone.</summary>
+    public Color? ScannerColor;
 
     /// <summary>When it may next hail the prisoner's ship, and how many hails that ship has had.</summary>
     public TimeSpan NextHail;

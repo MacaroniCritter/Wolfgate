@@ -7,7 +7,9 @@ using Content.Server._WF.NpcCrew.Systems;
 using Content.Shared._WF.Encounters;
 using Content.Shared._WF.Hailing;
 using Content.Shared._WF.NpcCrew;
+using Content.Shared.Access.Components;
 using Content.Shared.Database;
+using Content.Shared.Doors.Components;
 using Content.Shared.Ghost;
 using Content.Shared.Popups;
 using Robust.Shared.Player;
@@ -26,6 +28,7 @@ public sealed partial class WFEncounterSystem
 {
     [Dependency] private WFAbductCellSystem _cells = default!;
     [Dependency] private WFCrewGrabberSystem _grabbers = default!;
+    [Dependency] private WFCrewSecuritySystem _crewSecurity = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
 
     public const string AbductPay = "abduct-pay";
@@ -39,6 +42,12 @@ public sealed partial class WFEncounterSystem
 
     /// <summary>Hails a prisoner's ship gets.</summary>
     private const int AbductHails = 3;
+
+    /// <summary>How long it waits for someone to come and collect a prisoner paid for over the hail.</summary>
+    private const int AbductHandoverMinutes = 10;
+
+    /// <summary>What a ship holding someone shows on the mass scanner: a colour no other ship flies.</summary>
+    private static readonly Color AbductScannerColor = Color.Magenta;
 
     private static readonly TimeSpan AbductHailEvery = TimeSpan.FromSeconds(60);
     private static readonly TimeSpan AbductCloseDelay = TimeSpan.FromSeconds(4);
@@ -96,11 +105,13 @@ public sealed partial class WFEncounterSystem
             if (abduct.Cell is { } cell && abduct.Prisoner != null)
                 _cells.Open(cell);
             abduct.Prisoner = null;
+            if (abduct.Cell is not { } chair || _cells.Buckled(chair) == null)
+                AbductClearHostage(ship, abduct);
             return;
         }
 
         if (!ship.Virtual)
-            DeclineRings(ship);
+            AbductRings(ship, abduct);
 
         switch (abduct.Phase)
         {
@@ -119,7 +130,185 @@ public sealed partial class WFEncounterSystem
             case WFAbductPhase.Ransom:
                 AbductRansom(encounter, key, ship, abduct);
                 break;
+            case WFAbductPhase.Handover:
+                AbductHandover(encounter, key, ship, abduct);
+                break;
         }
+    }
+
+    /// <summary>
+    /// Anyone may call it about a prisoner: a ring at its helm is picked up with the price while it holds someone, and
+    /// told to come and collect during a handover. It takes no other calls.
+    /// </summary>
+    private void AbductRings(WFEncounterShipState ship, WFAbductState abduct)
+    {
+        var talking = abduct.Phase is WFAbductPhase.Ransom or WFAbductPhase.Handover && abduct.Prisoner != null
+                      && (abduct.Console is not { } line || _hailing.GetState(line) == null);
+        _rings.Clear();
+        var ringing = EntityQueryEnumerator<HailConsoleComponent, TransformComponent>();
+        while (ringing.MoveNext(out var uid, out var hail, out var xform))
+        {
+            if (xform.GridUid == ship.Grid && hail.State == HailState.Ringing)
+                _rings.Add(uid);
+        }
+
+        foreach (var console in _rings)
+        {
+            if (!talking || !TryFindHelm(ship, out _, out var speaker))
+            {
+                _hailing.AnswerAutomated(console, console, false);
+                continue;
+            }
+
+            talking = false;
+            _hailing.AnswerAutomated(console, speaker, true);
+            if (_hailing.GetState(console) != HailState.Connected)
+                continue;
+
+            abduct.Console = console;
+            abduct.Operator = speaker;
+            abduct.CloseAt = null;
+            if (abduct.Phase == WFAbductPhase.Handover)
+            {
+                AbductSay(abduct, "handover", ("name", Name(abduct.Prisoner!.Value)), ("minutes", AbductHandoverMinutes));
+                abduct.CloseAt = _timing.CurTime + AbductCloseDelay;
+                continue;
+            }
+
+            AbductDemand(console, speaker, abduct);
+        }
+
+        _rings.Clear();
+    }
+
+    /// <summary>States the price down an open line and offers the answers.</summary>
+    private void AbductDemand(EntityUid console, EntityUid speaker, WFAbductState abduct)
+    {
+        var ransom = abduct.Config.Ransom;
+        AbductSay(abduct, "demand", ("name", Name(abduct.Prisoner!.Value)), ("ransom", ransom));
+        if (!_hailing.Offer(console, speaker, new List<HailOption>
+            {
+                new(AbductPay, Loc.GetString($"{abduct.Config.Lines}-option-pay", ("ransom", ransom))),
+                new(AbductRefuse, Loc.GetString($"{abduct.Config.Lines}-option-refuse")),
+            }))
+            Log.Warning($"Abductor console {ToPrettyString(console)} could not offer its answers.");
+    }
+
+    /// <summary>Paid over the hail: the prisoner is cut loose, and the ship holds still and lets anyone dock and walk them off.</summary>
+    private void AbductBeginHandover(WFEncounterShipState ship, WFAbductState abduct)
+    {
+        AbductStandDown(ship);
+        RecallBoardingParty(ship);
+        SetAbductPhase(abduct, WFAbductPhase.Handover);
+        abduct.HandoverEnds = _timing.CurTime + TimeSpan.FromMinutes(AbductHandoverMinutes);
+        if (abduct.Cell is { } cell)
+            _cells.Open(cell);
+        if (abduct.Prisoner is { } prisoner)
+        {
+            _cells.Unbind(prisoner);
+            _popup.PopupEntity(Loc.GetString($"{abduct.Config.Lines}-handover-told"), prisoner, prisoner, PopupType.Large);
+        }
+
+        var crew = EntityQueryEnumerator<WFCrewComponent, WFCrewSecurityComponent>();
+        while (crew.MoveNext(out var uid, out var member, out var rules))
+        {
+            if (member.Group != ship.Group)
+                continue;
+
+            abduct.Truce[uid] = (member.Engagement, rules.Boarding, rules.Docking);
+            member.Engagement = WFCrewEngagement.Never;
+            rules.Boarding = WFCrewSecurityResponse.Ignore;
+            rules.Docking = WFCrewSecurityResponse.Ignore;
+            _crewSecurity.Reset(uid);
+        }
+
+        // No clamps on whoever comes for them, and no locked doors between the port and the cell.
+        if (TryComp<WFDockingClampComponent>(ship.Grid, out var clamps))
+        {
+            EntityManager.System<WFDockingClampSystem>().Release((ship.Grid, clamps), null);
+            clamps.OpenUntil = abduct.HandoverEnds;
+        }
+
+        var locks = EntityQueryEnumerator<DoorComponent, AccessReaderComponent, TransformComponent>();
+        while (locks.MoveNext(out var uid, out _, out var reader, out var xform))
+        {
+            if (xform.GridUid != ship.Grid || !reader.Enabled)
+                continue;
+
+            reader.Enabled = false;
+            Dirty(uid, reader);
+            abduct.Unlocked.Add(uid);
+        }
+
+        _objectives.SetQueue(ship.Grid, ship.Group, new List<WFCrewObjective> { new() { Kind = WFCrewObjectiveKind.Hold } });
+    }
+
+    /// <summary>Waits for the prisoner to be off the ship and their rescuers with them; out of time, a prisoner still aboard is sent home.</summary>
+    private void AbductHandover(Entity<WFEncounterComponent> encounter, string key, WFEncounterShipState ship, WFAbductState abduct)
+    {
+        var aboard = abduct.Prisoner is { } held && !TerminatingOrDeleted(held) && !_mobs.IsDead(held)
+                     && Transform(held).GridUid == ship.Grid;
+        if (_timing.CurTime >= abduct.HandoverEnds)
+        {
+            if (aboard)
+                AbductRelease(ship, abduct, true);
+        }
+        else if (aboard || AbductCaptives(ship.Grid).Count > 0)
+            return;
+
+        AbductEndTruce(abduct);
+        AbductEnd(encounter, key, ship, abduct);
+    }
+
+    /// <summary>Gives its crew their rules and its doors their locks back.</summary>
+    private void AbductEndTruce(WFAbductState abduct)
+    {
+        foreach (var (uid, rules) in abduct.Truce)
+        {
+            if (TryComp<WFCrewComponent>(uid, out var member))
+                member.Engagement = rules.Engagement;
+            if (TryComp<WFCrewSecurityComponent>(uid, out var security))
+            {
+                security.Boarding = rules.Boarding;
+                security.Docking = rules.Docking;
+            }
+        }
+
+        abduct.Truce.Clear();
+        foreach (var door in abduct.Unlocked)
+        {
+            if (TryComp<AccessReaderComponent>(door, out var reader))
+            {
+                reader.Enabled = true;
+                Dirty(door, reader);
+            }
+        }
+
+        abduct.Unlocked.Clear();
+    }
+
+    /// <summary>Shows the ship on every scanner for what it is, whatever it was hiding behind.</summary>
+    private void AbductMarkHostage(WFEncounterShipState ship, WFAbductState abduct)
+    {
+        if (HasComp<WFHostageShipComponent>(ship.Grid))
+            return;
+
+        AddComp<WFHostageShipComponent>(ship.Grid);
+        abduct.ScannerColor = _shuttles.GetIFFColor(ship.Grid);
+        _shuttles.SetIFFColor(ship.Grid, AbductScannerColor);
+        _shuttles.RemoveIFFFlag(ship.Grid, Content.Shared.Shuttles.Components.IFFFlags.HideLabel);
+    }
+
+    private void AbductClearHostage(WFEncounterShipState ship, WFAbductState abduct)
+    {
+        if (!RemComp<WFHostageShipComponent>(ship.Grid))
+            return;
+
+        if (abduct.ScannerColor is { } color)
+            _shuttles.SetIFFColor(ship.Grid, color);
+        abduct.ScannerColor = null;
+        if (ship.Stealth)
+            _shuttles.AddIFFFlag(ship.Grid, Content.Shared.Shuttles.Components.IFFFlags.HideLabel);
     }
 
     private void AbductRoam(Entity<WFEncounterComponent> encounter, string key, WFEncounterShipState ship, WFAbductState abduct)
@@ -472,6 +661,7 @@ public sealed partial class WFEncounterSystem
     private void AbductSecured(Entity<WFEncounterComponent> encounter, WFEncounterShipState ship, WFAbductState abduct, EntityUid prisoner)
     {
         AbductStandDown(ship);
+        AbductMarkHostage(ship, abduct);
         var ransom = abduct.Config.Ransom;
         _cells.Hold((abduct.Cell!.Value, Comp<WFAbductCellComponent>(abduct.Cell.Value)), prisoner, ransom);
         SetAbductPhase(abduct, WFAbductPhase.Ransom);
@@ -577,15 +767,7 @@ public sealed partial class WFEncounterSystem
             || abduct.Operator is not { } speaker || abduct.Prisoner is not { } prisoner)
             return false;
 
-        var ransom = abduct.Config.Ransom;
-        AbductSay(abduct, "demand", ("name", Name(prisoner)), ("ransom", ransom));
-        if (!_hailing.Offer(args.Console, speaker, new List<HailOption>
-            {
-                new(AbductPay, Loc.GetString($"{abduct.Config.Lines}-option-pay", ("ransom", ransom))),
-                new(AbductRefuse, Loc.GetString($"{abduct.Config.Lines}-option-refuse")),
-            }))
-            Log.Warning($"Abductor console {ToPrettyString(args.Console)} could not offer its answers.");
-
+        AbductDemand(args.Console, speaker, abduct);
         return true;
     }
 
@@ -604,13 +786,14 @@ public sealed partial class WFEncounterSystem
 
         // Set first: a paid ransom ends the run, and the call stays up for the answer.
         abduct.CloseAt = _timing.CurTime + AbductCloseDelay;
-        if (!AbductPayRansom(encounter, ship, abduct, args.ChooserEntity))
+        var name = abduct.Prisoner is { } held ? Name(held) : string.Empty;
+        if (abduct.Phase != WFAbductPhase.Ransom || !AbductPayRansom(encounter, ship, abduct, args.ChooserEntity, handover: true))
         {
             AbductSay(abduct, "short", ("ransom", abduct.Config.Ransom));
             return true;
         }
 
-        AbductSay(abduct, "paid");
+        AbductSay(abduct, "handover", ("name", name), ("minutes", AbductHandoverMinutes));
         return true;
     }
 
@@ -626,8 +809,12 @@ public sealed partial class WFEncounterSystem
             _popup.PopupEntity(Loc.GetString($"{abduct.Config.Lines}-prisoner-short", ("ransom", abduct.Config.Ransom)), args.Payer, args.Payer, PopupType.MediumCaution);
     }
 
-    /// <summary>Takes the ransom from someone's account and lets the prisoner go. False if they can't cover it.</summary>
-    public bool AbductPayRansom(Entity<WFEncounterComponent> encounter, WFEncounterShipState ship, WFAbductState abduct, EntityUid payer)
+    /// <summary>
+    /// Takes the ransom from someone's account and lets the prisoner go: sent home, or with <paramref name="handover"/>
+    /// left free aboard for someone to dock and collect. False if the payer can't cover it.
+    /// </summary>
+    public bool AbductPayRansom(Entity<WFEncounterComponent> encounter, WFEncounterShipState ship, WFAbductState abduct, EntityUid payer,
+        bool handover = false)
     {
         var ransom = abduct.Config.Ransom;
         if (abduct.Prisoner == null || !_bank.TryBankWithdraw(payer, ransom))
@@ -637,6 +824,12 @@ public sealed partial class WFEncounterSystem
         abduct.Collected += ransom;
         _adminLog.Add(LogType.Action, LogImpact.Medium,
             $"{ToPrettyString(payer):player} paid a ransom of {ransom} spesos to encounter ship {ToPrettyString(ship.Grid):entity}");
+        if (handover)
+        {
+            AbductBeginHandover(ship, abduct);
+            return true;
+        }
+
         AbductRelease(ship, abduct, true);
         var key = encounter.Comp.Ships.First(pair => pair.Value == ship).Key;
         AbductEnd(encounter, key, ship, abduct);
@@ -722,6 +915,7 @@ public sealed partial class WFEncounterSystem
         }
 
         ship.Boarded = null;
+        AbductClearHostage(ship, abduct);
         if (abduct.Cell is { } cell && TryComp<WFAbductCellComponent>(cell, out var comp))
             comp.Prisoner = null;
 
@@ -806,6 +1000,7 @@ public sealed partial class WFEncounterSystem
             return;
 
         EndAbductCall(abduct);
+        AbductEndTruce(abduct);
         if (abduct.Prisoner == null)
             return;
 
@@ -856,6 +1051,7 @@ public sealed partial class WFEncounterSystem
             WFAbductPhase.Dock => Loc.GetString("wf-encounter-abduct-status-dock", ("ship", mark)),
             WFAbductPhase.Grab => Loc.GetString("wf-encounter-abduct-status-grab", ("ship", mark)),
             WFAbductPhase.Ransom => Loc.GetString("wf-encounter-abduct-status-ransom", ("name", abduct.Prisoner is { } held && !TerminatingOrDeleted(held) ? Name(held) : mark)),
+            WFAbductPhase.Handover => Loc.GetString("wf-encounter-abduct-status-handover"),
             _ => Loc.GetString("wf-encounter-extort-status-roam"),
         };
     }
