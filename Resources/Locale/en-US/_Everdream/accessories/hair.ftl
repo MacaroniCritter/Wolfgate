@@ -1,4 +1,4 @@
-# WOLFGATE = Everdream hair port
+# WOLFGATE: Everdream hair port
 
 marking-eve = Eve
 marking-impish_short = Impish (Short)
