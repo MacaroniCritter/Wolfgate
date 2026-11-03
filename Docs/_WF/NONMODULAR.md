@@ -177,7 +177,9 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
 - [`Content.Server/Nutrition/EntitySystems/FoodSystem.cs`](../../Content.Server/Nutrition/EntitySystems/FoodSystem.cs): restore the licence header removed by Kill Spdx
 - [`Content.Server/Preferences/Managers/ServerPreferencesManager.cs`](../../Content.Server/Preferences/Managers/ServerPreferencesManager.cs)
   - a failed save is logged with its slot
+  - a player who left during the read, or hasn't loaded yet, has no play time to validate against
   - sanitized here like FinishLoad does on login
+- [`Content.Server/Procedural/DungeonJob/DungeonJob.PostGenAutoCabling.cs`](../../Content.Server/Procedural/DungeonJob/DungeonJob.PostGenAutoCabling.cs): a cable island no path reached threw KeyNotFound below and failed the dungeon
 - [`Content.Server/Projectiles/ProjectileSystem.cs`](../../Content.Server/Projectiles/ProjectileSystem.cs): restore the licence header removed by Kill Spdx
 - [`Content.Server/Radio/EntitySystems/RadioDeviceSystem.cs`](../../Content.Server/Radio/EntitySystems/RadioDeviceSystem.cs): keep the speaker's own output type and the admin-safe ghost range the radio host port dropped
 - [`Content.Server/Research/Systems/ResearchSystem.Client.cs`](../../Content.Server/Research/Systems/ResearchSystem.Client.cs)

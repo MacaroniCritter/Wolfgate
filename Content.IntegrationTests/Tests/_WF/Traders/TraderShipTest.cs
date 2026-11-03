@@ -544,7 +544,6 @@ public sealed class TraderShipTest
             Assert.That(listing!.ShipName, Is.EqualTo(ShipName), "The listing should keep the ship's name.");
             Assert.That(listing.DesignId?.Id, Is.EqualTo(VesselProto), "The listing should remember the design.");
             Assert.That(listing.DesignName, Is.EqualTo(protoMan.Index<VesselPrototype>(VesselProto).Name));
-            Assert.That(listing.Data, Is.Not.Empty, "The grid should have been serialised.");
 
             Assert.That(listing.SaleValue, Is.EqualTo(shipyardSys.GetPostSaleRateBill(console, appraisal)),
                 "The listing should record the post-rate, pre-tax bill.");
@@ -556,6 +555,16 @@ public sealed class TraderShipTest
                 "A bought ship should sit out back for the relist delay.");
             Assert.That(marketSys.GetAvailable(), Does.Not.Contain(listing),
                 "It should not be on the lot yet.");
+        });
+
+        // The copy takes many ticks, and blocking on it here would stop them running.
+        for (var i = 0; i < 1800 && !(listing!.Ready && entMan.Deleted(shuttle)); i++)
+            await pair.RunTicksSync(1);
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(listing!.Ready, Is.True, "The copy should have finished.");
+            Assert.That(listing.Data, Is.Not.Empty, "The grid should have been serialised.");
 
             // The old owner's bindings must not survive the copy.
             Assert.That(entMan.HasComponent<ShuttleDeedComponent>(shuttle), Is.False,
@@ -564,8 +573,7 @@ public sealed class TraderShipTest
             // Stand in for five minutes passing.
             listing.AvailableAt = listing.SoldAt;
             Assert.That(marketSys.GetAvailable(), Does.Contain(listing), "It should be on the lot now.");
-
-            entMan.DeleteEntity(shuttle);
+            Assert.That(entMan.Deleted(shuttle), Is.True, "The sold hull should be gone.");
         });
 
         await pair.RunTicksSync(2);
@@ -721,7 +729,7 @@ public sealed class TraderShipTest
             Assert.That(listing.ShipName, Is.EqualTo(ShipName));
         });
 
-        for (var i = 0; i < 40 && !entMan.Deleted(shuttle); i++)
+        for (var i = 0; i < 360 && !(listing!.Ready && entMan.Deleted(shuttle)); i++)
             await pair.RunTicksSync(5);
 
         var bought = EntityUid.Invalid;

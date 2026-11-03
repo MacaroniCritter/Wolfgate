@@ -385,6 +385,12 @@ namespace Content.Server.Preferences.Managers
             {
                 var prefs = await _db.GetPlayerPreferencesAsync(session.UserId, cancel);
 
+                // WOLFGATE START: a player who left during the read, or hasn't loaded yet, has no play time to validate against
+                // Nothing awaits this task, so the throw only ever reached the log. FinishLoad sends prefs when they do load.
+                if (!_dependencies.Resolve<Content.Server.Players.PlayTimeTracking.PlayTimeTrackingManager>().TryGetTrackerTimes(session, out _))
+                    return;
+                // WOLFGATE END
+
                 if (prefs != null)
                 {
                     // WOLFGATE: sanitized here like FinishLoad does on login

@@ -26,6 +26,7 @@ public sealed partial class AtmosphereSystem
         public TimeSpan Start;
         public TimeSpan Last;
         public TimeSpan QuietUntil;
+        public bool Alerted;
     }
 
     /// <summary>
@@ -45,7 +46,7 @@ public sealed partial class AtmosphereSystem
             return false;
         }
 
-        // A loop still going when its quiet ends goes straight back to quiet, with a fresh alert.
+        // A loop still going when its quiet ends goes straight back to quiet. It alerts once per run, not every ten minutes.
         if (now < run.QuietUntil)
         {
             run.Last = now;
@@ -61,6 +62,10 @@ public sealed partial class AtmosphereSystem
 
         run.Start = now;
         run.QuietUntil = now + WFBreachQuietTime;
+        if (run.Alerted)
+            return true;
+
+        run.Alerted = true;
         var name = ToPrettyString(grid);
         Log.Info($"Explosive depressurization from {tile.GridIndices} on {name} has looped for {WFBreachLoopTime.TotalMinutes} minutes; quieting it.");
         _wfChat.SendAdminAlert(Loc.GetString("wf-atmos-breach-loop-alert",

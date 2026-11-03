@@ -273,7 +273,10 @@ public sealed partial class ShipyardSystem : SharedShipyardSystem
         RaiseLocalEvent(ref soldEv);
         // WOLFGATE END
 
-        QueueDel(shuttleUid);
+        // WOLFGATE(Shipyard) START: the hull is parked and taken apart over many ticks; this stalled the server
+        // QueueDel(shuttleUid);
+        _wfHullRetire.Retire(shuttleUid);
+        // WOLFGATE END
         _sawmill.Info($"Sold shuttle {shuttleUid} for {bill}");
 
         // Update all record UI (skip records, no new records)

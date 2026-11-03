@@ -1,5 +1,8 @@
 # Administration
 
+`UpdateAdminStatus` also sends the Toolshed commands an admin's flags allow (`AdminManager.WFToolshedCommandsFor`), so
+`entities` and the like run without the `>` prefix. The server still checks each command in a pipeline.
+
 The Wolfgate tab in the admin menu and the tools behind it: spawn a vessel, spawn a humanoid in a starting gear
 outfit, build and call an ERT, power or unpower grids, and play internet sounds. Admins can also drag a ghost onto a
 body to put its player in it, and ctrl+click a ghost to spawn that player as their character in an outfit. The
@@ -43,6 +46,7 @@ Audio.
 
 ### Server
 
+- [`Content.Server/_WF/Administration/AdminManager.WFToolshed.cs`](AdminManager.WFToolshed.cs)
 - [`Content.Server/_WF/Administration/Commands/ErtBuilderCommand.cs`](Commands/ErtBuilderCommand.cs)
 - [`Content.Server/_WF/Administration/Commands/GridPowerCommand.cs`](Commands/GridPowerCommand.cs)
 - [`Content.Server/_WF/Administration/Commands/InternetSoundCommands.cs`](Commands/InternetSoundCommands.cs)
@@ -127,6 +131,7 @@ Audio.
 - [`Content.IntegrationTests/Tests/_WF/Administration/SecondChanceTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Administration/SecondChanceTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Administration/SetOutfitPickerTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Administration/SetOutfitPickerTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Administration/VesselSpawnStationTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Administration/VesselSpawnStationTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/Administration/WFToolshedCommandListTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Administration/WFToolshedCommandListTest.cs)
 
 ### Prototypes
 
@@ -152,6 +157,7 @@ Audio.
   - the scanner window an admin in a ghost gets instead
   - an admin in a ghost gets the resizable, far-zooming scanner
 - [`Content.Server/Administration/Commands/FollowCommand.cs`](../../Administration/Commands/FollowCommand.cs): aghost before orbiting
+- [`Content.Server/Administration/Managers/AdminManager.cs`](../../Administration/Managers/AdminManager.cs): the client refuses a command missing from this list
 - [`Content.Server/Administration/UI/AdminCameraEui.cs`](../../Administration/UI/AdminCameraEui.cs): aghost before orbiting
 - [`Content.Server/RoundEnd/RoundEndSystem.cs`](../../RoundEnd/RoundEndSystem.cs): no auto-call while delayroundend holds the round
 - [`Content.Server/Shuttles/Systems/EmergencyShuttleSystem.Console.cs`](../../Shuttles/Systems/EmergencyShuttleSystem.Console.cs)

@@ -76,6 +76,7 @@ public sealed partial class DungeonJob
                 var newStart = remaining.First();
                 frontier.Enqueue(newStart, 0f);
                 lastDirection[newStart] = Direction.Invalid;
+                costSoFar[newStart] = 0f; // WOLFGATE: a cable island no path reached threw KeyNotFound below and failed the dungeon
             }
 
             var node = frontier.Dequeue();
