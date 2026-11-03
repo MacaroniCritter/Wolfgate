@@ -169,10 +169,3 @@
   parent: BaseGoldCircuitboardRecipe
   id: MaterialSiloMachineCircuitboard
   result: MaterialSiloMachineCircuitboard
-
-# cloning stuff
-
-- type: latheRecipe
-  parent: BaseGoldCircuitboardRecipe
-  id: BodyScannerComputerCircuitboard
-  result: BodyScannerComputerCircuitboard

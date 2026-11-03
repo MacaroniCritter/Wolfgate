@@ -88,7 +88,9 @@ public sealed partial class WFEncounterSystem
             LeaveBehind(encounter, ship);
         }
 
-        if (!HasLivingCrew(ship) && !ship.Virtual)
+        // Hands on the mark are still crew while the run is on; with nobody aboard, the prisoner isn't dropped for that.
+        var handsOut = abduct.Phase == WFAbductPhase.Grab || abduct.Strays;
+        if (!HasLivingCrew(ship, anywhere: handsOut) && !ship.Virtual)
         {
             // Nobody left to hold anyone: whoever is in the cell waits for a rescue with the door open.
             if (abduct.Cell is { } cell && abduct.Prisoner != null)
@@ -143,11 +145,58 @@ public sealed partial class WFEncounterSystem
             return;
         }
 
+        AbductGoAfter(encounter, key, ship, abduct, mark);
+    }
+
+    /// <summary>Starts a run at a ship: whatever it was flying is dropped for it. False if it can't take the order.</summary>
+    private bool AbductGoAfter(Entity<WFEncounterComponent> encounter, string key, WFEncounterShipState ship, WFAbductState abduct, EntityUid mark)
+    {
+        abduct.Spared.Remove(mark);
         abduct.Mark = mark;
         abduct.DockMisses = 0;
+        abduct.NextMark = _timing.CurTime + AbductInterval(abduct.Config);
         SetAbductPhase(abduct, WFAbductPhase.Close);
         Log.Info($"Abductor {ToPrettyString(ship.Grid)} goes after {ToPrettyString(mark)}.");
+        if (!AbductChase(ship, mark))
+            return false;
+
         AbductClose(encounter, key, ship, abduct);
+        return true;
+    }
+
+    private bool AbductChase(WFEncounterShipState ship, EntityUid mark)
+    {
+        return _objectives.SetQueue(ship.Grid, ship.Group, new List<WFCrewObjective>
+        {
+            new() { Kind = WFCrewObjectiveKind.Follow, Target = GetNetEntity(mark), Range = AbductCloseRange / 2f },
+        });
+    }
+
+    /// <summary>
+    /// An admin's order to go for a ship, whatever its crew or how lately it was left alone. Returns why it can't, or
+    /// null.
+    /// </summary>
+    private string? AbductAdminOrder(Entity<WFEncounterComponent> encounter, string key, WFEncounterShipState ship, WFAbductState abduct, EntityUid mark)
+    {
+        if (abduct.Phase is WFAbductPhase.Grab or WFAbductPhase.Ransom)
+            return Loc.GetString("wf-encounter-admin-order-boarding");
+        if (DockedAtStation(mark) || _stealth.ShipUnseen(mark))
+            return Loc.GetString("wf-encounter-admin-order-abduct-unreachable");
+        if (AbductCaptives(mark).Count == 0)
+            return Loc.GetString("wf-encounter-admin-order-abduct-nobody");
+
+        return AbductGoAfter(encounter, key, ship, abduct, mark) ? null : Loc.GetString("wf-encounter-admin-order-failed");
+    }
+
+    /// <summary>An admin's other orders end a run that hasn't reached anyone yet.</summary>
+    private void AbductAdminCancel(WFAbductState abduct)
+    {
+        abduct.NextMark = _timing.CurTime + AbductInterval(abduct.Config);
+        if (abduct.Phase is not (WFAbductPhase.Close or WFAbductPhase.Dock))
+            return;
+
+        abduct.Mark = null;
+        SetAbductPhase(abduct, WFAbductPhase.Roam);
     }
 
     /// <summary>The ship with the fewest players aboard among the nearest few in reach, if any is small enough to take on.</summary>
@@ -216,12 +265,7 @@ public sealed partial class WFEncounterSystem
         }
 
         if (_objectives.QueueStatus(ship.Grid, ship.Group) is null or "complete" or "target-lost")
-        {
-            _objectives.SetQueue(ship.Grid, ship.Group, new List<WFCrewObjective>
-            {
-                new() { Kind = WFCrewObjectiveKind.Follow, Target = GetNetEntity(mark), Range = AbductCloseRange / 2f },
-            });
-        }
+            AbductChase(ship, mark);
     }
 
     private bool AbductIssueDock(WFEncounterShipState ship, EntityUid mark)
@@ -235,15 +279,16 @@ public sealed partial class WFEncounterSystem
 
     private void AbductDock(Entity<WFEncounterComponent> encounter, string key, WFEncounterShipState ship, WFAbductState abduct)
     {
-        if (!AbductMark(ship, abduct, out var mark))
+        // Looked at first: an encounter ship counts as a station, so its own dock would read as the mark being berthed.
+        if (abduct.Mark is { } alongside && !TerminatingOrDeleted(alongside) && _docking.AreGridsDocked(ship.Grid, alongside))
         {
-            AbductDrop(encounter, key, ship, abduct, null);
+            AbductBoard(encounter, key, ship, abduct, alongside);
             return;
         }
 
-        if (_docking.AreGridsDocked(ship.Grid, mark))
+        if (!AbductMark(ship, abduct, out var mark))
         {
-            AbductBoard(encounter, key, ship, abduct, mark);
+            AbductDrop(encounter, key, ship, abduct, null);
             return;
         }
 
@@ -557,15 +602,15 @@ public sealed partial class WFEncounterSystem
             return true;
         }
 
+        // Set first: a paid ransom ends the run, and the call stays up for the answer.
+        abduct.CloseAt = _timing.CurTime + AbductCloseDelay;
         if (!AbductPayRansom(encounter, ship, abduct, args.ChooserEntity))
         {
             AbductSay(abduct, "short", ("ransom", abduct.Config.Ransom));
-            abduct.CloseAt = _timing.CurTime + AbductCloseDelay;
             return true;
         }
 
         AbductSay(abduct, "paid");
-        abduct.CloseAt = _timing.CurTime + AbductCloseDelay;
         return true;
     }
 
@@ -647,6 +692,10 @@ public sealed partial class WFEncounterSystem
     {
         AbductStandDown(ship);
         RecallBoardingParty(ship);
+        // Someone already dragged aboard isn't carried off cuffed with no way to pay: they go home.
+        if (abduct.Prisoner is { } taken && !TerminatingOrDeleted(taken) && Transform(taken).GridUid == ship.Grid)
+            AbductRelease(ship, abduct, false);
+
         if (abduct.Cell is { } cell)
             _cells.Open(cell);
 
@@ -657,6 +706,10 @@ public sealed partial class WFEncounterSystem
     /// <summary>Done with this mark, whichever way it went: left alone a while, and the ship roams again.</summary>
     private void AbductEnd(Entity<WFEncounterComponent> encounter, string key, WFEncounterShipState ship, WFAbductState abduct)
     {
+        // A hail with a last line still to be heard hangs up on its timer; any other ending hangs up now.
+        if (abduct.CloseAt == null)
+            EndAbductCall(abduct);
+
         if (abduct.Mark is { } mark)
             abduct.Spared[mark] = _timing.CurTime + AbductSpare;
 
@@ -677,11 +730,7 @@ public sealed partial class WFEncounterSystem
         abduct.RansomEnds = null;
         SetAbductPhase(abduct, WFAbductPhase.Roam);
         abduct.NextMark = _timing.CurTime + AbductInterval(abduct.Config);
-        var queue = new List<WFCrewObjective>();
-        if (_docking.GetDocks(ship.Grid).Any(dock => dock.Comp.DockedWith != null))
-            queue.Add(new WFCrewObjective { Kind = WFCrewObjectiveKind.Undock });
-        queue.AddRange(AbductLegs(encounter, key, ship, abduct));
-        _objectives.SetQueue(ship.Grid, ship.Group, queue);
+        AbductWander(encounter, key, ship, abduct);
     }
 
     private void AbductDrop(Entity<WFEncounterComponent> encounter, string key, WFEncounterShipState ship, WFAbductState abduct, TimeSpan? spare)
@@ -705,6 +754,9 @@ public sealed partial class WFEncounterSystem
     private List<WFCrewObjective> AbductLegs(Entity<WFEncounterComponent> encounter, string key, WFEncounterShipState ship, WFAbductState abduct)
     {
         var queue = new List<WFCrewObjective>();
+        if (_docking.GetDocks(ship.Grid).Any(dock => dock.Comp.DockedWith != null))
+            queue.Add(new WFCrewObjective { Kind = WFCrewObjectiveKind.Undock });
+
         if (_prototypes.TryIndex(encounter.Comp.Prototype, out var prototype)
             && prototype.Ships.FirstOrDefault(entry => entry.Key == key) is { } entry)
         {

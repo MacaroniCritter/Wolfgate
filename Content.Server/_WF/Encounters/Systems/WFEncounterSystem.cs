@@ -801,8 +801,12 @@ public sealed partial class WFEncounterSystem : EntitySystem
             return;
 
         // Whoever it still holds goes home rather than into space with the hull's last hand gone.
-        if (ship.Abduct is { Prisoner: not null } holding && !ship.Virtual)
+        // That includes one left in the chair by a crew that died first.
+        if (ship.Abduct is { } holding && !ship.Virtual)
+        {
+            holding.Prisoner ??= holding.Cell is { } cell ? _cells.Buckled(cell) : null;
             AbductRelease(ship, holding, false);
+        }
 
         if (ship.Virtual)
         {

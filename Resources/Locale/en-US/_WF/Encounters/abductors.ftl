@@ -30,3 +30,5 @@ wf-encounter-abduct-status-close = closing on {$ship}
 wf-encounter-abduct-status-dock = docking with {$ship}
 wf-encounter-abduct-status-grab = taking someone off {$ship}
 wf-encounter-abduct-status-ransom = holding {$name} for ransom
+wf-encounter-admin-order-abduct-unreachable = That ship is berthed at a station or hidden.
+wf-encounter-admin-order-abduct-nobody = There is nobody aboard that ship to take.

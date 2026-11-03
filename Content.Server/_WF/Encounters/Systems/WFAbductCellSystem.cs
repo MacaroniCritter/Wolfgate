@@ -86,6 +86,12 @@ public sealed partial class WFAbductCellSystem : EntitySystem
         return TryComp<BuckleComponent>(prisoner, out var buckle) && buckle.BuckledTo == cell;
     }
 
+    /// <summary>Whoever sits buckled in a cell's chair, if anyone.</summary>
+    public EntityUid? Buckled(EntityUid cell)
+    {
+        return CompOrNull<StrapComponent>(cell)?.BuckledEntities.Cast<EntityUid?>().FirstOrDefault();
+    }
+
     /// <summary>Whether someone is on their feet outside a cell: broken out, not just out of the chair.</summary>
     public bool IsLoose(EntityUid prisoner, EntityUid cell)
     {

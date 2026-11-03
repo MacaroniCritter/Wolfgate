@@ -189,6 +189,63 @@ public sealed partial class WFEncounterTest
         });
     }
 
+    /// <summary>An admin's board order drops what the abductor was flying, and its crew fly to the ship and dock with it.</summary>
+    [Test]
+    public async Task AdminBoardOrderFliesAnAbductorToTheShip()
+    {
+        var (encounter, ship, abduct, cell) = await StartAbductor(new Vector2(9000f, 9000f));
+        EntityUid mark = default;
+        EntityUid body = default;
+        await Server.WaitAssertion(() =>
+        {
+            var vessel = Server.ResolveDependency<IPrototypeManager>().Index<VesselPrototype>("Hazel");
+            Assert.That(Server.System<Content.Server._WF.Administration.Systems.AdminVesselSpawnSystem>()
+                .TrySpawnVessel(vessel, MapData.MapId, new Vector2(9000f, 9300f), null, out var grid), Is.True);
+            mark = grid!.Value;
+
+            var encounters = Server.System<WFEncounterSystem>();
+            var comp = SEntMan.GetComponent<WFEncounterComponent>(encounter);
+            Assert.That(encounters.AdminOrder((encounter, comp), "abductor", WFEncounterAdminOrder.Board, mark, null), Is.Not.Null,
+                "Nobody is aboard to take.");
+            Assert.That(abduct.Mark, Is.Null);
+
+            // The test body is bare: the player takes a real one aboard.
+            body = SEntMan.SpawnEntity("MobHuman", Transform(mark, new Vector2(4.5f, -3.5f)));
+            Server.ResolveDependency<Robust.Server.Player.IPlayerManager>().SetAttachedEntity(ServerSession, body, force: true);
+            Assert.That(encounters.AdminOrder((encounter, comp), "abductor", WFEncounterAdminOrder.Board, mark, null), Is.Null);
+            Assert.That(abduct.Mark, Is.EqualTo(mark));
+            Assert.That(abduct.Phase, Is.EqualTo(WFAbductPhase.Close).Or.EqualTo(WFAbductPhase.Dock));
+        });
+
+        await Until(() => abduct.Phase != WFAbductPhase.Close && abduct.Phase != WFAbductPhase.Dock, 240, "The abductor docks with the ship it was sent at.");
+        await Server.WaitAssertion(() => Assert.That(ship.Boarded, Is.EqualTo(mark)));
+        var story = new System.Text.StringBuilder();
+        for (var i = 0; i < 20 && abduct.Phase != WFAbductPhase.Ransom; i++)
+        {
+            await RunTicks(600);
+            await Server.WaitPost(() =>
+            {
+                var at = SEntMan.GetComponent<TransformComponent>(body);
+                story.Append($"\n{i * 10}s {abduct.Phase} body on {at.GridUid} {at.LocalPosition} cuffs {SEntMan.GetComponent<CuffableComponent>(body).CuffedHandCount} ");
+                story.Append($"stamina {SEntMan.GetComponent<StaminaComponent>(body).StaminaDamage} puller {SEntMan.GetComponent<Content.Shared.Movement.Pulling.Components.PullableComponent>(body).Puller}");
+                var crew = SEntMan.EntityQueryEnumerator<WFCrewGrabberComponent, TransformComponent>();
+                while (crew.MoveNext(out var uid, out var job, out var where))
+                {
+                    story.Append($" | {uid} on {where.GridUid} {where.LocalPosition} swings {job.Swings}");
+                }
+            });
+        }
+
+        Assert.That(abduct.Phase, Is.EqualTo(WFAbductPhase.Ransom), $"Its hands take the player across the port and into the chair.{story}");
+        await Server.WaitAssertion(() =>
+        {
+            Assert.That(abduct.Prisoner, Is.EqualTo(body));
+            Assert.That(SEntMan.GetComponent<BuckleComponent>(body).BuckledTo, Is.EqualTo(cell));
+            Assert.That(SEntMan.GetComponent<TransformComponent>(body).GridUid, Is.EqualTo(ship.Grid));
+            Assert.That(SEntMan.GetComponent<MobStateComponent>(body).CurrentState, Is.EqualTo(Content.Shared.Mobs.MobState.Alive));
+        });
+    }
+
     /// <summary>The prisoner buys their way out from the chair, and goes home uncuffed with the money gone.</summary>
     [Test]
     public async Task PaidRansomSendsThePrisonerHome()
@@ -296,6 +353,14 @@ public sealed partial class WFEncounterTest
 
         await WaitUntilServer(Sealed, 3000);
 
+        // Looked at in the chair: the test's bare home grid has no air, so a few ticks there hurt on their own.
+        await Server.WaitAssertion(() =>
+        {
+            var hurt = SEntMan.GetComponent<Content.Shared.Damage.DamageableComponent>(captive).Damage.DamageDict
+                .Where(pair => pair.Value > 0).Select(pair => $"{pair.Key}={pair.Value}");
+            Assert.That(hurt, Is.Empty, "Held unhurt, with nobody beating them in the chair.");
+        });
+
         await Server.WaitPost(() => abduct.RansomEnds = Server.ResolveDependency<Robust.Shared.Timing.IGameTiming>().CurTime);
         await WaitUntilServer(() => abduct.Phase == WFAbductPhase.Roam, 300);
         await Server.WaitAssertion(() =>
@@ -307,7 +372,6 @@ public sealed partial class WFEncounterTest
                 .Where(pair => pair.Value > 0).Select(pair => $"{pair.Key}={pair.Value}");
             Assert.That(SEntMan.GetComponent<MobStateComponent>(captive).CurrentState, Is.EqualTo(Content.Shared.Mobs.MobState.Alive),
                 string.Join(", ", damage));
-            Assert.That(damage, Is.Empty, "Held unhurt, with nobody beating them in the chair.");
             Assert.That(abduct.Spared.ContainsKey(home), Is.True);
             Server.System<SharedTransformSystem>().SetCoordinates(SPlayer, new EntityCoordinates(MapData.MapUid, Vector2.Zero));
         });

@@ -242,7 +242,6 @@
     # Shitmed
     - id: MedicalBiofabMachineBoard
     - id: MMI # Shitmed
-    - id: GeneticDatabaseServerFlatpack # Mono
 
 # Hardsuit table, used for suit storage as well
 - type: entityTable
