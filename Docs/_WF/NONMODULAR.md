@@ -18,6 +18,9 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
   - engine 291 ignores the sprite-wide GetScreenTexture/RaiseShaderEvent; they are per post-shader now
 - [`Content.Client/_Mono/PlantAnalyzer/PlantAnalyzerPredictionSystem.cs`](../../Content.Client/_Mono/PlantAnalyzer/PlantAnalyzerPredictionSystem.cs): was 0.01, so the slightest drift silently cancelled the scan
 - [`Content.Client/_Mono/Tiles/TileEntityShaderSystem.cs`](../../Content.Client/_Mono/Tiles/TileEntityShaderSystem.cs): engine 291 ignores the sprite-wide RaiseShaderEvent; it is per post-shader now
+- [`Content.Client/_NF/Guidebook/Controls/GuideMedicalSource.xaml.cs`](../../Content.Client/_NF/Guidebook/Controls/GuideMedicalSource.xaml.cs)
+  - the assembler's recipes
+  - the medical assembler is a lathe now, so show its lathe recipe
 - [`Content.Client/_RMC14/Weapons/Ranged/Prediction/GunPredictionSystem.cs`](../../Content.Client/_RMC14/Weapons/Ranged/Prediction/GunPredictionSystem.cs): restore the licence header removed by Kill Spdx
 - [`Content.Client/CharacterInfo/CharacterInfoSystem.cs`](../../Content.Client/CharacterInfo/CharacterInfoSystem.cs)
   - replays skip the character info request
@@ -132,6 +135,11 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
 - [`Content.Server/_Mono/Trigger/LightningOnTriggerComponent.cs`](../../Content.Server/_Mono/Trigger/LightningOnTriggerComponent.cs): restore the licence header removed by Kill Spdx
 - [`Content.Server/_NF/Bank/BankSystem.cs`](../../Content.Server/_NF/Bank/BankSystem.cs): restore the licence header removed by Kill Spdx
 - [`Content.Server/_NF/Contraband/Systems/ContrabandTurnInSystem.cs`](../../Content.Server/_NF/Contraband/Systems/ContrabandTurnInSystem.cs): an executed heretic's body is what the Sultanate pays for
+- [`Content.Server/_NF/Medical/EntitySystems/MedicalRecipeDataSystem.cs`](../../Content.Server/_NF/Medical/EntitySystems/MedicalRecipeDataSystem.cs)
+  - the assembler's recipe pack
+  - the assembler's recipes
+  - what the medical assembler makes
+  - the assembler's microwave recipes became lathe recipes, which left the guidebook page empty
 - [`Content.Server/_NF/PublicTransit/PublicTransitSystem.cs`](../../Content.Server/_NF/PublicTransit/PublicTransitSystem.cs): announce the departure, as FTLToDock now flies and OnShuttleArrival announces the stop
 - [`Content.Server/_RMC14/Weapons/Ranged/Prediction/GunPredictionSystem.cs`](../../Content.Server/_RMC14/Weapons/Ranged/Prediction/GunPredictionSystem.cs): restore the licence header removed by Kill Spdx
 - [`Content.Server/Administration/Systems/AdminVerbSystem.Smites.cs`](../../Content.Server/Administration/Systems/AdminVerbSystem.Smites.cs): OwO accent removed
@@ -204,6 +212,7 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
 - [`Content.Server/VendingMachines/VendingMachineSystem.cs`](../../Content.Server/VendingMachines/VendingMachineSystem.cs)
   - restore the licence header removed by Kill Spdx
   - a free vend skips the cash payment, which logs a zero amount as invalid
+- [`Content.Server/Weapons/Ranged/Systems/GunSystem.cs`](../../Content.Server/Weapons/Ranged/Systems/GunSystem.cs): a bolt-action gun leaves its chamber full, and ammo that shoots itself has to leave it
 - [`Content.Shared/_Crescent/ShipShields/ShipShieldComponent.cs`](../../Content.Shared/_Crescent/ShipShields/ShipShieldComponent.cs): restore the licence header removed by Kill Spdx
 - [`Content.Shared/_Crescent/ShipShields/ShipShieldedComponent.cs`](../../Content.Shared/_Crescent/ShipShields/ShipShieldedComponent.cs): restore the licence header removed by Kill Spdx
 - [`Content.Shared/_Crescent/ShipShields/ShipShieldEmitterComponent.cs`](../../Content.Shared/_Crescent/ShipShields/ShipShieldEmitterComponent.cs): restore the licence header removed by Kill Spdx
@@ -258,6 +267,9 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
 - [`Content.Shared/_Mono/Traits/Physical/StrikingCallusesComponent.cs`](../../Content.Shared/_Mono/Traits/Physical/StrikingCallusesComponent.cs): restore the licence header removed by Kill Spdx
 - [`Content.Shared/_Mono/Traits/Physical/TenacityComponent.cs`](../../Content.Shared/_Mono/Traits/Physical/TenacityComponent.cs): restore the licence header removed by Kill Spdx
 - [`Content.Shared/_Mono/Traits/Physical/TrapAvoiderSystem.cs`](../../Content.Shared/_Mono/Traits/Physical/TrapAvoiderSystem.cs): restore the licence header removed by Kill Spdx
+- [`Content.Shared/_NF/Medical/SharedMedicalGuideDataSystem.cs`](../../Content.Shared/_NF/Medical/SharedMedicalGuideDataSystem.cs)
+  - the assembler's recipes
+  - the medical assembler is a lathe now, so a source can be a lathe recipe
 - [`Content.Shared/_RMC14/CCVar/RMCCVars.cs`](../../Content.Shared/_RMC14/CCVar/RMCCVars.cs): restore the licence header removed by Kill Spdx
 - [`Content.Shared/_RMC14/Random/SplitMix64.cs`](../../Content.Shared/_RMC14/Random/SplitMix64.cs): restore the licence header removed by Kill Spdx
 - [`Content.Shared/_RMC14/Random/Xoroshiro64S.cs`](../../Content.Shared/_RMC14/Random/Xoroshiro64S.cs): restore the licence header removed by Kill Spdx

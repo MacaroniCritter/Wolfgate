@@ -1,6 +1,7 @@
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Damage;
 using Content.Shared.Kitchen;
+using Content.Shared.Research.Prototypes; // WOLFGATE: the assembler's recipes
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
@@ -77,4 +78,20 @@ public sealed partial class MedicalRecipeData
         Result = proto.Result;
         _outputCount = proto.ResultCount;
     }
+
+    // WOLFGATE START: the medical assembler is a lathe now, so a source can be a lathe recipe
+    /// <summary>
+    ///     The lathe recipe this comes from, used in place of <see cref="Recipe"/>.
+    /// </summary>
+    [DataField]
+    public ProtoId<LatheRecipePrototype>? LatheRecipe;
+
+    public MedicalRecipeData(LatheRecipePrototype proto, EntProtoId result, string name)
+    {
+        Identitier = name;
+        LatheRecipe = proto.ID;
+        Result = result;
+        _outputCount = 1;
+    }
+    // WOLFGATE END
 }

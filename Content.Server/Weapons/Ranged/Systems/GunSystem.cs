@@ -174,6 +174,7 @@ public sealed partial class GunSystem : SharedGunSystem
                 case AmmoComponent newAmmo:
                     if (ent == null)
                         break;
+                    Containers.TryRemoveFromContainer(ent.Value); // WOLFGATE: a bolt-action gun leaves its chamber full, and ammo that shoots itself has to leave it
                     // Mono - check for muzzle flash of gun
                     var newMuzzleFlash = newAmmo.MuzzleFlash;
                     if (gun.MuzzleFlash != null)

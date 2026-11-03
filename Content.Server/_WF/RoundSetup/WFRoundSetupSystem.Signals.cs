@@ -36,8 +36,9 @@ public sealed partial class WFRoundSetupSystem
 
     private void OnCrewRadioReceive(ref RadioReceiveAttemptEvent args)
     {
-        if (args.Channel.ID == CrewChannel && (CrewForBody(args.RadioSource) is not { } crew ||
-            CrewForBody(args.RadioReceiver) != crew))
+        // Ghosts hear every crew, so staff can moderate the channel.
+        if (args.Channel.ID == CrewChannel && !HasComp<GhostComponent>(args.RadioReceiver) &&
+            (CrewForBody(args.RadioSource) is not { } crew || CrewForBody(args.RadioReceiver) != crew))
             args.Cancelled = true;
     }
 

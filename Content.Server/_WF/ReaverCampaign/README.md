@@ -122,7 +122,8 @@ Smuggling funds the Reavers (`.Funding`). Each smuggling crate (the market's `co
 and each crate of NPC freight (a manifest seal) fenced at a `sealedOnlyChutes` chute (the Underground fence), banks
 toward a war chest; every `fundingCrates` (5) pays out, bringing every stronghold's next reinforcement and the next
 spread forward by `fundingShare` (a quarter) of their intervals, announced as a routine radio line. The chest holds one
-payout at most and spends it once a stronghold stands and the campaign isn't held; `wf_reavers status` shows it.
+payout at most and spends it once a stronghold stands, the campaign isn't held and `fundingCooldown` (20 minutes) has
+passed since the last payout; `wf_reavers status` shows it.
 
 Ship raids favour laden ships (up to three times the weight for a hold worth 100,000, through
 `WFCargoValueQueryEvent`), and `RecentlyRaided` tells the market which stations a raid was just sent at.

@@ -78,11 +78,18 @@ public sealed class WFReaverFundingTest : WFReaverTestBase
             Assert.That((reinforcement - comp.NextReinforcement).TotalSeconds, Is.EqualTo(reinforcementCut.TotalSeconds).Within(1));
             Assert.That((spread - State().NextSpread!.Value).TotalSeconds, Is.EqualTo(spreadCut.TotalSeconds).Within(1));
 
-            // A sale that fills the chest pays out at once.
+            // A chest filled during the cooldown waits; after it, a sale that fills the chest pays out at once.
             for (var i = 0; i < campaign.FundingCrates; i++)
             {
                 market.Sell(chute, TradeTestWorld.Hauled(SEntMan, far, MapData.GridCoords, Contraband), seller);
             }
+
+            Assert.That(State().Funded, Is.EqualTo(1), "A payout landed inside the cooldown.");
+            Assert.That(State().Funding, Is.EqualTo(campaign.FundingCrates));
+
+            State().NextFunding = STiming.CurTime;
+            State().Funding = campaign.FundingCrates - 1;
+            market.Sell(chute, TradeTestWorld.Hauled(SEntMan, far, MapData.GridCoords, Contraband), seller);
 
             Assert.That(State().Funded, Is.EqualTo(2));
             Assert.That(State().Funding, Is.Zero);

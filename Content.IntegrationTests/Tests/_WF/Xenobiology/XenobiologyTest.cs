@@ -41,6 +41,53 @@ public sealed class XenobiologyTest
         return entities.EntityQuery<SlimeComponent>().Select(s => s.Uid()).Single(uid => !before.Contains(uid));
     }
 
+    /// <summary>Report 400: monkeys are Passive, and a slime has to count them as prey to be fed one.</summary>
+    [Test]
+    public async Task SlimesHuntPassiveMobs()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var entities = server.EntMan;
+        var map = await pair.CreateTestMap();
+
+        await server.WaitAssertion(() =>
+        {
+            var slime = SpawnGrey(entities, map.GridCoords);
+            var monkey = entities.SpawnEntity("MobMonkey", map.GridCoords.Offset(new Vector2(1f, 0)));
+            var factions = entities.System<Content.Shared.NPC.Systems.NpcFactionSystem>();
+            Assert.That(factions.GetNearbyHostiles(slime, 5f), Does.Contain(monkey));
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>Report 400: a split makes at least two slimes, however low the offspring roll, so it can't read as a colour change.</summary>
+    [Test]
+    public async Task MitosisAlwaysMakesAtLeastTwo()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var entities = server.EntMan;
+        var map = await pair.CreateTestMap();
+
+        await server.WaitAssertion(() =>
+        {
+            var slime = SpawnGrey(entities, map.GridCoords);
+            var comp = entities.GetComponent<SlimeComponent>(slime);
+            comp.MaxOffspring = 1;
+            entities.System<XenobiologySystem>().DoMitosis((slime, comp));
+
+            var children = entities.EntityQuery<SlimeComponent>().Where(s => s.Uid() != slime).Select(s => s.Uid()).ToList();
+            Assert.That(children, Has.Count.EqualTo(XenobiologySystem.MinOffspring));
+            foreach (var child in children)
+            {
+                entities.DeleteEntity(child);
+            }
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
     /// <summary>A latched slime sucked into a xenovac tank stays in the tank, not stuck unreachable on the tile.</summary>
     [Test]
     public async Task LatchedSlimeStaysInTheTank()

@@ -17,6 +17,22 @@ public sealed class WFWaypointSystem : EntitySystem
 
         SubscribeLocalEvent<UserInterfaceComponent, WFWaypointAddMessage>(OnAdd);
         SubscribeLocalEvent<UserInterfaceComponent, WFWaypointRemoveMessage>(OnRemove);
+        SubscribeLocalEvent<GridSplitEvent>(OnGridSplit);
+    }
+
+    /// <summary>Gives every piece of a split ship the waypoints, so a cockpit that breaks off keeps them.</summary>
+    private void OnGridSplit(ref GridSplitEvent args)
+    {
+        if (!TryComp<WFWaypointsComponent>(args.Grid, out var source))
+            return;
+
+        foreach (var grid in args.NewGrids)
+        {
+            var waypoints = EnsureComp<WFWaypointsComponent>(grid);
+            waypoints.Waypoints = new List<WFWaypoint>(source.Waypoints);
+            waypoints.NextId = source.NextId;
+            Dirty(grid, waypoints);
+        }
     }
 
     private static bool IsRadarUi(Enum key) => key is RadarConsoleUiKey or ShuttleConsoleUiKey;

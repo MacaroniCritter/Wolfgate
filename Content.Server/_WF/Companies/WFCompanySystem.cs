@@ -39,6 +39,8 @@ public sealed partial class WFCompanySystem : EntitySystem
     private readonly Dictionary<NetUserId, Dictionary<int, int>> _profileIds = new();
     /// <summary>The slot each player spawned this round, so the window acts as the character being played.</summary>
     private readonly Dictionary<NetUserId, int> _spawnedSlots = new();
+    /// <summary>The mind each spawned character was given.</summary>
+    private readonly Dictionary<NetUserId, EntityUid> _spawnedMinds = new();
     private readonly Dictionary<NetUserId, TimeSpan> _nextRequest = new();
     private readonly Dictionary<NetUserId, TimeSpan> _nextProfileRefresh = new();
     private readonly List<Task> _pendingWrites = new();
@@ -252,6 +254,7 @@ public sealed partial class WFCompanySystem : EntitySystem
         // Saved on the next update: a write started here would still be running when the restart adds the new round.
         _nextSave = TimeSpan.Zero;
         _spawnedSlots.Clear();
+        _spawnedMinds.Clear();
         _rankJoins.Clear();
         _newRecords.Clear();
         _companyBodies.Clear();
@@ -275,6 +278,10 @@ public sealed partial class WFCompanySystem : EntitySystem
             return;
         }
         _spawnedSlots[args.Player.UserId] = slot;
+        if (_minds.TryGetMind(args.Mob, out var mind, out _))
+            _spawnedMinds[args.Player.UserId] = mind;
+        else
+            _spawnedMinds.Remove(args.Player.UserId);
         EnsureComp<WFCompanyRankHudComponent>(args.Mob);
         ApplyMemberIdentity(args.Player, args.Mob, slot, args.JobId, records);
         IssueRankLoadout(args.Player, args.Mob, slot);

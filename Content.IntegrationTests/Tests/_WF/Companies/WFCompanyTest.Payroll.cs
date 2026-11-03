@@ -79,12 +79,15 @@ public sealed partial class WFCompanyTest
             // Lobby time never counts; only a living body spawned from the member character does.
             await server.WaitPost(() => companies.SamplePayroll(WFCompanyPolicy.PayrollHourSeconds));
             await server.WaitAssertion(() => Assert.That(companies.GetBalance(id.Value), Is.EqualTo(1000)));
+            var workerBody = EntityUid.Invalid;
+            var workerMind = EntityUid.Invalid;
             await server.WaitPost(() =>
             {
                 ticker.PlayerJoinGame(worker, silent: true);
-                var body = em.SpawnEntity("MobHuman", map.GridCoords);
+                var body = workerBody = em.SpawnEntity("MobHuman", map.GridCoords);
                 var minds = server.System<SharedMindSystem>();
-                minds.TransferTo(minds.CreateMind(worker.UserId, "Dee Worker"), body);
+                workerMind = minds.CreateMind(worker.UserId, "Dee Worker");
+                minds.TransferTo(workerMind, body);
                 spawnedSlots[worker.UserId] = preferences.GetPreferences(worker.UserId).SelectedCharacterIndex;
                 // Dummy sessions send no input, so mark the worker active.
                 server.ResolveDependency<IAfkManager>().PlayerDidAction(worker);
@@ -99,6 +102,31 @@ public sealed partial class WFCompanyTest
                 Assert.That(companies.GetBalance(id.Value), Is.EqualTo(700));
                 Assert.That(WorkerBank(), Is.EqualTo(300));
             });
+
+            // A ghost role takes a new mind, and that body is no part of the company: no wage for it.
+            var spawnedMinds = (Dictionary<NetUserId, EntityUid>) typeof(WFCompanySystem)
+                .GetField("_spawnedMinds", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(companies)!;
+            await server.WaitPost(() =>
+            {
+                spawnedMinds[worker.UserId] = workerMind;
+                var minds = server.System<SharedMindSystem>();
+                minds.TransferTo(minds.CreateMind(worker.UserId, "ADS unit"), em.SpawnEntity("MobHuman", map.GridCoords));
+            });
+            await pair.RunTicksSync(5);
+            await server.WaitPost(() => companies.SamplePayroll(WFCompanyPolicy.PayrollHourSeconds));
+            await server.WaitAssertion(() =>
+            {
+                Assert.That(worker.AttachedEntity, Is.Not.EqualTo(workerBody));
+                Assert.That(companies.GetBalance(id.Value), Is.EqualTo(700), "A ghost role drew a company wage.");
+                Assert.That(WorkerBank(), Is.EqualTo(300), "A ghost role drew a company wage.");
+            });
+            await server.WaitPost(() =>
+            {
+                var minds = server.System<SharedMindSystem>();
+                minds.SetUserId(workerMind, worker.UserId);
+                minds.TransferTo(workerMind, workerBody);
+            });
+            await pair.RunTicksSync(5);
 
             await RequestAs(owner, new(WFCompanyAction.UpsertRank)
             {

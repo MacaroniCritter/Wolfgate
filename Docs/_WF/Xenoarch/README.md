@@ -268,6 +268,7 @@ doesn't occur.
   - Goob gases the old gas effect could roll
   - no anomalite material here
   - Goob's proper invisibility, as the old effect had
+  - stays examinable, or a Close inspection node can never trigger
 - [`Resources/Prototypes/XenoArch/triggers.yml`](../../../Resources/Prototypes/XenoArch/triggers.yml)
   - Frontier's goblin blood; no sulfur blood here
   - no Mushroom tag here

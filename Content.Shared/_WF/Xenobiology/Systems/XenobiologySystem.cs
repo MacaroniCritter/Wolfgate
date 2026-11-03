@@ -40,6 +40,11 @@ public sealed partial class XenobiologySystem : EntitySystem
     /// </summary>
     public const float StartingHunger = 40f;
 
+    /// <summary>
+    /// Fewest slimes a split makes; one would only look like the slime changing colour.
+    /// </summary>
+    public const int MinOffspring = 2;
+
     private readonly List<Entity<SlimeComponent>> _splitting = new();
     private readonly List<Entity<PendingSlimeSpawnComponent>> _pending = new();
 
@@ -164,11 +169,11 @@ public sealed partial class XenobiologySystem : EntitySystem
     }
 
     /// <summary>
-    /// Splits a slime into offspring, each of which may mutate into one of its potential breeds.
+    /// Splits a slime into at least two offspring, each of which may mutate into one of its potential breeds.
     /// </summary>
     public void DoMitosis(Entity<SlimeComponent> ent)
     {
-        var offspring = _random.Next(1, Math.Max(1, ent.Comp.MaxOffspring) + 1);
+        var offspring = _random.Next(MinOffspring, Math.Max(MinOffspring, ent.Comp.MaxOffspring) + 1);
         _audio.PlayPvs(ent.Comp.MitosisSound, ent);
 
         for (var i = 0; i < offspring; i++)

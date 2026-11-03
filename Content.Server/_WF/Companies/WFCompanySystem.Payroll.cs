@@ -58,6 +58,7 @@ public sealed partial class WFCompanySystem
     private Character? PlayingCharacter(ICommonSession session)
     {
         if (session.Status != SessionStatus.InGame || !_spawnedSlots.TryGetValue(session.UserId, out var slot) ||
+            !PlaysSpawnedCharacter(session) ||
             session.AttachedEntity is not { } body || HasComp<GhostComponent>(body) ||
             !TryComp<MobStateComponent>(body, out var state) || state.CurrentState == MobState.Dead || _afk.IsAfk(session) ||
             _preferences.GetPreferencesOrNull(session.UserId)?.Characters.GetValueOrDefault(slot) is not HumanoidCharacterProfile profile ||
@@ -136,7 +137,7 @@ public sealed partial class WFCompanySystem
     /// <summary>The company's share of a member's earnings, without taking it; 0 for non-members.</summary>
     public int CutFor(ICommonSession? session, int amount)
     {
-        if (session == null || amount <= 0 || CurrentCharacter(session) is not { } character ||
+        if (session == null || amount <= 0 || !PlaysSpawnedCharacter(session) || CurrentCharacter(session) is not { } character ||
             CompanyOf(character.ProfileId) is not { Frozen: false } company)
             return 0;
         return WFCompanyPolicy.CutOf(amount, company.Cut);
