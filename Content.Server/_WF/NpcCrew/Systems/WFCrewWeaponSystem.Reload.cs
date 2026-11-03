@@ -82,7 +82,8 @@ public sealed partial class WFCrewWeaponSystem
             }
             if (HasLiveThreat(uid))
                 TryReloadOrSwitch(uid);
-            else
+            // A grabber's baton is out for someone who isn't a threat; holstering it here also restarts its cooldown for good.
+            else if (!HasComp<WFCrewGrabberComponent>(uid))
             {
                 RemCompDeferred<NPCRangedCombatComponent>(uid);
                 RemCompDeferred<NPCMeleeCombatComponent>(uid);
@@ -142,6 +143,9 @@ public sealed partial class WFCrewWeaponSystem
 
         // Someone it has finished with, or a boarding party's mark that has not hit it (NpcIntents).
         if (_factions.IsIgnored(uid, target) || EntityManager.System<Content.Server._WF.NpcIntents.WFNpcIntentSystem>().HoldsFireOn(uid, target))
+            return false;
+
+        if (HasComp<WFCrewNonLethalComponent>(uid) && CompOrNull<Content.Shared.Cuffs.Components.CuffableComponent>(target)?.CuffedHandCount > 0)
             return false;
 
         TryComp<WFCrewComponent>(uid, out var crew);

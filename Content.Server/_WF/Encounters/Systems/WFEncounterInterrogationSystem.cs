@@ -106,7 +106,7 @@ public sealed partial class WFEncounterInterrogationSystem : EntitySystem
     /// <summary>Hails the nearest stranger in a ship's warning zone that is not being asked and is not on cooldown.</summary>
     private void Ask(EntityUid uid, WFEncounterComponent encounter, WFEncounterShipState ship, TimeSpan now)
     {
-        if (ship.Lurking || ship.Extort != null || TerminatingOrDeleted(ship.Grid) || _status.IsDisabled(ship.Grid)
+        if (ship.Lurking || ship.Extort != null || ship.Abduct != null || TerminatingOrDeleted(ship.Grid) || _status.IsDisabled(ship.Grid)
             || _calls.Values.Any(call => call.Ship == ship))
             return;
 

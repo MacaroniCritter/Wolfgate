@@ -73,6 +73,7 @@ public sealed partial class WFEncounterSystem
         SubscribeLocalEvent<HailAnsweredEvent>(OnExtortAnswered);
         SubscribeLocalEvent<HailOptionChosenEvent>(OnExtortChosen);
         SubscribeLocalEvent<HailCallEndedEvent>(OnExtortCallEnded);
+        InitializeAbduct();
     }
 
     private WFExtortState NewExtort(WFEncounterExtort config)
@@ -310,6 +311,9 @@ public sealed partial class WFEncounterSystem
     /// <summary>The mark answered: the toll is named and the answers put in front of whoever is on the call.</summary>
     private void OnExtortAnswered(ref HailAnsweredEvent args)
     {
+        if (AbductAnswered(ref args))
+            return;
+
         if (!TryExtorter(args.Grid, args.Console, out _, out _, out _, out var extort) || extort.Phase != WFExtortPhase.Calling
             || extort.Operator is not { } speaker)
             return;
@@ -329,6 +333,9 @@ public sealed partial class WFEncounterSystem
     /// <summary>An answer was picked: the toll is taken from whoever picked it, or the ship is boarded.</summary>
     private void OnExtortChosen(ref HailOptionChosenEvent args)
     {
+        if (AbductChosen(ref args))
+            return;
+
         if (!TryExtorter(args.OffererGrid, args.Offerer, out var encounter, out var key, out var ship, out var extort)
             || extort.Phase != WFExtortPhase.Demand)
             return;
@@ -759,7 +766,7 @@ public sealed partial class WFEncounterSystem
     {
         foreach (var ship in encounter.Ships.Values)
         {
-            if (ships && encounter.Resolution == null && ExtortStatus(ship) is { } status)
+            if (ships && encounter.Resolution == null && (ExtortStatus(ship) ?? AbductStatus(ship)) is { } status)
                 state = Loc.GetString("wf-encounter-admin-state-detail", ("state", state), ("detail", status));
         }
 

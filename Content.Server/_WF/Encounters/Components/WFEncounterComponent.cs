@@ -298,6 +298,9 @@ public sealed partial class WFEncounterShipState
     /// <summary>Set on an extorter: where it is in its round of tolls.</summary>
     public WFExtortState? Extort;
 
+    /// <summary>Set on an abductor: its run at a mark and whoever it holds.</summary>
+    public WFAbductState? Abduct;
+
     /// <summary>Whether it answers an attack by turning on the attacker.</summary>
     [DataField]
     public bool Evades = true;

@@ -172,7 +172,8 @@ public sealed partial class WFEncounterZoneSystem : EntitySystem
 
                 var key = (ship.Grid, rival.Grid);
                 var there = CentreOfMass(rival.Grid);
-                if (there.MapId != here.MapId || (there.Position - here.Position).Length() > range)
+                if (there.MapId != here.MapId || (there.Position - here.Position).Length() > range
+                    || _spared.HoldsFireOn(ship.Grid, rival.Grid) || _spared.HoldsFireOn(rival.Grid, ship.Grid))
                 {
                     _rivals.Remove(key);
                     continue;
@@ -412,7 +413,7 @@ public sealed partial class WFEncounterZoneSystem : EntitySystem
 
             // Its own side comes and goes as it likes: a hull showing its colours, or one with its people free aboard.
             // A ship that minds only NPCs lets every player vessel by. Their fire is still answered.
-            if (ship.NpcTargetsOnly || _spared.Spared(ship.Grid, intruder))
+            if (ship.NpcTargetsOnly || _spared.Spared(ship.Grid, intruder) || _spared.HoldsFireOn(ship.Grid, intruder))
             {
                 Release(encounter, ship, intruder);
                 _alerts.EndZoneWarning(ship.Grid, intruder);
@@ -582,7 +583,8 @@ public sealed partial class WFEncounterZoneSystem : EntitySystem
                 || !_answeredShots.Add((ship.Grid, shot.Shot)))
                 continue;
 
-            if (_escorts.AreInFormation(ship.Grid, shot.Shooter) || SameSide(encounter, ship, shot.Shooter))
+            if (_escorts.AreInFormation(ship.Grid, shot.Shooter) || SameSide(encounter, ship, shot.Shooter)
+                || _spared.HoldsFireOn(ship.Grid, shot.Shooter))
                 continue;
 
             var fresh = !_alerts.IsAttacker(ship.Grid, shot.Shooter);

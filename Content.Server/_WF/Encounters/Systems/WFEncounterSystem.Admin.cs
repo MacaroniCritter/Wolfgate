@@ -63,6 +63,8 @@ public sealed partial class WFEncounterSystem
                 break;
 
             case WFEncounterAdminOrder.Board:
+                if (ship.Abduct is { } abduct)
+                    return AbductAdminOrder(encounter, key, ship, abduct, mark);
                 if (!ship.Hunt || ship.Extort != null)
                     return Loc.GetString("wf-encounter-admin-order-not-hunter");
                 ship.Prey = mark;
@@ -91,6 +93,9 @@ public sealed partial class WFEncounterSystem
                     SetExtortPhase(extorting, WFExtortPhase.Roam);
                     extorting.NextMark = _timing.CurTime + ExtortInterval(extorting.Config);
                 }
+
+                if (ship.Abduct is { } abducting)
+                    AbductAdminCancel(abducting);
 
                 ship.Prey = null;
                 var attack = order == WFEncounterAdminOrder.Attack;
