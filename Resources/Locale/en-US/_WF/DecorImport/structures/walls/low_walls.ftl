@@ -1,0 +1,16 @@
+ent-DarkPackLowWallRich = low wall
+    .desc = It's a lot like a wall, but lower.
+ent-DarkPackLowWallRichOld = low wall
+    .desc = It's a lot like a wall, but lower.
+ent-DarkPackLowWallJunkAlt = low wall
+    .desc = It's a lot like a wall, but lower.
+ent-DarkPackLowWallMarket = low wall
+    .desc = It's a lot like a wall, but lower.
+ent-DarkPackLowWallOld = low wall
+    .desc = It's a lot like a wall, but lower.
+ent-DarkPackLowWallPainted = low wall
+    .desc = It's a lot like a wall, but lower.
+ent-DarkPackLowWallBar = low wall
+    .desc = It's a lot like a wall, but lower.
+ent-DarkPackLowWallWood = low wall
+    .desc = It's a lot like a wall, but lower.

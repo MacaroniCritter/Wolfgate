@@ -42,7 +42,7 @@
 
   The cursor readout names the tile, grid, floor and entity under the cursor and what the current mode will do.
 
-  The Mapping window has three tabs. [bold]Session[/bold] holds the join code, members, autosave, grids, reference grids and Leave session. [bold]Save[/bold] saves and downloads. [bold]Library[/bold] lists your maps. The escape menu's [bold]Mapping[/bold] entry opens it too.
+  The Mapping window has five tabs. [bold]Session[/bold] holds the join code, members, autosave and Leave session. [bold]Grids[/bold] lists your grids. [bold]Reference[/bold] previews and places reference grids. [bold]Save[/bold] saves and downloads. [bold]Library[/bold] lists your maps. The escape menu's [bold]Mapping[/bold] entry opens it too.
 
   ## Moving panels
 

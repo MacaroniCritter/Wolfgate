@@ -54,6 +54,13 @@ public sealed class WFMappingLibraryList : BoxContainer
         Rebuild();
     }
 
+    /// <summary>Folds a map's versions out, as its Versions button does.</summary>
+    public void ExpandForTest(string map)
+    {
+        _expanded.Add(map);
+        Rebuild();
+    }
+
     private void Rebuild()
     {
         RemoveAllChildren();

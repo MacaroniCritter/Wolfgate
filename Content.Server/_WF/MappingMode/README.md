@@ -53,9 +53,10 @@ reconnect, and My maps lists the library: Open starts a new session from a versi
 it, the smaller Download copies its plain level files to the client, Delete asks for a second click. In game, the
 Mapping entry of the escape menu
 opens the Mapping window. Its Session tab shows the name, join code (Copy, and New code for the owner, which revokes
-the old one), the live limits, members (the owner can remove them for good and set the autosave step), the grids on
-your level (tiles, entities and Go to, with Next grid to cycle through them largest first), Delete the grid under me,
-Load reference, Reset layout (the mode bar) and Leave. Save saves into your own library under a name (blank uses the
+the old one), the live limits, members (the owner can remove them for good and set the autosave step), Reset layout
+(the mode bar) and Leave. Grids lists the grids on your level (tiles, entities and Go to, with Next grid to cycle
+through them largest first) and Delete the grid under me. Reference lists the files you can place and previews the
+picked one's floor plan, read from its yaml without loading it (`WFMappingPreviewParser`). Save saves into your own library under a name (blank uses the
 session name), and Export... opens the export wizard on the newest saved version of that name; Library lists, exports,
 downloads and deletes. Opening a map, rejoining and placing a reference put you at the centre of the largest grid
 instead of the origin.
@@ -458,6 +459,7 @@ requests are handled in MappingTools (`MappingToolsSystem.Links.cs`). Cvars are 
 - [`Content.Server/_WF/MappingMode/WFMappingModeSystem.Spawners.cs`](WFMappingModeSystem.Spawners.cs)
 - [`Content.Server/_WF/MappingMode/WFMappingModeSystem.Test.cs`](WFMappingModeSystem.Test.cs)
 - [`Content.Server/_WF/MappingMode/WFMappingModeSystem.WorldGrid.cs`](WFMappingModeSystem.WorldGrid.cs)
+- [`Content.Server/_WF/MappingMode/WFMappingPreviewParser.cs`](WFMappingPreviewParser.cs)
 - [`Content.Server/_WF/MappingMode/WFMappingSession.cs`](WFMappingSession.cs)
 - [`Content.Server/_WF/MappingMode/WFMappingSessionMapComponent.cs`](WFMappingSessionMapComponent.cs)
 - [`Content.Server/_WF/MappingMode/WFMappingTemplateShareSystem.cs`](WFMappingTemplateShareSystem.cs)
@@ -530,6 +532,7 @@ requests are handled in MappingTools (`MappingToolsSystem.Links.cs`). Cvars are 
 - [`Content.Client/_WF/MappingMode/Modes/WFMappingSelectMode.cs`](../../../Content.Client/_WF/MappingMode/Modes/WFMappingSelectMode.cs)
 - [`Content.Client/_WF/MappingMode/Modes/WFMappingShapeMode.cs`](../../../Content.Client/_WF/MappingMode/Modes/WFMappingShapeMode.cs)
 - [`Content.Client/_WF/MappingMode/Modes/WFMappingShapeOverlay.cs`](../../../Content.Client/_WF/MappingMode/Modes/WFMappingShapeOverlay.cs)
+- [`Content.Client/_WF/MappingMode/Modes/WFMappingWrenchMode.cs`](../../../Content.Client/_WF/MappingMode/Modes/WFMappingWrenchMode.cs)
 - [`Content.Client/_WF/MappingMode/Palette/WFMappingDecalPalette.xaml`](../../../Content.Client/_WF/MappingMode/Palette/WFMappingDecalPalette.xaml)
 - [`Content.Client/_WF/MappingMode/Palette/WFMappingDecalPalette.xaml.cs`](../../../Content.Client/_WF/MappingMode/Palette/WFMappingDecalPalette.xaml.cs)
 - [`Content.Client/_WF/MappingMode/Palette/WFMappingPalette.xaml`](../../../Content.Client/_WF/MappingMode/Palette/WFMappingPalette.xaml)
@@ -582,6 +585,7 @@ requests are handled in MappingTools (`MappingToolsSystem.Links.cs`). Cvars are 
 - [`Content.Client/_WF/MappingMode/WFMappingMenuWindow.xaml`](../../../Content.Client/_WF/MappingMode/WFMappingMenuWindow.xaml)
 - [`Content.Client/_WF/MappingMode/WFMappingMenuWindow.xaml.cs`](../../../Content.Client/_WF/MappingMode/WFMappingMenuWindow.xaml.cs)
 - [`Content.Client/_WF/MappingMode/WFMappingReferenceOverlay.cs`](../../../Content.Client/_WF/MappingMode/WFMappingReferenceOverlay.cs)
+- [`Content.Client/_WF/MappingMode/WFMappingReferencePreviewControl.cs`](../../../Content.Client/_WF/MappingMode/WFMappingReferencePreviewControl.cs)
 - [`Content.Client/_WF/MappingMode/WFMappingReferenceSystem.cs`](../../../Content.Client/_WF/MappingMode/WFMappingReferenceSystem.cs)
 - [`Content.Client/_WF/MappingMode/WFMappingUploadClientSystem.cs`](../../../Content.Client/_WF/MappingMode/WFMappingUploadClientSystem.cs)
 - [`Content.Client/_WF/MappingMode/WFMappingUploadRow.cs`](../../../Content.Client/_WF/MappingMode/WFMappingUploadRow.cs)
@@ -603,6 +607,7 @@ requests are handled in MappingTools (`MappingToolsSystem.Links.cs`). Cvars are 
 - [`Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingLibraryTest.cs`](../../../Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingLibraryTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingLimitsTest.cs`](../../../Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingLimitsTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingLinksLayerTest.cs`](../../../Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingLinksLayerTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingMenuLayoutTest.cs`](../../../Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingMenuLayoutTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingModeBarTest.cs`](../../../Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingModeBarTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingModeTestUtil.cs`](../../../Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingModeTestUtil.cs)
 - [`Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingPermissionTest.cs`](../../../Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingPermissionTest.cs)
@@ -619,6 +624,7 @@ requests are handled in MappingTools (`MappingToolsSystem.Links.cs`). Cvars are 
 - [`Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingUploadClientTest.cs`](../../../Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingUploadClientTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingUploadTest.cs`](../../../Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingUploadTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingWorldGridTest.cs`](../../../Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingWorldGridTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingWrenchTest.cs`](../../../Content.IntegrationTests/Tests/_WF/MappingMode/WFMappingWrenchTest.cs)
 
 ### Unit tests
 
@@ -628,6 +634,7 @@ requests are handled in MappingTools (`MappingToolsSystem.Links.cs`). Cvars are 
 - [`Content.Tests/_WF/MappingMode/WFMappingIssueCatalogTest.cs`](../../../Content.Tests/_WF/MappingMode/WFMappingIssueCatalogTest.cs)
 - [`Content.Tests/_WF/MappingMode/WFMappingIssuesSchedulerTest.cs`](../../../Content.Tests/_WF/MappingMode/WFMappingIssuesSchedulerTest.cs)
 - [`Content.Tests/_WF/MappingMode/WFMappingLibraryNamesTest.cs`](../../../Content.Tests/_WF/MappingMode/WFMappingLibraryNamesTest.cs)
+- [`Content.Tests/_WF/MappingMode/WFMappingPreviewParserTest.cs`](../../../Content.Tests/_WF/MappingMode/WFMappingPreviewParserTest.cs)
 - [`Content.Tests/_WF/MappingMode/WFMappingPruneTest.cs`](../../../Content.Tests/_WF/MappingMode/WFMappingPruneTest.cs)
 - [`Content.Tests/_WF/MappingMode/WFMappingQuickSelectStoreTest.cs`](../../../Content.Tests/_WF/MappingMode/WFMappingQuickSelectStoreTest.cs)
 - [`Content.Tests/_WF/MappingMode/WFMappingScreenLayoutTest.cs`](../../../Content.Tests/_WF/MappingMode/WFMappingScreenLayoutTest.cs)
@@ -657,6 +664,7 @@ requests are handled in MappingTools (`MappingToolsSystem.Links.cs`). Cvars are 
 - [`Resources/Locale/en-US/_WF/MappingMode/mapping-template.ftl`](../../../Resources/Locale/en-US/_WF/MappingMode/mapping-template.ftl)
 - [`Resources/Locale/en-US/_WF/MappingMode/mapping-test.ftl`](../../../Resources/Locale/en-US/_WF/MappingMode/mapping-test.ftl)
 - [`Resources/Locale/en-US/_WF/MappingMode/mapping-upload.ftl`](../../../Resources/Locale/en-US/_WF/MappingMode/mapping-upload.ftl)
+- [`Resources/Locale/en-US/_WF/MappingMode/mapping-wrench.ftl`](../../../Resources/Locale/en-US/_WF/MappingMode/mapping-wrench.ftl)
 
 ### Textures
 

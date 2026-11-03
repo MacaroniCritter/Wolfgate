@@ -2428,6 +2428,9 @@ unmarked:
   - path: Resources/Textures/_NF/Objects/Tiles/woodtile.rsi/
     module: DecorImport
     reason: Floor tile item sprites, ported from Frontier.
+  - path: Resources/Textures/_NF/Structures/Wallmounts/trophies.rsi/
+    module: DecorImport
+    reason: Decor sprites, ported from Frontier.
   - path: Resources/Audio/_DV/CosmicCult/
     module: DecorImport
     reason: Door sounds, ported from Delta-V.
@@ -2578,6 +2581,9 @@ unmarked:
   - path: Resources/Textures/_RMC14/Objects/Medical/
     module: DecorImport
     reason: Decor sprites, ported from RMC-14.
+  - path: Resources/Textures/_RMC14/Objects/Misc/Janitorial/cart_wreck.rsi/
+    module: DecorImport
+    reason: Decor sprites, ported from RMC-14.
   - path: Resources/Textures/_RMC14/Structures/Flora/
     module: DecorImport
     reason: Decor sprites, ported from RMC-14.
@@ -2587,6 +2593,18 @@ unmarked:
   - path: Resources/Textures/_RMC14/Structures/Wallmounts/Lighting/
     module: DecorImport
     reason: Decor sprites, ported from RMC-14.
+  - path: Resources/Textures/_RMC14/Structures/hybrisa_misc_props/64x64.rsi/
+    module: DecorImport
+    reason: Decor sprites, ported from RMC-14.
+  - path: Resources/Textures/_RMC14/Structures/overhead_neon_signs.rsi/
+    module: DecorImport
+    reason: Neon sign sprites, ported from RMC-14.
+  - path: Resources/Textures/_RMC14/Structures/overhead_signs.rsi/
+    module: DecorImport
+    reason: Sign sprites, ported from RMC-14.
+  - path: Resources/Textures/_RMC14/Effects/LightMasks/
+    module: DecorImport
+    reason: Light mask for the neon signs, ported from RMC-14.
   - path: Resources/Textures/_RMC14/Structures/Doors/
     module: DecorImport
     reason: Door sprites, ported from RMC-14.
@@ -2614,6 +2632,9 @@ unmarked:
   - path: Resources/Textures/_RMC14/Structures/Machines/drop_pod.rsi/
     module: DecorImport
     reason: Drop pod sprites, ported from RMC-14.
+  - path: Resources/Textures/_RMC14/Structures/fences.rsi/
+    module: DecorImport
+    reason: Fence sprites, ported from RMC-14.
   - path: Resources/Textures/_RMC14/Tiles/almayer/
     module: DecorImport
     reason: Tile sprites, ported from RMC-14.

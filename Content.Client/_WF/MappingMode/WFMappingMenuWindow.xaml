@@ -3,8 +3,8 @@
                       xmlns:mapping="clr-namespace:Content.Client._WF.MappingMode"
                       xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
                       Title="{Loc 'wf-mapping-mode-menu-title'}"
-                      MinSize="460 420"
-                      SetSize="560 640">
+                      MinSize="600 400"
+                      SetSize="680 520">
     <BoxContainer Orientation="Vertical" Margin="8" SeparationOverride="6">
         <TabContainer Name="Tabs" Access="Public" VerticalExpand="True">
             <!-- Session -->
@@ -39,55 +39,6 @@
                                    HorizontalExpand="True" ClipText="True" />
                         </BoxContainer>
 
-                        <Label Text="{Loc 'wf-mapping-mode-menu-grids'}" StyleClasses="LabelHeading" Margin="0 6 0 0" />
-                        <BoxContainer Orientation="Horizontal" SeparationOverride="6">
-                            <Label Name="GridsHint" Access="Public" StyleClasses="LabelSubText" VAlign="Center"
-                                   HorizontalExpand="True" ClipText="True" />
-                            <Button Name="NextGridButton" Access="Public" Text="{Loc 'wf-mapping-ship-menu-next-grid'}"
-                                    ToolTip="{Loc 'wf-mapping-ship-menu-next-grid-tooltip'}" TooltipDelay="0" />
-                            <Button Name="NewGridButton" Access="Public" ToggleMode="True"
-                                    Text="{Loc 'wf-mapping-mode-menu-new-grid'}"
-                                    ToolTip="{Loc 'wf-mapping-mode-menu-new-grid-tooltip'}" TooltipDelay="0" />
-                            <Button Name="GridsRefreshButton" Access="Public" Text="{Loc 'wf-mapping-mode-lobby-refresh'}" />
-                        </BoxContainer>
-                        <BoxContainer Name="GridList" Access="Public" Orientation="Vertical" SeparationOverride="2" />
-                        <Button Name="DeleteGridButton" Access="Public" HorizontalAlignment="Left"
-                                Text="{Loc 'wf-mapping-mode-menu-delete-grid'}"
-                                ToolTip="{Loc 'wf-mapping-mode-menu-delete-grid-tooltip'}"
-                                TooltipDelay="0" />
-                        <PanelContainer Name="DeleteConfirmBox" Access="Public" Visible="False">
-                            <PanelContainer.PanelOverride>
-                                <graphics:StyleBoxFlat BackgroundColor="#3a1010" BorderColor="#ff5050"
-                                                       BorderThickness="1" ContentMarginLeftOverride="6"
-                                                       ContentMarginRightOverride="6" ContentMarginTopOverride="4"
-                                                       ContentMarginBottomOverride="4" />
-                            </PanelContainer.PanelOverride>
-                            <BoxContainer Orientation="Vertical" SeparationOverride="4">
-                                <Label Name="DeleteConfirmLabel" Access="Public" />
-                                <Label Text="{Loc 'wf-mapping-mode-menu-delete-grid-preview-hint'}"
-                                       StyleClasses="LabelSubText" />
-                                <BoxContainer Orientation="Horizontal" SeparationOverride="6">
-                                    <Button Name="DeleteConfirmButton" Access="Public" StyleClasses="Caution"
-                                            Text="{Loc 'wf-mapping-mode-menu-delete-grid-confirm'}" />
-                                    <Button Name="DeleteCancelButton" Access="Public"
-                                            Text="{Loc 'wf-mapping-mode-menu-delete-grid-cancel'}" />
-                                </BoxContainer>
-                            </BoxContainer>
-                        </PanelContainer>
-
-                        <Label Text="{Loc 'wf-mapping-mode-menu-reference'}" StyleClasses="LabelHeading" Margin="0 6 0 0" />
-                        <Button Name="ReferenceButton" Access="Public" ToggleMode="True"
-                                Text="{Loc 'wf-mapping-mode-menu-reference-load'}" />
-                        <BoxContainer Name="ReferenceBox" Access="Public" Orientation="Vertical" SeparationOverride="4"
-                                      Visible="False">
-                            <Label Text="{Loc 'wf-mapping-mode-menu-reference-hint'}" StyleClasses="LabelSubText" />
-                            <LineEdit Name="ReferenceSearch" Access="Public"
-                                      PlaceHolder="{Loc 'wf-mapping-mode-menu-reference-search'}" />
-                            <ItemList Name="ReferenceList" Access="Public" SelectMode="Single" MinHeight="220" />
-                            <Button Name="ReferencePlaceButton" Access="Public" Disabled="True"
-                                    Text="{Loc 'wf-mapping-mode-menu-reference-place'}" />
-                        </BoxContainer>
-
                         <Label Text="{Loc 'wf-mapping-modebar-menu-screen'}" StyleClasses="LabelHeading"
                                Margin="0 6 0 0" />
                         <Button Name="ResetLayoutButton" Access="Public" HorizontalAlignment="Left"
@@ -101,6 +52,65 @@
                     </BoxContainer>
                 </BoxContainer>
             </ScrollContainer>
+
+            <!-- Grids -->
+            <BoxContainer Name="GridsBox" Access="Public" Orientation="Vertical" Margin="8" SeparationOverride="6">
+                <BoxContainer Orientation="Horizontal" SeparationOverride="6">
+                    <Label Name="GridsHint" Access="Public" StyleClasses="LabelSubText" VAlign="Center"
+                           HorizontalExpand="True" ClipText="True" />
+                    <Button Name="NextGridButton" Access="Public" Text="{Loc 'wf-mapping-ship-menu-next-grid'}"
+                            ToolTip="{Loc 'wf-mapping-ship-menu-next-grid-tooltip'}" TooltipDelay="0" />
+                    <Button Name="NewGridButton" Access="Public" ToggleMode="True"
+                            Text="{Loc 'wf-mapping-mode-menu-new-grid'}"
+                            ToolTip="{Loc 'wf-mapping-mode-menu-new-grid-tooltip'}" TooltipDelay="0" />
+                    <Button Name="GridsRefreshButton" Access="Public" Text="{Loc 'wf-mapping-mode-lobby-refresh'}" />
+                </BoxContainer>
+                <ScrollContainer HScrollEnabled="False" VerticalExpand="True">
+                    <BoxContainer Name="GridList" Access="Public" Orientation="Vertical" SeparationOverride="2" />
+                </ScrollContainer>
+                <Button Name="DeleteGridButton" Access="Public" HorizontalAlignment="Left"
+                        Text="{Loc 'wf-mapping-mode-menu-delete-grid'}"
+                        ToolTip="{Loc 'wf-mapping-mode-menu-delete-grid-tooltip'}"
+                        TooltipDelay="0" />
+                <PanelContainer Name="DeleteConfirmBox" Access="Public" Visible="False">
+                    <PanelContainer.PanelOverride>
+                        <graphics:StyleBoxFlat BackgroundColor="#3a1010" BorderColor="#ff5050"
+                                               BorderThickness="1" ContentMarginLeftOverride="6"
+                                               ContentMarginRightOverride="6" ContentMarginTopOverride="4"
+                                               ContentMarginBottomOverride="4" />
+                    </PanelContainer.PanelOverride>
+                    <BoxContainer Orientation="Vertical" SeparationOverride="4">
+                        <Label Name="DeleteConfirmLabel" Access="Public" />
+                        <Label Text="{Loc 'wf-mapping-mode-menu-delete-grid-preview-hint'}"
+                               StyleClasses="LabelSubText" />
+                        <BoxContainer Orientation="Horizontal" SeparationOverride="6">
+                            <Button Name="DeleteConfirmButton" Access="Public" StyleClasses="Caution"
+                                    Text="{Loc 'wf-mapping-mode-menu-delete-grid-confirm'}" />
+                            <Button Name="DeleteCancelButton" Access="Public"
+                                    Text="{Loc 'wf-mapping-mode-menu-delete-grid-cancel'}" />
+                        </BoxContainer>
+                    </BoxContainer>
+                </PanelContainer>
+            </BoxContainer>
+
+            <!-- Reference -->
+            <BoxContainer Orientation="Vertical" Margin="8" SeparationOverride="6">
+                <Label Text="{Loc 'wf-mapping-mode-menu-reference-hint'}" StyleClasses="LabelSubText" />
+                <BoxContainer Orientation="Horizontal" SeparationOverride="8" VerticalExpand="True">
+                    <BoxContainer Orientation="Vertical" SeparationOverride="4" HorizontalExpand="True">
+                        <LineEdit Name="ReferenceSearch" Access="Public"
+                                  PlaceHolder="{Loc 'wf-mapping-mode-menu-reference-search'}" />
+                        <ItemList Name="ReferenceList" Access="Public" SelectMode="Single" VerticalExpand="True" />
+                    </BoxContainer>
+                    <BoxContainer Orientation="Vertical" SeparationOverride="4" HorizontalExpand="True">
+                        <mapping:WFMappingReferencePreviewControl Name="ReferencePreview" Access="Public"
+                                                                  VerticalExpand="True" />
+                        <Label Name="ReferenceInfo" Access="Public" StyleClasses="LabelSubText" ClipText="True" />
+                        <Button Name="ReferencePlaceButton" Access="Public" Disabled="True"
+                                Text="{Loc 'wf-mapping-mode-menu-reference-place'}" />
+                    </BoxContainer>
+                </BoxContainer>
+            </BoxContainer>
 
             <!-- Save -->
             <BoxContainer Orientation="Vertical" Margin="8" SeparationOverride="6">

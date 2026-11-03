@@ -234,3 +234,143 @@
   - type: Sprite
     sprite: _WF/DecorImport/Structures/Lighting/light_bigfloorlamp.rsi
     offset: "0,0"
+
+- type: entity
+  abstract: true
+  parent: [ BaseUrbanProp, BaseUrbanToggleLight ]
+  id: BaseCoyoteLamp
+  components:
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Lighting/lamps.rsi
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.2,-0.4,0.2,0.2"
+        density: 60
+        mask:
+        - MachineMask
+        layer:
+        - MidImpassable
+        - LowImpassable
+  - type: PointLight
+    radius: 4
+    energy: 1.2
+    color: "#FFD8A8"
+
+- type: entity
+  parent: BaseCoyoteLamp
+  id: CoyoteTorchiere
+  components:
+  - type: Sprite
+    layers:
+    - state: torchere
+      map: [ "enum.ToggleableVisuals.Layer" ]
+  - type: GenericVisualizer
+    visuals:
+      enum.ToggleableVisuals.Enabled:
+        enum.ToggleableVisuals.Layer:
+          True: { state: torchere-on }
+          False: { state: torchere }
+
+- type: entity
+  parent: BaseCoyoteLamp
+  id: CoyoteTorchiereBlue
+  suffix: Blue
+  components:
+  - type: Sprite
+    layers:
+    - state: blue_torchere
+      map: [ "enum.ToggleableVisuals.Layer" ]
+  - type: GenericVisualizer
+    visuals:
+      enum.ToggleableVisuals.Enabled:
+        enum.ToggleableVisuals.Layer:
+          True: { state: blue_torchere-on }
+          False: { state: blue_torchere }
+  - type: PointLight
+    color: "#A8E0FF"
+
+- type: entity
+  parent: BaseCoyoteLamp
+  id: CoyoteTableLamp
+  components:
+  - type: Sprite
+    drawdepth: SmallObjects
+    layers:
+    - state: table_lamp
+      map: [ "enum.ToggleableVisuals.Layer" ]
+  - type: GenericVisualizer
+    visuals:
+      enum.ToggleableVisuals.Enabled:
+        enum.ToggleableVisuals.Layer:
+          True: { state: table_lamp-on }
+          False: { state: table_lamp }
+  - type: Physics
+    canCollide: false
+  - type: PointLight
+    radius: 3
+    color: "#A8E0FF"
+
+- type: entity
+  abstract: true
+  parent: [ BaseUrbanPropNoCollide, BaseUrbanIgnitable ]
+  id: BaseCoyoteCandle
+  components:
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Lighting/lamps.rsi
+    drawdepth: SmallObjects
+
+- type: entity
+  parent: BaseCoyoteCandle
+  id: CoyoteCandleLarge
+  components:
+  - type: Sprite
+    layers:
+    - state: candle
+  - type: FireVisuals
+    sprite: _WF/DecorImport/Structures/Lighting/lamps.rsi
+    normalState: candle-on
+    lightColor: "#FFB060"
+    lightRadiusPerStack: 0.33
+    maxLightRadius: 2.5
+    lightEnergyPerStack: 0.00
+    maxLightEnergy: 1
+
+- type: entity
+  parent: BaseCoyoteCandle
+  id: CoyoteCandleSmall
+  components:
+  - type: Sprite
+    layers:
+    - state: lil_candle
+  - type: FireVisuals
+    sprite: _WF/DecorImport/Structures/Lighting/lamps.rsi
+    normalState: lil_candle-on
+    lightColor: "#FFB060"
+    lightRadiusPerStack: 0.17
+    maxLightRadius: 2
+    lightEnergyPerStack: 0.00
+    maxLightEnergy: 1
+
+- type: entity
+  parent: PoweredLightPostSmall
+  id: CoyoteFloorLamp
+  components:
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Lighting/lamps.rsi
+    layers:
+    - state: flamp1
+      map: [ "enum.PoweredLightLayers.Base" ]
+  - type: PointLight
+    radius: 4
+    energy: 1.2
+    color: "#FFD8A8"
+  - type: PoweredLightVisuals
+    spriteStateMap:
+      empty: flamp-empty
+      off: flamp0
+      on: flamp1
+      broken: flamp-broken
+      burned: flamp-burned

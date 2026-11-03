@@ -2369,3 +2369,33 @@
     collection: BayFootstepSand
   itemDrop: FloorTileItemDS13FloorDryCracked
   weather: true
+
+- type: tile
+  id: MojaveSewerWaterDeep
+  name: tiles-wf-mojave-sewer-water-deep
+  sprite: /Textures/_WF/DecorImport/Tiles/mojavesun/sewer_deep.png
+  baseTurf: Plating
+  isSubfloor: false
+  footstepSounds:
+    collection: FootstepWater
+  heatCapacity: 10000
+
+- type: tile
+  id: MojaveSewerWaterMedium
+  name: tiles-wf-mojave-sewer-water-medium
+  sprite: /Textures/_WF/DecorImport/Tiles/mojavesun/sewer_medium.png
+  baseTurf: Plating
+  isSubfloor: false
+  footstepSounds:
+    collection: FootstepWater
+  heatCapacity: 10000
+
+- type: tile
+  id: MojaveSewerWaterShallow
+  name: tiles-wf-mojave-sewer-water-shallow
+  sprite: /Textures/_WF/DecorImport/Tiles/mojavesun/sewer_shallow.png
+  baseTurf: Plating
+  isSubfloor: false
+  footstepSounds:
+    collection: FootstepWater
+  heatCapacity: 10000

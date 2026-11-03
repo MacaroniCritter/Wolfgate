@@ -12,6 +12,7 @@ public enum WFMappingBuildMode : byte
     Template,
     Pipe,
     Link,
+    Wrench,
 }
 
 /// <summary>What Erase mode removes.</summary>

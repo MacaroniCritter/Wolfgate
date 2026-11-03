@@ -3987,3 +3987,39 @@
   name: tiles-wf-tg-floor-necropolis
   spawn: FloorTileItemTgFloorNecropolis
   maxCount: 30
+
+- type: stack
+  id: FloorTileDarkPackFloorCityClinic
+  name: tiles-wf-dark-pack-floor-city-clinic
+  spawn: FloorTileItemDarkPackFloorCityClinic
+  maxCount: 30
+
+- type: stack
+  id: FloorTileDarkPackFloorCityFactory
+  name: tiles-wf-dark-pack-floor-city-factory
+  spawn: FloorTileItemDarkPackFloorCityFactory
+  maxCount: 30
+
+- type: stack
+  id: FloorTileDarkPackFloorCityIndustrial
+  name: tiles-wf-dark-pack-floor-city-industrial
+  spawn: FloorTileItemDarkPackFloorCityIndustrial
+  maxCount: 30
+
+- type: stack
+  id: FloorTileDarkPackFloorCityToilet
+  name: tiles-wf-dark-pack-floor-city-toilet
+  spawn: FloorTileItemDarkPackFloorCityToilet
+  maxCount: 30
+
+- type: stack
+  id: FloorTileDarkPackFloorCityToiletLarge
+  name: tiles-wf-dark-pack-floor-city-toilet-large
+  spawn: FloorTileItemDarkPackFloorCityToiletLarge
+  maxCount: 30
+
+- type: stack
+  id: FloorTileDarkPackFloorSidewalk
+  name: tiles-wf-dark-pack-floor-sidewalk
+  spawn: FloorTileItemDarkPackFloorSidewalk
+  maxCount: 30

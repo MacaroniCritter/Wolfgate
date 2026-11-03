@@ -795,3 +795,7 @@ VariedXenoArtifactItem: ComplexXenoArtifactItem
 # 2026-10-26
 GoonSetpiecesBloodwall: TauCetiMeatlandWall
 # WOLFGATE END
+
+# WOLFGATE(DecorImport) START: bamboo wall cut from the import
+TgMineralBamboo: null
+# WOLFGATE END

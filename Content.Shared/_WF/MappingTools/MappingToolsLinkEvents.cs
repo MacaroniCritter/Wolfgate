@@ -12,6 +12,13 @@ public sealed class MappingToolsLinkEvent(NetEntity source, NetEntity sink, List
     public readonly List<(string Source, string Sink)> Links = links;
 }
 
+/// <summary>Anchors or unanchors an entity, as a wrench would.</summary>
+[Serializable, NetSerializable]
+public sealed class MappingToolsWrenchEvent(NetEntity target) : EntityEventArgs
+{
+    public readonly NetEntity Target = target;
+}
+
 /// <summary>Asks for the ports of a source and a sink and the links between them.</summary>
 [Serializable, NetSerializable]
 public sealed class MappingToolsLinkPortsRequestEvent(NetEntity source, NetEntity sink) : EntityEventArgs

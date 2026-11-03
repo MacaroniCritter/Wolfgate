@@ -103,3 +103,5 @@ ent-CMHybrisaMiscStoneplanterseats2 = { ent-CMHybrisaMiscStoneplanterseats }
     .desc = { ent-CMHybrisaMiscStoneplanterseats.desc }
 ent-CMHybrisaMiscStoneplanterseats3 = { ent-CMHybrisaMiscStoneplanterseats }
     .desc = { ent-CMHybrisaMiscStoneplanterseats.desc }
+ent-DarkPackParkBench = bench
+ent-DarkPackParkBench2 = { ent-DarkPackParkBench }

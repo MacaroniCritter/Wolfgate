@@ -1,0 +1,93 @@
+# WOLFGATE(DecorImport) START: ported from RMC-14
+# TODO RMC14 cutting
+- type: entity
+  parent: BaseFenceMetal
+  id: CMFence
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: _RMC14/Structures/fences.rsi
+    state: fence0
+  - type: InteractionOutline
+  - type: Clickable
+  - type: VehicleSmashable
+    deleteOnHit: false
+    damageOnHit: 50
+    slowdownBelowWeightClass: Medium
+    slowdownMultiplier: 0.5
+    slowdownDuration: 0.4
+  - type: IconSmooth
+    key: fences
+    base: fence
+    mode: CardinalFlags
+  - type: Damageable
+    damageContainer: StructuralMarine # WOLFGATE(DecorImport): no StructuralMarine modifier set in Wolfgate
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 600
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+    - trigger:
+        !type:DamageTrigger
+        damage: 50
+      behaviors:
+        - !type:PlaySoundBehavior
+          sound:
+            path: /Audio/Items/wirecutter.ogg
+        - !type:SpawnEntitiesBehavior
+          spawn:
+            RMCFenceBroken:
+              min: 1
+              max: 1
+          offset: 0
+        - !type:DoActsBehavior
+          acts: [ "Destruction" ]
+  - type: DamageOnXenoScissors
+    damage:
+      types:
+        Slash: 50
+  - type: XenoToggleChargingDamage
+    stageLoss: 1
+    stageLossProbability: 0.5
+    damage:
+      types:
+        Blunt: 22
+  - type: XenoCrusherChargable
+  - type: RMCMesonsNonviewable
+
+- type: entity
+  parent: CMBaseStructureCorrodible
+  id: RMCFenceBroken
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: _RMC14/Structures/fences.rsi
+    state: brokenfence0
+  - type: Clickable
+  - type: InteractionOutline
+  - type: PlacementReplacement
+    key: walls
+  - type: IconSmooth
+    key: fences
+    base: brokenfence
+    mode: CardinalFlags
+  - type: Physics
+    canCollide: false
+  - type: Damageable
+    damageContainer: StructuralMarine # WOLFGATE(DecorImport): no StructuralMarine modifier set in Wolfgate
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 600
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: Tag
+    tags: []
+# WOLFGATE END

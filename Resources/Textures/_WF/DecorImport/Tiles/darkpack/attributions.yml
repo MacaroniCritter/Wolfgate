@@ -57,3 +57,33 @@
   license: CC-BY-SA-3.0
   copyright: "Taken from https://github.com/DarkPack13/SecondCity/blob/2a1e8fd0ccf64a5fd40504b20b1e1f76774f5ecc/modular_darkpack/modules/walls/icons/floors.dmi (state wood_ornate)."
   source: "https://github.com/DarkPack13/SecondCity"
+
+- files: [ clinic.png ]
+  license: CC-BY-SA-3.0
+  copyright: "Taken from https://github.com/DarkPack13/SecondCity/blob/2a1e8fd0ccf64a5fd40504b20b1e1f76774f5ecc/modular_darkpack/modules/walls/icons/floors.dmi (states clinic1-9)."
+  source: "https://github.com/DarkPack13/SecondCity"
+
+- files: [ factory.png ]
+  license: CC-BY-SA-3.0
+  copyright: "Taken from https://github.com/DarkPack13/SecondCity/blob/2a1e8fd0ccf64a5fd40504b20b1e1f76774f5ecc/modular_darkpack/modules/walls/icons/floors.dmi (states factory1-9)."
+  source: "https://github.com/DarkPack13/SecondCity"
+
+- files: [ industrial.png ]
+  license: CC-BY-SA-3.0
+  copyright: "Taken from https://github.com/DarkPack13/SecondCity/blob/2a1e8fd0ccf64a5fd40504b20b1e1f76774f5ecc/modular_darkpack/modules/walls/icons/floors.dmi (states industrial1-9)."
+  source: "https://github.com/DarkPack13/SecondCity"
+
+- files: [ toilet.png ]
+  license: CC-BY-SA-3.0
+  copyright: "Taken from https://github.com/DarkPack13/SecondCity/blob/2a1e8fd0ccf64a5fd40504b20b1e1f76774f5ecc/modular_darkpack/modules/walls/icons/floors.dmi (states toilet1-9)."
+  source: "https://github.com/DarkPack13/SecondCity"
+
+- files: [ toilet_large.png ]
+  license: CC-BY-SA-3.0
+  copyright: "Taken from https://github.com/DarkPack13/SecondCity/blob/2a1e8fd0ccf64a5fd40504b20b1e1f76774f5ecc/modular_darkpack/modules/walls/icons/floors.dmi (states toilet_large1-9)."
+  source: "https://github.com/DarkPack13/SecondCity"
+
+- files: [ sidewalk.png ]
+  license: CC-BY-SA-3.0
+  copyright: "Taken from https://github.com/DarkPack13/SecondCity/blob/2a1e8fd0ccf64a5fd40504b20b1e1f76774f5ecc/modular_darkpack/modules/walls/icons/floors.dmi (states sidewalk1-3)."
+  source: "https://github.com/DarkPack13/SecondCity"

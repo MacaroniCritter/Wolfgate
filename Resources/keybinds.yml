@@ -738,6 +738,10 @@ binds:
   type: State
   key: Num9
   priority: 1
+- function: WFMappingMode10
+  type: State
+  key: Num0
+  priority: 1
 - function: WFMappingModePrimary
   type: State
   key: MouseLeft
