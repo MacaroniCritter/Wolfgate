@@ -4916,3 +4916,19 @@ Entries:
   id: 100327
   time: '2026-11-03T02:29:35.0000000+00:00'
   url: https://github.com/VanguardControl/Wolfgate/pull/454
+- author: Balls2zawall
+  changes:
+    - type: Fix
+      message: >-
+        The Foxtrot-II's missile ejection system has been refurbished and should
+        now launch ordnance properly.
+  id: 100328
+  time: '2026-11-03T08:21:57.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/467
+- author: Sushiburger
+  changes:
+    - type: Add
+      message: 'Three Hairstyles: Eve, Impish (Short), Remilia'
+  id: 100329
+  time: '2026-11-03T08:43:59.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/464
