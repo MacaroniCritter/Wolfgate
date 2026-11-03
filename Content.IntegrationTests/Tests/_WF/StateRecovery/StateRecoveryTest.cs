@@ -189,6 +189,9 @@ public sealed class StateRecoveryTest
 
                 await RunFor(pair, TimeSpan.FromSeconds(0.25));
             }
+
+            // The last window's warning has to land before warnings count as failures again.
+            await RunFor(pair, TimeSpan.FromSeconds(2.5));
         }
         finally
         {
