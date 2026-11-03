@@ -66,7 +66,6 @@ Marines Universe's AGPL-3.0; the art is CC-BY-SA-3.0 unless its `meta.json` says
 - [`Resources/Prototypes/_WF/Streets/Signs/graffiti.yml`](../../../Resources/Prototypes/_WF/Streets/Signs/graffiti.yml)
 - [`Resources/Prototypes/_WF/Streets/Signs/posters.yml`](../../../Resources/Prototypes/_WF/Streets/Signs/posters.yml)
 - [`Resources/Prototypes/_WF/Streets/Signs/road_signs.yml`](../../../Resources/Prototypes/_WF/Streets/Signs/road_signs.yml)
-- [`Resources/Prototypes/_WF/Streets/Signs/shop_signs.yml`](../../../Resources/Prototypes/_WF/Streets/Signs/shop_signs.yml)
 - [`Resources/Prototypes/_WF/Streets/Signs/traffic_directors.yml`](../../../Resources/Prototypes/_WF/Streets/Signs/traffic_directors.yml)
 - [`Resources/Prototypes/_WF/Streets/Tiles/asphalt.yml`](../../../Resources/Prototypes/_WF/Streets/Tiles/asphalt.yml)
 - [`Resources/Prototypes/_WF/Streets/Tiles/hybrisa_basic.yml`](../../../Resources/Prototypes/_WF/Streets/Tiles/hybrisa_basic.yml)
@@ -342,5 +341,6 @@ Marines Universe's AGPL-3.0; the art is CC-BY-SA-3.0 unless its `meta.json` says
 - [`Resources/Prototypes/_RMC14/Entities/Structures/Furniture/hybrisa_planter.yml`](../../../Resources/Prototypes/_RMC14/Entities/Structures/Furniture/hybrisa_planter.yml)
   - in the spawn menu's Streets group
   - a vehicle drives through it
+- [`Resources/Prototypes/_RMC14/Entities/Structures/Props/Hybrisa_misc_props.yml`](../../../Resources/Prototypes/_RMC14/Entities/Structures/Props/Hybrisa_misc_props.yml): vehicles drive through street furniture
 
 <!-- WOLFGATE-GENERATED END -->

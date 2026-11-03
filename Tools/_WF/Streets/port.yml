@@ -145,8 +145,6 @@ set:
     VehicleSmashable: {}
   RMCPhoneboxBrokenBase:
     VehicleSmashable: {}
-  RMCPropSlotmachinebroken:
-    VehicleSmashable: {}
   RMCPropSupermartFreezerLeft:
     VehicleSmashable: {}
   RMCPropSupermartShelfEmpty:
@@ -214,9 +212,6 @@ entities:
   - source: rmc
     file: Resources/Prototypes/_RMC14/Entities/Structures/road_signs.yml
     out: Signs/road_signs.yml
-  - source: rmc
-    file: Resources/Prototypes/_RMC14/Entities/Structures/overhead_signs.yml
-    out: Signs/shop_signs.yml
   - source: cmu
     file: Content.CMU/Resources/Prototypes/CMU14/Entities/Structures/Misc/trafficdirectors.yml
     out: Signs/traffic_directors.yml
@@ -254,7 +249,8 @@ entities:
     file: Resources/Prototypes/_RMC14/Entities/Structures/Props/Hybrisa_misc_props.yml
     out: Furniture/hybrisa_props.yml
     # The egg, the specimen cell and the dropship wreckage are Hybrisa's story.
-    skip: [RMCPropInertEgg, RMCPropGiantXenoCryo, RMCPropDropshipdamage]
+    # DecorImport brought the slot machines in first; its copies are the ones used.
+    skip: [RMCPropInertEgg, RMCPropGiantXenoCryo, RMCPropDropshipdamage, RMCPropSlotmachinebroken, RMCPropSlotmachineIdle]
   - source: rmc
     file: Resources/Prototypes/_RMC14/Entities/Structures/Props/supermart.yml
     out: Furniture/supermart.yml
@@ -269,6 +265,8 @@ entities:
   - source: rmc
     file: Resources/Prototypes/_RMC14/Entities/Structures/fence.yml
     out: Buildings/fences.yml
+    # DecorImport brought these in first; its copies are the ones used.
+    skip: [CMFence, RMCFenceBroken]
   - source: rmc
     file: Resources/Prototypes/_RMC14/Entities/Structures/Platforms/platform.yml
     out: Buildings/platforms.yml
