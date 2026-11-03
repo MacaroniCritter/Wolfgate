@@ -9,8 +9,11 @@ responder ship voucher, the MMC Dredger (`WFDredger`), a salvage ship sold at th
 (`WFCarabela`), a salvage frigate with a mobile drydock sold at the civilian shipyard beside the Caracara, and the
 Reach (`WFReach`), a crewed civilian capital ship with a full set of departments.
 
-If a sold ship's copy fails to save, `ShipyardSystem.WFStripUnsavable` takes off the components that won't save and
-tries once more, so one bad entity aboard doesn't lose the ship. The seller is paid either way.
+The seller is paid at once. `WFHullRetireSystem` then parks the sold hull on a paused map and copies and deletes it 4 ms
+per tick, so a sale doesn't stall the server. Before a copy, `ShipyardSystem.WFPruneDeadKeys` drops storage, device link
+and clothing entries that point off the hull, since two of them in one dictionary would fail the save. If a copy still
+fails, `ShipyardSystem.WFStripUnsavable` takes off the components that won't save and it starts over, so one bad entity
+aboard doesn't lose the ship. The seller is paid either way.
 
 `VesselShipyardTest` holds the checks that apply to every vessel grid, so ship tests belong there rather than in
 tests for one ship: each vessel must load as a shuttle with every hardpoint-only gun mounted on a hardpoint.
@@ -35,6 +38,7 @@ share from its slot, or from the counter of a trader hosting it (`ShipyardHostCa
 - [`Content.Server/_WF/Shipyard/UsedShipMarketComponent.cs`](UsedShipMarketComponent.cs)
 - [`Content.Server/_WF/Shipyard/UsedShipMarketSystem.cs`](UsedShipMarketSystem.cs)
 - [`Content.Server/_WF/Shipyard/UsedShipReinitSystem.cs`](UsedShipReinitSystem.cs)
+- [`Content.Server/_WF/Shipyard/WFHullRetireSystem.cs`](WFHullRetireSystem.cs)
 - [`Content.Server/_WF/Shipyard/WiresSystem.Wolfgate.cs`](WiresSystem.Wolfgate.cs)
 
 ### Integration tests
@@ -42,8 +46,10 @@ share from its slot, or from the counter of a trader hosting it (`ShipyardHostCa
 - [`Content.IntegrationTests/Tests/_WF/Shipyard/IronmanShipPurchaseTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Shipyard/IronmanShipPurchaseTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Shipyard/ShipPurchaseTitleTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Shipyard/ShipPurchaseTitleTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Shipyard/UsedShipContainedUnsavableTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Shipyard/UsedShipContainedUnsavableTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/Shipyard/UsedShipDeadKeysTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Shipyard/UsedShipDeadKeysTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Shipyard/UsedShipReinitTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Shipyard/UsedShipReinitTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Shipyard/VesselShipyardTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Shipyard/VesselShipyardTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/Shipyard/WFHullRetireTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Shipyard/WFHullRetireTest.cs)
 
 ### Prototypes
 
@@ -76,7 +82,9 @@ share from its slot, or from the counter of a trader hosting it (`ShipyardHostCa
 ## Non-modular edits
 
 - [`Content.Server/_NF/Shipyard/Systems/ShipyardSystem.Consoles.cs`](../../_NF/Shipyard/Systems/ShipyardSystem.Consoles.cs): refuse the sale when the bank share can't be taken; an Ironman's frozen balance bought ships for free
-- [`Content.Server/_NF/Shipyard/Systems/ShipyardSystem.cs`](../../_NF/Shipyard/Systems/ShipyardSystem.cs): last look at the grid, with its deed, before it goes. See _WF/Shipyard.
+- [`Content.Server/_NF/Shipyard/Systems/ShipyardSystem.cs`](../../_NF/Shipyard/Systems/ShipyardSystem.cs)
+  - last look at the grid, with its deed, before it goes. See _WF/Shipyard.
+  - the hull is parked and taken apart over many ticks; this stalled the server
 - [`Content.Server/Spreader/SpreaderGridComponent.cs`](../../Spreader/SpreaderGridComponent.cs): the queue is rebuilt on grid init and cannot be written, so a grid with a live spreader failed to save
 - [`Content.Shared/Damage/Components/DamageableComponent.cs`](../../../Content.Shared/Damage/Components/DamageableComponent.cs): written on save so a resold ship keeps its dents
 - [`Content.Shared/Damage/DamageSpecifier.cs`](../../../Content.Shared/Damage/DamageSpecifier.cs)

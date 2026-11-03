@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using Content.Shared._WF.MappingMode;
@@ -11,6 +12,8 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization.Markdown;
 using Robust.Shared.Serialization.Markdown.Mapping;
 using Robust.Shared.Utility;
 
@@ -66,6 +69,7 @@ public sealed partial class WFMappingModeSystem
     private void InitializeReference()
     {
         SubscribeNetworkEvent<WFMappingReferenceListRequest>(OnReferenceList);
+        SubscribeNetworkEvent<WFMappingReferencePreviewRequest>(OnReferencePreview);
         SubscribeNetworkEvent<WFMappingReferencePickRequest>(OnReferencePick);
         SubscribeNetworkEvent<WFMappingReferenceConfirmRequest>(OnReferenceConfirm);
         SubscribeNetworkEvent<WFMappingReferenceCancelRequest>(OnReferenceCancel);
@@ -116,6 +120,76 @@ public sealed partial class WFMappingModeSystem
             return;
 
         RaiseNetworkEvent(new WFMappingReferenceListEvent(ReferenceFiles(player)), player);
+    }
+
+    private void OnReferencePreview(WFMappingReferencePreviewRequest ev, EntitySessionEventArgs args)
+    {
+        var player = args.SenderSession;
+        if (!Enabled || !TryGetPresent(player, out _))
+            return;
+
+        if (!_previewThrottle.TryTake(player.UserId, _timing.CurTime))
+        {
+            SendPreview(player, ev.Path, null, "wf-mapping-mode-reference-preview-busy");
+            return;
+        }
+
+        if (ev.Path.Length > WFMappingModeLimits.MaxPathLength || ReferenceFiles(player).All(f => f.Path != ev.Path))
+        {
+            SendPreview(player, ev.Path, null, "wf-mapping-mode-reference-not-listed");
+            return;
+        }
+
+        var path = new ResPath(ev.Path);
+        var maxBytes = _cfg.GetCVar(WFMappingModeCVars.MaxReferenceBytes);
+        if (FileSize(path) is not { } size || size > maxBytes)
+        {
+            SendPreview(player, ev.Path, null, "wf-mapping-mode-reference-too-large",
+                ("max", (maxBytes / (1024.0 * 1024.0)).ToString("0.#", CultureInfo.InvariantCulture)));
+            return;
+        }
+
+        try
+        {
+            var preview = ReadPreview(path, size);
+            if (preview.Grids.Count == 0)
+                SendPreview(player, ev.Path, null, "wf-mapping-mode-reference-empty");
+            else
+                SendPreview(player, ev.Path, preview, null);
+        }
+        catch (Exception e)
+        {
+            Log.Warning($"Reading a preview of {ev.Path} for {player} failed: {e.Message}");
+            SendPreview(player, ev.Path, null, "wf-mapping-mode-reference-failed");
+        }
+    }
+
+    private void SendPreview(ICommonSession player, string path, WFMappingReferencePreview? preview, string? errorKey,
+        params (string, object)[] args)
+    {
+        var error = errorKey == null ? null : Loc.GetString(errorKey, args);
+        RaiseNetworkEvent(new WFMappingReferencePreviewEvent(path, preview, error), player);
+    }
+
+    private WFMappingReferencePreview ReadPreview(ResPath path, long size)
+    {
+        using var stream = _res.UserData.Exists(path) ? _res.UserData.OpenRead(path) : _res.ContentFileRead(path);
+        using var reader = new StreamReader(stream);
+        var root = DataNodeParser.ParseYamlStream(reader).Single().Root as MappingDataNode
+                   ?? throw new InvalidDataException("The file's root isn't a mapping.");
+
+        return WFMappingPreviewParser.Parse(root, size, ClassifyPreviewCell);
+    }
+
+    /// <summary>Airtight things that block sight are walls; other airtight things and doors are openings.</summary>
+    private WFMappingPreviewCell ClassifyPreviewCell(string id)
+    {
+        if (!_prototypes.TryIndex<EntityPrototype>(id, out var proto) || !proto.Components.ContainsKey("Airtight"))
+            return WFMappingPreviewCell.None;
+
+        return proto.Components.ContainsKey("Occluder") && !proto.Components.ContainsKey("Door")
+            ? WFMappingPreviewCell.Wall
+            : WFMappingPreviewCell.Opening;
     }
 
     private void OnReferencePick(WFMappingReferencePickRequest ev, EntitySessionEventArgs args)

@@ -86,6 +86,7 @@ wf-mapping-mode-reference-failed = That file couldn't be loaded.
 wf-mapping-mode-reference-empty = That file has no grids.
 wf-mapping-mode-reference-expired = The reference wasn't placed in time and was dropped.
 wf-mapping-mode-reference-busy = Another reference is loading. Try again in a moment.
+wf-mapping-mode-reference-preview-busy = Too many previews at once. Pick it again in a moment.
 wf-mapping-mode-reference-placed = Placed {$count ->
     [one] the reference grid
    *[other] {$count} reference grids
@@ -210,6 +211,8 @@ wf-mapping-mode-download-save-failed = {$file} couldn't be saved there.
 wf-mapping-mode-escape-button = Mapping
 wf-mapping-mode-menu-title = Mapping
 wf-mapping-mode-menu-tab-session = Session
+wf-mapping-mode-menu-tab-grids = Grids
+wf-mapping-mode-menu-tab-reference = Reference
 wf-mapping-mode-menu-tab-save = Save
 wf-mapping-mode-menu-tab-library = Library
 wf-mapping-mode-menu-no-session = You aren't in a mapping session.
@@ -238,7 +241,6 @@ wf-mapping-mode-menu-autosave-step = Every {$minutes ->
    *[other] {$minutes} minutes
 }
 wf-mapping-mode-menu-autosave-owner-only = Only the owner can change this.
-wf-mapping-mode-menu-grids = Grids
 wf-mapping-mode-menu-delete-grid = Delete the grid under me
 wf-mapping-mode-menu-delete-grid-tooltip = Shows the grid you're over in red and asks before deleting it. Undo brings it back.
 wf-mapping-mode-menu-delete-grid-none = You aren't over a grid.
@@ -252,11 +254,15 @@ wf-mapping-mode-menu-delete-grid-confirm = Delete grid
 wf-mapping-mode-menu-delete-grid-cancel = Cancel
 wf-mapping-mode-menu-new-grid = New grid
 wf-mapping-mode-menu-new-grid-tooltip = The next tiles you lay off every grid start a new grid. Otherwise they join the nearest grid.
-wf-mapping-mode-menu-reference = Reference grids
-wf-mapping-mode-menu-reference-load = Load reference
 wf-mapping-mode-menu-reference-hint = Pick a file and press Place. R turns it, click puts it down, Escape or right click drops it.
 wf-mapping-mode-menu-reference-search = Search
 wf-mapping-mode-menu-reference-place = Place
+wf-mapping-mode-menu-reference-pick = Pick a file to preview it.
+wf-mapping-mode-menu-reference-loading = Loading preview...
+wf-mapping-mode-menu-reference-stats = {$grids ->
+    [one] 1 grid
+   *[other] {$grids} grids
+}, {$width} by {$height} tiles, {$tiles} floor, {$entities} entities, {$size} MiB
 wf-mapping-mode-menu-reference-source-saved = My library
 wf-mapping-mode-menu-reference-source-ships = Ship grids
 wf-mapping-mode-menu-reference-source-maps = Maps

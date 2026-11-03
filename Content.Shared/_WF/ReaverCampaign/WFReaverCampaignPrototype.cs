@@ -134,6 +134,10 @@ public sealed partial class WFReaverCampaignPrototype : IPrototype
     [DataField]
     public float FundingShare = 0.25f;
 
+    /// <summary>Shortest time between funding payouts; crates sold meanwhile wait in the full war chest.</summary>
+    [DataField]
+    public TimeSpan FundingCooldown = TimeSpan.FromMinutes(20);
+
     /// <summary>The highest stronghold level reinforcements bring it to, by tier.</summary>
     [DataField]
     public List<int> MaxLevelByTier = new() { 0, 1, 2, 2, 3, 4 };

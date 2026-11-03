@@ -68,11 +68,13 @@ public sealed partial class WFMappingMenuUIController : UIController, IOnStateEx
     public void OnSystemLoaded(WFMappingReferenceSystem system)
     {
         system.PlacementStarted += OnPlacementStarted;
+        system.PreviewReceived += OnPreviewReceived;
     }
 
     public void OnSystemUnloaded(WFMappingReferenceSystem system)
     {
         system.PlacementStarted -= OnPlacementStarted;
+        system.PreviewReceived -= OnPreviewReceived;
     }
 
     public void OnSystemLoaded(WFMappingUploadClientSystem system)
@@ -140,11 +142,8 @@ public sealed partial class WFMappingMenuUIController : UIController, IOnStateEx
         window.GridsWanted += () => _mapping.RequestGrids();
         window.ResetLayoutButton.OnPressed += _ => UIManager.GetUIController<WFMappingScreenUIController>().ResetLayout();
         window.ExportButton.OnPressed += _ => ExportSaved();
-        window.ReferenceButton.OnToggled += args =>
-        {
-            if (args.Pressed)
-                _reference.RequestList();
-        };
+        window.ReferencesWanted += () => _reference.RequestList();
+        window.PreviewWanted += path => _reference.RequestPreview(path);
         window.ReferencePicked += path => _reference.Pick(path);
         window.LeaveButton.OnPressed += _ => _mapping.Send(new WFMappingLeaveRequest());
         window.SaveButton.OnPressed += _ => Save();
@@ -238,6 +237,11 @@ public sealed partial class WFMappingMenuUIController : UIController, IOnStateEx
     private void OnPlacementStarted()
     {
         _window?.Close();
+    }
+
+    private void OnPreviewReceived(WFMappingReferencePreviewEvent ev)
+    {
+        _window?.SetPreview(ev);
     }
 
     private void UpdateSession()

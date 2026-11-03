@@ -9484,3 +9484,93 @@
       - TgFloorNecropolis
   - type: Stack
     stackType: FloorTileTgFloorNecropolis
+
+- type: entity
+  parent: FloorTileItemBase
+  id: FloorTileItemDarkPackFloorCityClinic
+  components:
+  - type: Sprite
+    state: dark
+  - type: Item
+    heldPrefix: steel
+  - type: FloorTile
+    outputs:
+      - Plating
+      - DarkPackFloorCityClinic
+  - type: Stack
+    stackType: FloorTileDarkPackFloorCityClinic
+
+- type: entity
+  parent: FloorTileItemBase
+  id: FloorTileItemDarkPackFloorCityFactory
+  components:
+  - type: Sprite
+    state: dark
+  - type: Item
+    heldPrefix: steel
+  - type: FloorTile
+    outputs:
+      - Plating
+      - DarkPackFloorCityFactory
+  - type: Stack
+    stackType: FloorTileDarkPackFloorCityFactory
+
+- type: entity
+  parent: FloorTileItemBase
+  id: FloorTileItemDarkPackFloorCityIndustrial
+  components:
+  - type: Sprite
+    state: dark
+  - type: Item
+    heldPrefix: steel
+  - type: FloorTile
+    outputs:
+      - Plating
+      - DarkPackFloorCityIndustrial
+  - type: Stack
+    stackType: FloorTileDarkPackFloorCityIndustrial
+
+- type: entity
+  parent: FloorTileItemBase
+  id: FloorTileItemDarkPackFloorCityToilet
+  components:
+  - type: Sprite
+    state: dark
+  - type: Item
+    heldPrefix: steel
+  - type: FloorTile
+    outputs:
+      - Plating
+      - DarkPackFloorCityToilet
+  - type: Stack
+    stackType: FloorTileDarkPackFloorCityToilet
+
+- type: entity
+  parent: FloorTileItemBase
+  id: FloorTileItemDarkPackFloorCityToiletLarge
+  components:
+  - type: Sprite
+    state: dark
+  - type: Item
+    heldPrefix: steel
+  - type: FloorTile
+    outputs:
+      - Plating
+      - DarkPackFloorCityToiletLarge
+  - type: Stack
+    stackType: FloorTileDarkPackFloorCityToiletLarge
+
+- type: entity
+  parent: FloorTileItemBase
+  id: FloorTileItemDarkPackFloorSidewalk
+  components:
+  - type: Sprite
+    state: dark
+  - type: Item
+    heldPrefix: steel
+  - type: FloorTile
+    outputs:
+      - Plating
+      - DarkPackFloorSidewalk
+  - type: Stack
+    stackType: FloorTileDarkPackFloorSidewalk

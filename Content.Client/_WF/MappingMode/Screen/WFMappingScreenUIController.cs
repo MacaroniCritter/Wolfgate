@@ -228,7 +228,7 @@ public sealed partial class WFMappingScreenUIController : UIController
             var button = new Button
             {
                 Text = Loc.GetString("wf-mapping-screen-rail-button",
-                    ("key", (int) mode),
+                    ("key", (int) mode % 10),
                     ("mode", Loc.GetString($"wf-mapping-screen-mode-{name}"))),
                 ToolTip = Loc.GetString($"wf-mapping-screen-mouse-{name}"),
                 TooltipDelay = 0.3f,

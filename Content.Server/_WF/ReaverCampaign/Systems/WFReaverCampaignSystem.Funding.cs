@@ -34,16 +34,18 @@ public sealed partial class WFReaverCampaignSystem
                && origin.Run != null;
     }
 
-    /// <summary>Pays out a full war chest once the campaign isn't held and a stronghold stands to spend it.</summary>
+    /// <summary>Pays out a full war chest once the campaign isn't held, a stronghold stands to spend it and the last payout has cooled down.</summary>
     private void TickFunding(WFReaverCampaignPrototype campaign, WFReaverCampaignComponent state)
     {
-        if (campaign.FundingCrates <= 0 || state.Funding < campaign.FundingCrates || Held || state.Finished)
+        if (campaign.FundingCrates <= 0 || state.Funding < campaign.FundingCrates || Held || state.Finished ||
+            _timing.CurTime < state.NextFunding)
             return;
 
         if (Strongholds().Count == 0)
             return;
 
         state.Funding = 0;
+        state.NextFunding = _timing.CurTime + campaign.FundingCooldown;
         Fund(campaign, state);
     }
 

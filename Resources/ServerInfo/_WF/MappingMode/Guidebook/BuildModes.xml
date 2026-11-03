@@ -31,6 +31,9 @@
     <Box HorizontalAlignment="Left">[bold]9[/bold]</Box>
     <Box HorizontalAlignment="Left">Link</Box>
     <Box HorizontalAlignment="Left">Signal links, device lists and access.</Box>
+    <Box HorizontalAlignment="Left">[bold]0[/bold]</Box>
+    <Box HorizontalAlignment="Left">Wrench</Box>
+    <Box HorizontalAlignment="Left">Anchor or unanchor machines.</Box>
   </Table>
 
   Right click drops a drag in progress. Escape drops what you're doing; press it again to go back to Place. Picking anything in the palette or the quick-select bar switches to Place, so pick first, then change mode.
@@ -80,6 +83,10 @@
   ## Link (9)
 
   Click machines to wire them up. See Wiring.
+
+  ## Wrench (0)
+
+  Click anything a wrench works on to anchor or unanchor it. The line by the cursor says which it is. Anchoring snaps it to its tile and refuses a tile that's already blocked. Undo covers it.
 
   ## Other keys
 

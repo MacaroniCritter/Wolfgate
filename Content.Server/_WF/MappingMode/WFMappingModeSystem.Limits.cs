@@ -33,6 +33,7 @@ public sealed partial class WFMappingModeSystem
     private readonly WFMappingThrottle<NetUserId> _kickThrottle = new(1, 3);
     private readonly WFMappingThrottle<NetUserId> _listThrottle = new(2, 2);
     private readonly WFMappingThrottle<NetUserId> _pickThrottle = new(1 / 5.0, 1);
+    private readonly WFMappingThrottle<NetUserId> _previewThrottle = new(2, 3);
     private readonly WFMappingThrottle<NetUserId> _confirmThrottle = new(1, 1);
 
     /// <summary>How long a counted entity total is trusted before it is counted again.</summary>

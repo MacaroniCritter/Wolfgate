@@ -4842,3 +4842,10 @@ Entries:
   id: 100323
   time: '2026-11-02T23:35:51.0000000+00:00'
   url: https://github.com/VanguardControl/Wolfgate/pull/462
+- author: TheSlapper
+  changes:
+    - type: Add
+      message: Added various urban items for mapping.
+  id: 100324
+  time: '2026-11-03T00:45:47.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/463

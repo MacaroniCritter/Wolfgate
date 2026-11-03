@@ -23,6 +23,9 @@ public sealed partial class WFMappingMenuWindow : FancyWindow
     private static readonly Color SuccessColor = Color.FromHex("#7fd17f");
     private static readonly Color FailureColor = Color.FromHex("#ff7a7a");
 
+    private const int GridsTab = 1;
+    private const int ReferenceTab = 2;
+
     private WFMappingSessionInfo? _session;
     private int? _namedSession;
     private List<MappingMapFile> _referenceFiles = new();
@@ -31,14 +34,23 @@ public sealed partial class WFMappingMenuWindow : FancyWindow
     public event Action<NetUserId>? KickRequested;
     public event Action<int>? AutosaveRequested;
     public event Action<string>? ReferencePicked;
+
+    /// <summary>Raised when the Reference tab opens, to fill its list.</summary>
+    public event Action? ReferencesWanted;
+
+    /// <summary>Raised a moment after a file is picked, so running down the list doesn't ask for each one.</summary>
+    public event Action<string>? PreviewWanted;
     public event Action<NetEntity>? GoToGridRequested;
     public event Action<NetEntity>? DeleteGridRequested;
 
-    /// <summary>Raised every few seconds while the Session tab shows, so the grid list follows edits.</summary>
+    /// <summary>Raised every few seconds while the Grids tab shows, so the grid list follows edits.</summary>
     public event Action? GridsWanted;
 
     private static readonly TimeSpan GridsInterval = TimeSpan.FromSeconds(3);
     private TimeSpan _nextGrids;
+
+    private static readonly TimeSpan PreviewDelay = TimeSpan.FromSeconds(0.2);
+    private TimeSpan? _previewAt;
 
     public WFMappingMenuWindow()
     {
@@ -47,8 +59,15 @@ public sealed partial class WFMappingMenuWindow : FancyWindow
         HelpGuidebookIds = new List<ProtoId<GuideEntryPrototype>> { WFMappingGuide.Root };
 
         Tabs.SetTabTitle(0, Loc.GetString("wf-mapping-mode-menu-tab-session"));
-        Tabs.SetTabTitle(1, Loc.GetString("wf-mapping-mode-menu-tab-save"));
-        Tabs.SetTabTitle(2, Loc.GetString("wf-mapping-mode-menu-tab-library"));
+        Tabs.SetTabTitle(GridsTab, Loc.GetString("wf-mapping-mode-menu-tab-grids"));
+        Tabs.SetTabTitle(ReferenceTab, Loc.GetString("wf-mapping-mode-menu-tab-reference"));
+        Tabs.SetTabTitle(3, Loc.GetString("wf-mapping-mode-menu-tab-save"));
+        Tabs.SetTabTitle(4, Loc.GetString("wf-mapping-mode-menu-tab-library"));
+        Tabs.OnTabChanged += tab =>
+        {
+            if (tab == ReferenceTab)
+                ReferencesWanted?.Invoke();
+        };
 
         foreach (var minutes in WFMappingAutosaveSteps.Minutes)
         {
@@ -68,7 +87,7 @@ public sealed partial class WFMappingMenuWindow : FancyWindow
 
         LibraryList.ShowOpen = false;
         UploadRow.ShowOpen = false;
-        ReferenceButton.OnToggled += args => ReferenceBox.Visible = args.Pressed;
+        ReferenceInfo.Text = Loc.GetString("wf-mapping-mode-menu-reference-pick");
         ReferenceSearch.OnTextChanged += _ => PopulateReferences();
         ReferenceList.OnItemSelected += args => SelectReference(ReferenceList[args.ItemIndex].Metadata as string);
         ReferenceList.OnItemDeselected += _ => SelectReference(null);
@@ -86,6 +105,11 @@ public sealed partial class WFMappingMenuWindow : FancyWindow
         NoSessionBox.Visible = session == null;
         ReturnButton.Visible = session == null && adminObserver;
         SessionBox.Visible = session != null;
+        if (session == null && Tabs.CurrentTab is GridsTab or ReferenceTab)
+            Tabs.CurrentTab = 0;
+
+        Tabs.SetTabVisible(GridsTab, session != null);
+        Tabs.SetTabVisible(ReferenceTab, session != null);
 
         if (session == null)
         {
@@ -222,6 +246,38 @@ public sealed partial class WFMappingMenuWindow : FancyWindow
         PopulateReferences();
     }
 
+    /// <summary>Shows a file's floor plan and size, if it is the file still picked.</summary>
+    public void SetPreview(WFMappingReferencePreviewEvent ev)
+    {
+        if (ev.Path != _selectedReference)
+            return;
+
+        ReferencePreview.SetPreview(ev.Preview);
+        ReferenceInfo.Text = ev.Preview is { } preview ? PreviewInfo(preview) : ev.Error ?? string.Empty;
+    }
+
+    private static string PreviewInfo(WFMappingReferencePreview preview)
+    {
+        Box2? bounds = null;
+        foreach (var grid in preview.Grids)
+        {
+            var matrix = Matrix3Helpers.CreateTransform(grid.Offset, grid.Rotation);
+            foreach (var rect in grid.Floor)
+            {
+                var box = matrix.TransformBox(new Box2(rect.Left, rect.Bottom, rect.Right, rect.Top));
+                bounds = bounds is { } union ? union.Union(box) : box;
+            }
+        }
+
+        return Loc.GetString("wf-mapping-mode-menu-reference-stats",
+            ("grids", preview.Grids.Count),
+            ("width", (int) MathF.Round(bounds?.Width ?? 0)),
+            ("height", (int) MathF.Round(bounds?.Height ?? 0)),
+            ("tiles", preview.Tiles.ToString("N0", CultureInfo.InvariantCulture)),
+            ("entities", preview.Entities.ToString("N0", CultureInfo.InvariantCulture)),
+            ("size", WFMappingLibraryList.FormatMiB(preview.Bytes)));
+    }
+
     public void SetResult(WFMappingResult? result)
     {
         ShowResult(ResultLabel, result);
@@ -240,7 +296,14 @@ public sealed partial class WFMappingMenuWindow : FancyWindow
         UpdateSaveTimes();
 
         var now = _timing.RealTime;
-        if (now < _nextGrids || !SessionBox.VisibleInTree)
+        if (_previewAt is { } previewAt && now >= previewAt)
+        {
+            _previewAt = null;
+            if (_selectedReference != null)
+                PreviewWanted?.Invoke(_selectedReference);
+        }
+
+        if (now < _nextGrids || !GridsBox.VisibleInTree)
             return;
 
         _nextGrids = now + GridsInterval;
@@ -301,6 +364,7 @@ public sealed partial class WFMappingMenuWindow : FancyWindow
                 }
 
                 var item = ReferenceList.AddItem("  " + shown, metadata: file.Path);
+                item.TooltipText = shown;
                 item.Selected = file.Path == _selectedReference;
             }
         }
@@ -325,7 +389,15 @@ public sealed partial class WFMappingMenuWindow : FancyWindow
 
     private void SelectReference(string? path)
     {
+        if (_selectedReference == path)
+            return;
+
         _selectedReference = path;
         ReferencePlaceButton.Disabled = path == null;
+        ReferencePreview.SetPreview(null);
+        ReferenceInfo.Text = Loc.GetString(path == null
+            ? "wf-mapping-mode-menu-reference-pick"
+            : "wf-mapping-mode-menu-reference-loading");
+        _previewAt = path == null ? null : _timing.RealTime + PreviewDelay;
     }
 }

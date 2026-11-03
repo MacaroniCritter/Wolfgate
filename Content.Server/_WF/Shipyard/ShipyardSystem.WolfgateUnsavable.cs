@@ -1,3 +1,6 @@
+using Content.Shared.Clothing.Components;
+using Content.Shared.DeviceLinking;
+using Content.Shared.Storage;
 using Robust.Shared.EntitySerialization;
 using Robust.Shared.IoC;
 
@@ -6,13 +9,14 @@ namespace Content.Server._NF.Shipyard.Systems;
 public sealed partial class ShipyardSystem
 {
     [Dependency] private IDependencyCollection _wfDependencies = default!;
+    [Dependency] private Content.Server._WF.Shipyard.WFHullRetireSystem _wfHullRetire = default!;
 
     /// <summary>
     /// Takes off any component aboard a sold hull that won't save, so one bad component doesn't lose the whole copy. The
     /// hull is about to be deleted either way. Skipping the entity instead leaves its children pointing at nothing, and
     /// the copy then fails to load.
     /// </summary>
-    private void WFStripUnsavable(EntityUid grid, SerializationOptions options)
+    public void WFStripUnsavable(EntityUid grid, SerializationOptions options)
     {
         var probeOptions = options with { ErrorOnOrphan = false };
         var pending = new Queue<EntityUid>();
@@ -51,6 +55,56 @@ public sealed partial class ShipyardSystem
                     RemComp(uid, bad);
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Drops entries keyed by entities the copy won't hold. The serializer writes each such key as "invalid", so two in
+    /// one dictionary fail the whole save with a duplicate key. Only for a hull about to be deleted.
+    /// </summary>
+    public void WFPruneDeadKeys(EntityUid grid)
+    {
+        var saved = new HashSet<EntityUid>();
+        var pending = new Queue<EntityUid>();
+        pending.Enqueue(grid);
+        while (pending.TryDequeue(out var uid))
+        {
+            if (MetaData(uid).EntityPrototype?.MapSavable == false)
+                continue;
+
+            saved.Add(uid);
+            var children = Transform(uid).ChildEnumerator;
+            while (children.MoveNext(out var child))
+            {
+                pending.Enqueue(child);
+            }
+        }
+
+        foreach (var uid in saved)
+        {
+            if (TryComp<StorageComponent>(uid, out var storage))
+                WFPruneKeys(storage.StoredItems, saved);
+
+            if (TryComp<DeviceLinkSourceComponent>(uid, out var source))
+            {
+                var ports = source.LinkedPorts;
+                WFPruneKeys(ports, saved);
+            }
+
+            if (TryComp<ToggleableClothingComponent>(uid, out var clothing))
+            {
+                var pieces = clothing.ClothingUids;
+                WFPruneKeys(pieces, saved);
+            }
+        }
+    }
+
+    private static void WFPruneKeys<T>(Dictionary<EntityUid, T> entries, HashSet<EntityUid> saved)
+    {
+        foreach (var key in entries.Keys)
+        {
+            if (!saved.Contains(key))
+                entries.Remove(key);
         }
     }
 }

@@ -90,6 +90,8 @@ public sealed partial class WFReaverCampaignSystem
         state.NextSpread += span;
         state.NextRaid += span;
         state.OverrunSince += span;
+        if (state.NextFunding != TimeSpan.Zero)
+            state.NextFunding += span;
         Shift(state.Raided, span);
         Shift(state.InsideSince, span);
         Shift(state.InterceptCooldowns, span);

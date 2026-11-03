@@ -6,6 +6,7 @@ using Robust.Shared.Enums;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
+using DrawDepth = Content.Shared.DrawDepth.DrawDepth;
 
 namespace Content.Client._WF.BitmaskWalls;
 
@@ -30,11 +31,13 @@ public sealed partial class WallFrillOverlay : Overlay
 
     private List<Entity<MapGridComponent>> _grids = new();
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpace;
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
 
     public WallFrillOverlay(WallFrillSystem frills)
     {
         IoCManager.InjectDependencies(this);
+        // Over mobs, under doors and anything hung on the wall face.
+        ZIndex = (int) DrawDepth.Doors;
         _frills = frills;
         _transform = _entManager.System<SharedTransformSystem>();
         _map = _entManager.System<SharedMapSystem>();

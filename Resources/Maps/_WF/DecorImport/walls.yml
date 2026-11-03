@@ -5,7 +5,7 @@ meta:
   forkId: ""
   forkVersion: ""
   time: 10/19/2026 18:22:06
-  entityCount: 2010
+  entityCount: 2005
 maps: []
 grids:
 - 1
@@ -9692,33 +9692,6 @@ entities:
     - type: Transform
       parent: 1
       pos: 66.5,-60.5
-- proto: TgMineralBamboo
-  entities:
-  - uid: 1703
-    components:
-    - type: Transform
-      parent: 1
-      pos: 50.5,-44.5
-  - uid: 1704
-    components:
-    - type: Transform
-      parent: 1
-      pos: 51.5,-44.5
-  - uid: 1705
-    components:
-    - type: Transform
-      parent: 1
-      pos: 52.5,-44.5
-  - uid: 1706
-    components:
-    - type: Transform
-      parent: 1
-      pos: 50.5,-45.5
-  - uid: 1707
-    components:
-    - type: Transform
-      parent: 1
-      pos: 51.5,-45.5
 - proto: TgMineralGold
   entities:
   - uid: 1713

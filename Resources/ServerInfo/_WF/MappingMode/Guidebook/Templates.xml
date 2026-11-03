@@ -59,7 +59,7 @@
 
   A reference is a copy of a game ship, a game map or a level of one of your own maps, dropped onto your map to look at or copy from.
 
-  - Open the Mapping window's Session tab and press [bold]Load reference[/bold].
+  - Open the Mapping window's [bold]Reference[/bold] tab. Picking a file previews its floor plan and size.
   - Pick a source: [bold]My library[/bold], [bold]Ship grids[/bold] or [bold]Maps[/bold]. Search narrows the list.
   - Pick a file and press [bold]Place[/bold].
   - An outline follows the cursor. R turns it. Click to put it down. Escape or right click drops it.

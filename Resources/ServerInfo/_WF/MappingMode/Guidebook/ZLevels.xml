@@ -17,7 +17,7 @@
 
   ## Lining up levels
 
-  Every level uses the same world tiles, and Up and Down keep you where you are, so build over what shows through from below. Every grid sits on whole world tiles at a right angle: anything placed, pasted or loaded off them, ships and maps included, moves onto them by itself. The [bold]World grid[/bold] layer draws those tiles. The [bold]Depth perspective[/bold] layer draws the levels below smaller, as on a planet; it's off by default so levels line up on screen. The Grids list on the Session tab lists the grids on every level.
+  Every level uses the same world tiles, and Up and Down keep you where you are, so build over what shows through from below. Every grid sits on whole world tiles at a right angle: anything placed, pasted or loaded off them, ships and maps included, moves onto them by itself. The [bold]World grid[/bold] layer draws those tiles. The [bold]Depth perspective[/bold] layer draws the levels below smaller, as on a planet; it's off by default so levels line up on screen. The Grids tab lists the grids on every level.
 
   ## Saving and downloading
 

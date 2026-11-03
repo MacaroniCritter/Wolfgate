@@ -5,6 +5,8 @@ using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Damage;
 using Content.Shared.Kitchen;
+using Content.Shared.Lathe.Prototypes; // WOLFGATE: the assembler's recipe pack
+using Content.Shared.Research.Prototypes; // WOLFGATE: the assembler's recipes
 using Robust.Server.Player;
 using Robust.Shared.Enums;
 using Robust.Shared.Player;
@@ -19,6 +21,7 @@ public sealed partial class MedicalRecipeDataSystem : SharedMedicalGuideDataSyst
     [Dependency] private IPrototypeManager _protoMan = default!;
 
     private Dictionary<string, List<MedicalRecipeData>> _sources = new();
+    private static readonly ProtoId<LatheRecipePackPrototype> AssemblerPack = "MedicalAssemblerStatic"; // WOLFGATE: what the medical assembler makes
 
     public override void Initialize()
     {
@@ -32,6 +35,8 @@ public sealed partial class MedicalRecipeDataSystem : SharedMedicalGuideDataSyst
     {
         if (!args.WasModified<EntityPrototype>()
             && !args.WasModified<FoodRecipePrototype>()
+            && !args.WasModified<LatheRecipePrototype>() // WOLFGATE: the assembler's recipes
+            && !args.WasModified<LatheRecipePackPrototype>() // WOLFGATE: the assembler's recipe pack
         )
             return;
 
@@ -54,6 +59,15 @@ public sealed partial class MedicalRecipeDataSystem : SharedMedicalGuideDataSyst
                 _sources.GetOrNew(recipe.Result).Add(new MedicalRecipeData(recipe));
             }
         }
+
+        // WOLFGATE START: the assembler's microwave recipes became lathe recipes, which left the guidebook page empty
+        foreach (var recipeId in _protoMan.Index(AssemblerPack).Recipes)
+        {
+            var recipe = _protoMan.Index(recipeId);
+            if (recipe.Result is { } made)
+                _sources.GetOrNew(made.Id).Add(new MedicalRecipeData(recipe, made, _protoMan.Index(made).Name));
+        }
+        // WOLFGATE END
 
         Registry.Clear();
 

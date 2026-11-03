@@ -112,6 +112,9 @@ public sealed partial class FireControlWindow
     {
         var state = _wfMining;
         _wfMiningPanel.Visible = state.Lasers > 0;
+        // The panel takes the column's slack, not the shield panel over it, so the scan grows down and the power steps stay put.
+        _wfMiningPanel.VerticalExpand = state.Lasers > 0;
+        _wfShieldPanel.VerticalExpand = state.Lasers == 0;
         if (state.Lasers == 0)
             return;
 

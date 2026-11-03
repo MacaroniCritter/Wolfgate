@@ -36,7 +36,14 @@ public sealed partial class WFMappingReferenceSystem : EntitySystem
         ContentKeyFunctions.WFMappingReferenceCancel,
     };
 
+    /// <summary>Floor plans kept before the cache starts over.</summary>
+    private const int MaxCachedPreviews = 64;
+
     private readonly List<BoundKeyFunction> _added = new();
+    private readonly Dictionary<string, WFMappingReferencePreview> _previews = new();
+
+    /// <summary>Raised with the answer to <see cref="RequestPreview"/>.</summary>
+    public event Action<WFMappingReferencePreviewEvent>? PreviewReceived;
 
     /// <summary>The footprint being placed, or null when nothing is.</summary>
     public WFMappingReferenceFootprintEvent? Footprint { get; private set; }
@@ -54,8 +61,10 @@ public sealed partial class WFMappingReferenceSystem : EntitySystem
         base.Initialize();
 
         SubscribeNetworkEvent<WFMappingReferenceFootprintEvent>(OnFootprint);
+        SubscribeNetworkEvent<WFMappingReferencePreviewEvent>(OnPreview);
         _mapping.ResultReceived += OnResult;
         _mapping.SessionEnded += End;
+        _mapping.SessionEnded += _previews.Clear;
 
         CommandBinds.Builder
             .BindBefore(ContentKeyFunctions.WFMappingSelect,
@@ -79,6 +88,7 @@ public sealed partial class WFMappingReferenceSystem : EntitySystem
         End();
         _mapping.ResultReceived -= OnResult;
         _mapping.SessionEnded -= End;
+        _mapping.SessionEnded -= _previews.Clear;
         CommandBinds.Unregister<WFMappingReferenceSystem>();
     }
 
@@ -94,6 +104,28 @@ public sealed partial class WFMappingReferenceSystem : EntitySystem
     public void RequestList()
     {
         RaiseNetworkEvent(new WFMappingReferenceListRequest());
+    }
+
+    /// <summary>Gets a listed file's floor plan, from the server the first time.</summary>
+    public void RequestPreview(string path)
+    {
+        if (_previews.TryGetValue(path, out var preview))
+            PreviewReceived?.Invoke(new WFMappingReferencePreviewEvent(path, preview, null));
+        else
+            RaiseNetworkEvent(new WFMappingReferencePreviewRequest(path));
+    }
+
+    private void OnPreview(WFMappingReferencePreviewEvent ev)
+    {
+        if (ev.Preview != null)
+        {
+            if (_previews.Count >= MaxCachedPreviews)
+                _previews.Clear();
+
+            _previews[ev.Path] = ev.Preview;
+        }
+
+        PreviewReceived?.Invoke(ev);
     }
 
     /// <summary>Asks the server to load a listed file aside and send its footprint.</summary>

@@ -5782,3 +5782,135 @@
     collection: FootstepFloor
   itemDrop: FloorTileItemTgFloorNecropolis
   weather: true
+
+- type: tile
+  id: DarkPackFloorCityClinic
+  name: tiles-wf-dark-pack-floor-city-clinic
+  sprite: /Textures/_WF/DecorImport/Tiles/darkpack/clinic.png
+  variants: 9
+  placementVariants:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  baseTurf: Plating
+  isSubfloor: false
+  deconstructTools: [ Prying ]
+  footstepSounds:
+    collection: FootstepFloor
+  itemDrop: FloorTileItemDarkPackFloorCityClinic
+  heatCapacity: 10000
+
+- type: tile
+  id: DarkPackFloorCityFactory
+  name: tiles-wf-dark-pack-floor-city-factory
+  sprite: /Textures/_WF/DecorImport/Tiles/darkpack/factory.png
+  variants: 9
+  placementVariants:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  baseTurf: Plating
+  isSubfloor: false
+  deconstructTools: [ Prying ]
+  footstepSounds:
+    collection: FootstepFloor
+  itemDrop: FloorTileItemDarkPackFloorCityFactory
+  heatCapacity: 10000
+
+- type: tile
+  id: DarkPackFloorCityIndustrial
+  name: tiles-wf-dark-pack-floor-city-industrial
+  sprite: /Textures/_WF/DecorImport/Tiles/darkpack/industrial.png
+  variants: 9
+  placementVariants:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  baseTurf: Plating
+  isSubfloor: false
+  deconstructTools: [ Prying ]
+  footstepSounds:
+    collection: FootstepFloor
+  itemDrop: FloorTileItemDarkPackFloorCityIndustrial
+  heatCapacity: 10000
+
+- type: tile
+  id: DarkPackFloorCityToilet
+  name: tiles-wf-dark-pack-floor-city-toilet
+  sprite: /Textures/_WF/DecorImport/Tiles/darkpack/toilet.png
+  variants: 9
+  placementVariants:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  baseTurf: Plating
+  isSubfloor: false
+  deconstructTools: [ Prying ]
+  footstepSounds:
+    collection: FootstepFloor
+  itemDrop: FloorTileItemDarkPackFloorCityToilet
+  heatCapacity: 10000
+
+- type: tile
+  id: DarkPackFloorCityToiletLarge
+  name: tiles-wf-dark-pack-floor-city-toilet-large
+  sprite: /Textures/_WF/DecorImport/Tiles/darkpack/toilet_large.png
+  variants: 9
+  placementVariants:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  baseTurf: Plating
+  isSubfloor: false
+  deconstructTools: [ Prying ]
+  footstepSounds:
+    collection: FootstepFloor
+  itemDrop: FloorTileItemDarkPackFloorCityToiletLarge
+  heatCapacity: 10000
+
+- type: tile
+  id: DarkPackFloorSidewalk
+  name: tiles-wf-dark-pack-floor-sidewalk
+  sprite: /Textures/_WF/DecorImport/Tiles/darkpack/sidewalk.png
+  variants: 3
+  placementVariants:
+  - 1.0
+  - 1.0
+  - 1.0
+  baseTurf: Plating
+  isSubfloor: false
+  deconstructTools: [ Prying ]
+  footstepSounds:
+    collection: FootstepFloor
+  itemDrop: FloorTileItemDarkPackFloorSidewalk
+  heatCapacity: 10000

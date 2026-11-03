@@ -338,8 +338,8 @@ public sealed partial class ShipyardSystem
     }
 
     /// <summary>
-    /// Serialises a grid now, which has to happen on the main thread, and writes the YAML text on a worker so a big
-    /// ship doesn't hold up the tick for it. The task gives null if the write failed.
+    /// Serialises a grid now in one go, which has to happen on the main thread, and writes the YAML text on a worker.
+    /// The task gives null if the write failed. A sale uses <see cref="Content.Server._WF.Shipyard.WFHullRetireSystem"/>.
     /// </summary>
     public bool TrySaveShipDeferred(EntityUid grid, List<EntityUid> carry, [NotNullWhen(true)] out Task<string?>? writing)
     {
@@ -370,6 +370,8 @@ public sealed partial class ShipyardSystem
         MappingDataNode node;
         try
         {
+            WFPruneDeadKeys(grid);
+
             FileCategory category;
             try
             {
@@ -401,23 +403,27 @@ public sealed partial class ShipyardSystem
         }
 
         var name = ToPrettyString(grid).ToString();
-        writing = Task.Run(() =>
-        {
-            try
-            {
-                using var writer = new StringWriter();
-                var stream = new YamlStream { new YamlDocument(node.ToYaml()) };
-                stream.Save(new YamlMappingFix(new Emitter(writer)), false);
-                return (string?) writer.ToString();
-            }
-            catch (Exception e)
-            {
-                Log.Error($"Failed to write the copy of {name} for resale: {e}");
-                return null;
-            }
-        });
-
+        writing = Task.Run(() => WFWriteCopy(node, name));
         return true;
+    }
+
+    /// <summary>
+    /// Writes a serialised ship as YAML text, or null if that failed. Safe on a worker thread.
+    /// </summary>
+    public string? WFWriteCopy(MappingDataNode node, string name)
+    {
+        try
+        {
+            using var writer = new StringWriter();
+            var stream = new YamlStream { new YamlDocument(node.ToYaml()) };
+            stream.Save(new YamlMappingFix(new Emitter(writer)), false);
+            return writer.ToString();
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Failed to write the copy of {name} for resale: {e}");
+            return null;
+        }
     }
 
     /// <summary>

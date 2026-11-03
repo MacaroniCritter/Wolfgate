@@ -1,0 +1,176 @@
+# WOLFGATE(DecorImport) START: ported from Frontier
+# region base
+- type: entity
+  abstract: true
+  id: NFBaseStructureWallTrophy
+  suffix: Frontier
+  description: "A wall-mounted frame for showcasing the achievements of your parents' favorite child."
+  placement:
+    mode: SnapgridCenter
+    snap:
+    - Wallmount
+  components:
+  - type: Sprite
+    sprite: _NF/Structures/Wallmounts/trophies.rsi
+    drawdepth: WallTops
+    snapCardinals: false
+  - type: WallMount
+    arc: 200
+  - type: Rotatable
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Transform
+    anchored: true
+  - type: Physics
+    bodyType: Static
+    canCollide: false
+  - type: Fixtures
+    fixtures: {}
+  - type: Appearance
+
+# region frames
+- type: entity
+  parent: NFBaseStructureWallTrophy
+  id: NFStructureWallTrophyFrameWood
+  name: wooden trophy mount
+  components:
+  - type: Sprite
+    layers:
+    - state: shield-frame
+      color: "#844b27" # "wood"
+    - state: shield-velvet
+      color: "#2d4877" # "fancy blue table"
+  - type: Damageable
+    damageContainer: Inorganic
+    damageModifierSet: Wood
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:EmptyAllContainersBehaviour
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+      - !type:PlaySoundBehavior
+        sound:
+          collection: WoodDestroy
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          MaterialWoodPlank1:
+            min: 1
+            max: 2
+          MaterialCloth1:
+            min: 0
+            max: 1
+  - type: StaticPrice
+    price: 25
+
+- type: entity
+  parent: NFBaseStructureWallTrophy
+  id: NFStructureWallTrophyFrameBrass
+  name: brass trophy mount
+  components:
+  - type: Sprite
+    layers:
+    - state: shield-frame
+      color: "#b18b25" # "Brass"
+    - state: shield-velvet
+      color: "#1f5f41" # "fancy green table"
+  - type: Damageable
+    damageContainer: Inorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 150
+      behaviors:
+      - !type:EmptyAllContainersBehaviour
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+      - !type:PlaySoundBehavior
+        sound:
+          collection: WoodDestroy
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          SheetBrass1:
+            min: 0
+            max: 1
+          MaterialCloth1:
+            min: 0
+            max: 1
+  - type: StaticPrice
+    price: 15
+
+- type: entity
+  parent: NFBaseStructureWallTrophy
+  id: NFStructureWallTrophyFrameSilver
+  name: silver trophy mount
+  components:
+  - type: Sprite
+    layers:
+    - state: shield-frame
+      color: "#dcdcdc" # "Silver"
+    - state: shield-velvet
+      color: "#9b3170" # "fancy pink table"
+  - type: Damageable
+    damageContainer: Inorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:EmptyAllContainersBehaviour
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+      - !type:PlaySoundBehavior
+        sound:
+          collection: WoodDestroy
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          IngotSilver1:
+            min: 0
+            max: 1
+          MaterialCloth1:
+            min: 0
+            max: 1
+  - type: StaticPrice
+    price: 20
+
+- type: entity
+  parent: NFBaseStructureWallTrophy
+  id: NFStructureWallTrophyFrameGold
+  name: golden trophy mount
+  components:
+  - type: Sprite
+    layers:
+    - state: shield-frame
+      color: "#ffc20e" # "Gold"
+    - state: shield-velvet
+      color: "#5a2355" # "fancy purple table"
+  - type: Damageable
+    damageContainer: Inorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:EmptyAllContainersBehaviour
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+      - !type:PlaySoundBehavior
+        sound:
+          collection: WoodDestroy
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          IngotGold1:
+            min: 0
+            max: 1
+          MaterialCloth1:
+            min: 0
+            max: 1
+  - type: StaticPrice
+    price: 25
+# WOLFGATE END

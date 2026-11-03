@@ -154,7 +154,7 @@ public sealed partial class MappingToolsSystem
         }
 
         if (xform.Anchored)
-            _transform.Unanchor(uid, xform, setPhysics: false);
+            _transform.Unanchor(uid, xform, setPhysics: !pose.Anchored);
 
         _transform.SetCoordinates(uid, xform, new EntityCoordinates(pose.Parent, pose.Position), pose.Rotation);
         if (pose.Anchored)

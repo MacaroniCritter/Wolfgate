@@ -189,10 +189,16 @@ public sealed partial class WFCompanySystem
         return "wf-company-error-failed";
     }
 
+    /// <summary>Whether a session spawned a character and still plays its mind. A ghost role takes a new mind, so its body is not the member's character.</summary>
+    private bool PlaysSpawnedCharacter(ICommonSession session) =>
+        _spawnedMinds.TryGetValue(session.UserId, out var spawned) &&
+        _minds.TryGetMind(session, out var mind, out _) && mind == spawned;
+
     /// <summary>The body a session plays as its member character, alive or critical, AFK or not.</summary>
     private (EntityUid Body, Company Company)? MemberBody(ICommonSession session)
     {
         if (session.Status != SessionStatus.InGame || !_spawnedSlots.TryGetValue(session.UserId, out var slot) ||
+            !PlaysSpawnedCharacter(session) ||
             session.AttachedEntity is not { } body || HasComp<GhostComponent>(body) ||
             !TryComp<MobStateComponent>(body, out var state) || state.CurrentState == MobState.Dead ||
             !_profileIds.TryGetValue(session.UserId, out var ids) || !ids.TryGetValue(slot, out var profile) ||
@@ -234,8 +240,9 @@ public sealed partial class WFCompanySystem
 
     private void OnRadioReceive(ref RadioReceiveAttemptEvent args)
     {
-        if (args.Channel.ID == CompanyChannel && (CompanyForBody(args.RadioSource) is not { } company ||
-            CompanyForBody(args.RadioReceiver) != company))
+        // Ghosts hear every company, so staff can moderate the channel.
+        if (args.Channel.ID == CompanyChannel && !HasComp<GhostComponent>(args.RadioReceiver) &&
+            (CompanyForBody(args.RadioSource) is not { } company || CompanyForBody(args.RadioReceiver) != company))
             args.Cancelled = true;
     }
 

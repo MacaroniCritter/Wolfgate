@@ -96,9 +96,9 @@ public record struct UsedShipListedEvent(UsedShipListing Listing);
 public sealed partial class UsedShipMarketSystem : EntitySystem
 {
     [Dependency] private IGameTiming _timing = default!;
-    [Dependency] private DockingSystem _docking = default!;
     [Dependency] private IPrototypeManager _proto = default!;
     [Dependency] private ShipyardSystem _shipyard = default!;
+    [Dependency] private WFHullRetireSystem _retire = default!;
     [Dependency] private StationSystem _station = default!;
     [Dependency] private UsedShipReinitSystem _reinit = default!;
 
@@ -187,8 +187,8 @@ public sealed partial class UsedShipMarketSystem : EntitySystem
     }
 
     /// <summary>
-    /// Copies a ship that has just been sold and puts it out back. The live grid is left alone so its
-    /// own deletion still runs every cleanup bound to the old owner; the copy is stripped when it is loaded.
+    /// Copies a ship that has just been sold and puts it out back, over the ticks after the sale. The live grid is only
+    /// parked, so its own deletion still runs every cleanup bound to the old owner; the copy is stripped when it is loaded.
     /// </summary>
     public bool TryCapture(EntityUid shuttle,
         EntityUid console,
@@ -225,14 +225,8 @@ public sealed partial class UsedShipMarketSystem : EntitySystem
             Log.Info($"Copying {ToPrettyString(shuttle)} for resale with {carry.Count} crew or machines aboard.");
 
         // A docked hull's joints and docks point at the station; the copy cannot carry them and a
-        // dangling reference makes the whole load fail. The hull is about to be deleted regardless.
-        _docking.UndockDocks(shuttle);
-
-        if (!_shipyard.TrySaveShipDeferred(shuttle, carry, out var writing))
-        {
-            Log.Error($"Could not copy {shipName} for the used lot; it is lost.");
-            return false;
-        }
+        // dangling reference makes the whole load fail. Retiring undocks it first.
+        var writing = _retire.RetireWithCopy(shuttle, carry);
 
         var saleValue = _shipyard.GetPostSaleRateBill(console, appraisal);
         var now = _timing.CurTime;

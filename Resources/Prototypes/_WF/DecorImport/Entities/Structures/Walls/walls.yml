@@ -16,27 +16,6 @@
 
 - type: entity
   parent: BaseWallTierOne
-  id: TgMineralBamboo
-  components:
-  - type: StaticPrice
-    price: 30
-  - type: Construction
-    graph: Barricade
-    node: woodWall
-  - type: RCDDeconstructable
-    cost: 6
-    delay: 8
-    fx: EffectRCDDeconstruct8
-  - type: Sprite
-    sprite: _WF/DecorImport/Structures/Walls/bamboo_wall.rsi
-  - type: Icon
-    sprite: _WF/DecorImport/Structures/Walls/bamboo_wall.rsi
-  - type: IconSmooth
-    key: walls
-    base: bamboo_wall
-
-- type: entity
-  parent: BaseWallTierOne
   id: TgMineralGold
   components:
   - type: Construction

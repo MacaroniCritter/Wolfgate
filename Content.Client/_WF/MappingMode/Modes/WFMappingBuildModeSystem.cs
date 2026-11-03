@@ -8,6 +8,7 @@ using Content.Client.Popups;
 using Content.Shared._WF.MappingMode;
 using Content.Shared._WF.MappingTools;
 using Content.Shared.Atmos.Components;
+using Content.Shared.Construction.Components;
 using Content.Shared.Input;
 using Robust.Client.Graphics;
 using Robust.Client.Input;
@@ -38,6 +39,7 @@ public sealed partial class WFMappingBuildModeSystem : EntitySystem
     [Dependency] private IPrototypeManager _prototypes = default!;
     [Dependency] private ITileDefinitionManager _tileDefs = default!;
     [Dependency] private DecalPlacementSystem _decals = default!;
+    [Dependency] private EntityLookupSystem _lookup = default!;
     [Dependency] private MappingToolsSystem _tools = default!;
     [Dependency] private PopupSystem _popup = default!;
     [Dependency] private SharedMapSystem _map = default!;
@@ -60,6 +62,7 @@ public sealed partial class WFMappingBuildModeSystem : EntitySystem
         WFMappingKeyFunctions.WFMappingMode7,
         WFMappingKeyFunctions.WFMappingMode8,
         WFMappingKeyFunctions.WFMappingMode9,
+        WFMappingKeyFunctions.WFMappingMode10,
         WFMappingKeyFunctions.WFMappingModePrimary,
         WFMappingKeyFunctions.WFMappingModeSecondary,
         WFMappingKeyFunctions.WFMappingModeMiddle,
@@ -157,6 +160,7 @@ public sealed partial class WFMappingBuildModeSystem : EntitySystem
         RegisterHandler(new WFMappingPickMode(this));
         RegisterHandler(new WFMappingPipeMode(this));
         RegisterHandler(new WFMappingLinkMode(this));
+        RegisterHandler(new WFMappingWrenchMode(this));
 
         _tools.SelectingChanged += OnSelectingChanged;
         _tools.PickingChanged += OnPickingChanged;
@@ -407,8 +411,40 @@ public sealed partial class WFMappingBuildModeSystem : EntitySystem
                 ("join", PipeAutoJoin ? "yes" : "no"),
                 ("replace", PipeReplace ? "yes" : "no")),
             WFMappingBuildMode.Link => _link.ReadoutText(),
+            WFMappingBuildMode.Wrench => WrenchReadout(),
             _ => string.Empty,
         };
+    }
+
+    /// <summary>What a click in Wrench mode would turn, or how to use it.</summary>
+    private string WrenchReadout()
+    {
+        if (AnchorableAt(MouseMapPosition) is not { } target)
+            return Loc.GetString("wf-mapping-screen-readout-wrench");
+
+        return Loc.GetString("wf-mapping-screen-readout-wrench-target", ("name", Name(target)),
+            ("anchored", Transform(target).Anchored ? "yes" : "no"));
+    }
+
+    /// <summary>The wrenchable entity at a map position, anchored ones first since those are what blocks a tile.</summary>
+    public EntityUid? AnchorableAt(MapCoordinates position)
+    {
+        if (position.MapId == MapId.Nullspace)
+            return null;
+
+        EntityUid? found = null;
+        foreach (var uid in _lookup.GetEntitiesIntersecting(position))
+        {
+            if (!HasComp<AnchorableComponent>(uid))
+                continue;
+
+            if (Transform(uid).Anchored)
+                return uid;
+
+            found ??= uid;
+        }
+
+        return found;
     }
 
     /// <summary>The name of the pipe colour preset, or the custom colour's hex.</summary>

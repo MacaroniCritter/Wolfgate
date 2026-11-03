@@ -137,6 +137,9 @@
   - type: NpcFactionMember
     factions:
     - SimpleHostile
+    # SimpleHostile is neutral to Passive, which is how monkeys are fed to slimes.
+    addHostileFactions:
+    - Passive
   - type: ContainerContainer
     containers:
       storagebase: !type:Container

@@ -38,6 +38,7 @@ public sealed class WFReaverPauseTest : WFReaverTestBase
             var state = State();
             state.NextSpread = _before + Lead;
             state.NextRaid = _before + Lead;
+            state.NextFunding = _before + Lead;
             state.LastFounded = _before - TimeSpan.FromHours(2);
         });
     }
@@ -52,6 +53,7 @@ public sealed class WFReaverPauseTest : WFReaverTestBase
         Assert.That(comp.NextReinforcement, Is.GreaterThanOrEqualTo(_before + Lead + span - slack));
         Assert.That(state.NextSpread, Is.GreaterThanOrEqualTo(_before + Lead + span - slack));
         Assert.That(state.NextRaid, Is.GreaterThanOrEqualTo(_before + Lead + span - slack));
+        Assert.That(state.NextFunding, Is.GreaterThanOrEqualTo(_before + Lead + span - slack));
         Assert.That(state.LastFounded, Is.GreaterThanOrEqualTo(_before - TimeSpan.FromHours(2) + span - slack));
     }
 

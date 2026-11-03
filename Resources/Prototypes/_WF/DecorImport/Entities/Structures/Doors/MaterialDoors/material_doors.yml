@@ -8,6 +8,62 @@
     mode: NoSprite
 
 - type: entity
+  abstract: true
+  id: BaseDecorImportWoodDoor
+  components:
+  - type: RangedDamageSound
+    soundGroups:
+      Brute:
+        collection: WFBulletImpactWood
+  - type: Construction
+    graph: DoorGraph
+    node: woodDoor
+  - type: Door
+    openSound:
+      path: /Audio/Effects/door_open.ogg
+    closeSound:
+      path: /Audio/Effects/door_close.ogg
+  - type: Damageable
+    damageContainer: StructuralInorganic
+    damageModifierSet: Wood
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+
+- type: entity
+  abstract: true
+  id: BaseDecorImportMetalDoor
+  components:
+  - type: RangedDamageSound
+    soundGroups:
+      Brute:
+        collection: MetalBulletImpact
+  - type: Construction
+    graph: DoorGraph
+    node: metalDoor
+  - type: Door
+    openSound:
+      path: /Audio/Effects/stonedoor_openclose.ogg
+    closeSound:
+      path: /Audio/Effects/stonedoor_openclose.ogg
+  - type: Damageable
+    damageContainer: StructuralInorganic
+    damageModifierSet: Metallic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 200
+      behaviors:
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+
+- type: entity
   parent: BaseMaterialDoorNavMap
   id: CMDoorAncientTempleDoor
   components:
@@ -56,7 +112,7 @@
     damageModifierSet: StructuralMetallic
 
 - type: entity
-  parent: BaseMaterialDoorNavMap
+  parent: [ BaseDecorImportWoodDoor, DecorImportMaterialDoorBase ]
   id: GoonDoorDoorOffice
   components:
   - type: Construction
@@ -73,7 +129,7 @@
     closeTimeTwo: 0.47
 
 - type: entity
-  parent: BaseMaterialDoorNavMap
+  parent: [ BaseDecorImportWoodDoor, DecorImportMaterialDoorBase ]
   id: GoonDoorDoorWood
   components:
   - type: Construction
@@ -297,3 +353,116 @@
       path: /Audio/_WF/DecorImport/skyrat/xen_door.ogg
     closeSound:
       path: /Audio/_WF/DecorImport/skyrat/xen_door.ogg
+
+- type: entity
+  parent: [ BaseDecorImportMetalDoor, DecorImportMaterialDoorBase ]
+  id: BaseDarkPackDoor
+  abstract: true
+  components:
+  - type: Sprite
+    noRot: false
+    layers:
+    - state: closed
+      map: ["enum.DoorVisualLayers.Base"]
+      offset: 0,0.5
+  - type: Door
+    openingAnimationTime: 0
+    closingAnimationTime: 0
+
+- type: entity
+  parent: BaseDarkPackDoor
+  id: DarkPackDoorMetal
+  components:
+  - type: Construction
+    graph: DoorGraph
+    node: metalDoor
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Doors/MaterialDoors/door_metal_darkpack.rsi
+
+- type: entity
+  parent: BaseDarkPackDoor
+  id: DarkPackDoorOld
+  components:
+  - type: Construction
+    graph: DoorGraph
+    node: metalDoor
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Doors/MaterialDoors/door_old_darkpack.rsi
+
+- type: entity
+  parent: BaseDarkPackDoor
+  id: DarkPackDoorReinforced
+  components:
+  - type: Construction
+    graph: DoorGraph
+    node: metalDoor
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Doors/MaterialDoors/door_reinf_darkpack.rsi
+
+- type: entity
+  parent: BaseDarkPackDoor
+  id: DarkPackDoorPrison
+  components:
+  - type: Construction
+    graph: DoorGraph
+    node: metalDoor
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Doors/MaterialDoors/door_prison_darkpack.rsi
+
+- type: entity
+  parent: BaseDarkPackDoor
+  id: DarkPackDoorSimple
+  components:
+  - type: Construction
+    graph: DoorGraph
+    node: metalDoor
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Doors/MaterialDoors/door_simple_darkpack.rsi
+
+- type: entity
+  parent: BaseDarkPackDoor
+  id: DarkPackDoorGlassBlue
+  components:
+  - type: Construction
+    graph: DoorGraph
+    node: metalDoor
+  - type: Occluder
+    enabled: false
+  - type: Door
+    occludes: false
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Doors/MaterialDoors/door_glass_blue_darkpack.rsi
+
+- type: entity
+  parent: [ BaseDecorImportWoodDoor, BaseDarkPackDoor ]
+  id: DarkPackDoorWood
+  components:
+  - type: Construction
+    graph: DoorGraph
+    node: woodDoor
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Doors/MaterialDoors/door_wood_darkpack.rsi
+
+- type: entity
+  parent: [ BaseDecorImportWoodDoor, BaseDarkPackDoor ]
+  id: DarkPackDoorOldWood
+  components:
+  - type: Construction
+    graph: DoorGraph
+    node: woodDoor
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Doors/MaterialDoors/door_oldwood_darkpack.rsi
+
+- type: entity
+  parent: [ BaseDecorImportWoodDoor, BaseDarkPackDoor ]
+  id: DarkPackDoorWoodGlass
+  components:
+  - type: Construction
+    graph: DoorGraph
+    node: woodDoor
+  - type: Occluder
+    enabled: false
+  - type: Door
+    occludes: false
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Doors/MaterialDoors/door_glass_darkpack.rsi

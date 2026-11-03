@@ -58,6 +58,10 @@ public sealed partial class WFReaverCampaignComponent : Component
     [ViewVariables]
     public int Funded;
 
+    /// <summary>When the next funding payout may land.</summary>
+    [ViewVariables]
+    public TimeSpan NextFunding;
+
     /// <summary>Raids launched this round; every third goes for a station.</summary>
     [ViewVariables]
     public int Raids;

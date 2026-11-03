@@ -105,6 +105,7 @@ rotation maths).
 - [`Content.Server/_WF/MappingTools/MappingToolsSystem.Links.cs`](MappingToolsSystem.Links.cs)
 - [`Content.Server/_WF/MappingTools/MappingToolsSystem.PipeDevices.cs`](MappingToolsSystem.PipeDevices.cs)
 - [`Content.Server/_WF/MappingTools/MappingToolsSystem.Pipes.cs`](MappingToolsSystem.Pipes.cs)
+- [`Content.Server/_WF/MappingTools/MappingToolsSystem.Wrench.cs`](MappingToolsSystem.Wrench.cs)
 - [`Content.Server/_WF/MappingTools/MappingZLevelsSystem.cs`](MappingZLevelsSystem.cs)
 - [`Content.Server/_WF/MappingTools/WFMappingPermissionEvents.cs`](WFMappingPermissionEvents.cs)
 

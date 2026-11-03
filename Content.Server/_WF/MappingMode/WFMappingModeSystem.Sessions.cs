@@ -511,6 +511,7 @@ public sealed partial class WFMappingModeSystem
         _toolsThrottle.Forget(user);
         _editThrottle.Forget(user);
         _gridThrottle.Forget(user);
+        _previewThrottle.Forget(user);
         _unsavedWarned.Remove(user);
     }
 
@@ -655,6 +656,7 @@ public sealed partial class WFMappingModeSystem
         _kickThrottle.Clear();
         _listThrottle.Clear();
         _pickThrottle.Clear();
+        _previewThrottle.Clear();
         _confirmThrottle.Clear();
         _gridThrottle.Clear();
         _unsavedWarned.Clear();

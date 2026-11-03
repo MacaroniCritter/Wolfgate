@@ -1,0 +1,109 @@
+# WOLFGATE(DecorImport) START: ported from ADT
+- type: entity
+  id: ADTBustHelios
+  parent: BaseStructure
+  name: bust of Helios
+  description: A sculpture in the form of the ancient Greek God of the Sun.
+  components:
+  - type: Sprite
+    noRot: true
+    sprite: ADT/Structures/Decoration/Statues/busts.rsi
+    state: helios
+    drawdepth: Mobs
+    offset: "0.0,0.5"
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.3,-0.3,0.3,0.8"
+        density: 60
+        mask:
+        - MachineMask
+        layer:
+        - MidImpassable
+        - LowImpassable
+  - type: Damageable
+    damageContainer: StructuralInorganic # WOLFGATE(DecorImport): moved from ADT's Injurable
+    damageModifierSet: Metallic
+  - type: Destructible
+    thresholds:
+      - trigger:
+          !type:DamageTrigger
+          damage: 100
+        behaviors:
+          - !type:DoActsBehavior
+            acts: [ "Destruction" ]
+
+- type: entity
+  id: ADTBustDarwin
+  parent: BaseStructure
+  name: bust of Darwin
+  description: A prize was named after him!
+  components:
+  - type: Sprite
+    noRot: true
+    sprite: ADT/Structures/Decoration/Statues/busts.rsi
+    state: darwin
+    drawdepth: Mobs
+    offset: "0.0,0.5"
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.3,-0.3,0.3,0.8"
+        density: 60
+        mask:
+        - MachineMask
+        layer:
+        - MidImpassable
+        - LowImpassable
+  - type: Damageable
+    damageContainer: StructuralInorganic # WOLFGATE(DecorImport): moved from ADT's Injurable
+    damageModifierSet: Metallic
+  - type: Destructible
+    thresholds:
+      - trigger:
+          !type:DamageTrigger
+          damage: 100
+        behaviors:
+          - !type:DoActsBehavior
+            acts: [ "Destruction" ]
+
+- type: entity
+  id: ADTBustPompeii
+  parent: BaseStructure
+  name: bust of Pompey
+  description: A sculpture in the form of Pompeia Plotina, daughter of Lucius Pompey.
+  components:
+  - type: Sprite
+    noRot: true
+    sprite: ADT/Structures/Decoration/Statues/busts.rsi
+    state: pompeii
+    drawdepth: Mobs
+    offset: "0.0,0.5"
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.3,-0.3,0.3,0.8"
+        density: 60
+        mask:
+        - MachineMask
+        layer:
+        - MidImpassable
+        - LowImpassable
+  - type: Damageable
+    damageContainer: StructuralInorganic # WOLFGATE(DecorImport): moved from ADT's Injurable
+    damageModifierSet: Metallic
+  - type: Destructible
+    thresholds:
+      - trigger:
+          !type:DamageTrigger
+          damage: 100
+        behaviors:
+          - !type:DoActsBehavior
+            acts: [ "Destruction" ]
+# WOLFGATE END

@@ -785,3 +785,30 @@
   components:
   - type: Sprite
     overrideDir: East
+
+- type: entity
+  parent: ChairBase
+  id: DarkPackParkBench
+  components:
+  - type: Sprite
+    sprite: _WF/DecorImport/Structures/Furniture/Bench/64x64_darkpack.rsi
+    state: table1
+    offset: "0.5,0.5"
+    noRot: false
+  - type: Damageable
+    damageModifierSet: Wood
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ Destruction ]
+
+- type: entity
+  parent: DarkPackParkBench
+  id: DarkPackParkBench2
+  components:
+  - type: Sprite
+    state: table2

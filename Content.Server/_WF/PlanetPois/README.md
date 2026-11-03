@@ -209,7 +209,6 @@ payment, sells a few, and eats whoever is left dead in his inn.
 
 ## Non-modular edits
 
-- [`Content.Server/Procedural/DungeonJob/DungeonJob.PostGenAutoCabling.cs`](../../Procedural/DungeonJob/DungeonJob.PostGenAutoCabling.cs): a restart after the frontier empties needs a cost too, or the next step throws.
 - [`Content.Server/Zombies/ZombieSystem.cs`](../../Zombies/ZombieSystem.cs): an inert zombie's kills do not rise
 
 <!-- WOLFGATE-GENERATED END -->

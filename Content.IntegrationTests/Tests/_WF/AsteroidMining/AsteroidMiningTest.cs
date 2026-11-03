@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Content.Shared._WF.ShipShields;
 using Content.Client._Mono.FireControl.UI;
 using Content.Client._WF.Cockpit;
 using Content.IntegrationTests.Pair;
@@ -1077,6 +1078,43 @@ public sealed class AsteroidMiningTest
 
             gunnery.WfUpdateMining(new WFMiningBeamGunneryState(0, 0f, 0f, null));
             Assert.That(panel.Visible, Is.False, "Losing the lasers takes the panel away again.");
+        });
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>Report 406: scanning a rock grows the panel downward, so the power steps don't jump under a shield panel.</summary>
+    [Test]
+    public async Task MiningPowerStaysPutWhenARockIsScanned()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true });
+        await pair.Client.WaitAssertion(() =>
+        {
+            using var gunnery = new FireControlWindow();
+            var panel = WFCockpitLease.Descendants(gunnery).Single(control => control.Name == "WfGunneryMining");
+            gunnery.WfUpdateShields(new WFShipShieldShuntState(true, true, 0.8f, MathF.PI / 2f, 0.25f, MathF.PI / 2f));
+
+            float PanelTop(WFMiningBeamTargetEntry? target)
+            {
+                gunnery.WfUpdateMining(new WFMiningBeamGunneryState(1, 0.7f, 0f, target));
+                // Outside the UI tree nothing passes a change up to the window.
+                foreach (var control in WFCockpitLease.Descendants(gunnery))
+                {
+                    control.InvalidateMeasure();
+                }
+
+                var size = gunnery.MinSize;
+                gunnery.Measure(size);
+                gunnery.Arrange(UIBox2.FromDimensions(Vector2.Zero, size));
+                return panel.GlobalPosition.Y;
+            }
+
+            var rock = new WFMiningBeamTargetEntry("medium asteroid", 34f,
+                new[] { new WFMiningBeamOreEntry("iron ore", 0.4f, Color.Brown) }, 0.2f, 0.4f, 0.6f, 0.5f, 0.3f, 0f, 0.9f);
+            var idle = PanelTop(null);
+            var idleHeight = panel.DesiredSize.Y;
+            var scanned = PanelTop(rock);
+            Assert.That(panel.DesiredSize.Y, Is.GreaterThan(idleHeight), "The scan should make the panel taller.");
+            Assert.That(scanned, Is.EqualTo(idle).Within(1f), "The mining panel moved when a rock was scanned.");
         });
         await pair.CleanReturnAsync();
     }
