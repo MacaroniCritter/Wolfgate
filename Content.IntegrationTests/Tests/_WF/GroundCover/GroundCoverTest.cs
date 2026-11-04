@@ -264,6 +264,20 @@ public sealed class GroundCoverTest
                 "The client wasn't sent the wetness.");
         });
 
+        // A client that dropped the grid's snow, as a full state resync can make it, is sent it again.
+        await pair.Client.WaitPost(() =>
+        {
+            var net = entMan.GetNetEntity(map.Grid.Owner);
+            pair.Client.System<ClientGroundCoverSystem>().Forget(new List<NetEntity> { net });
+        });
+        await pair.RunTicksSync(pair.SecondsToTicks(2));
+        await pair.Client.WaitAssertion(() =>
+        {
+            var grid = pair.Client.EntMan.GetEntity(entMan.GetNetEntity(map.Grid.Owner));
+            Assert.That(pair.Client.System<ClientGroundCoverSystem>().GetDepth(grid, Open), Is.EqualTo(150),
+                "Snow the client dropped wasn't sent again.");
+        });
+
         await server.WaitPost(() => server.System<WFGroundCoverSystem>().SetDepth(map.Grid, Open, 0));
         await pair.RunTicksSync(pair.SecondsToTicks(2));
         await pair.Client.WaitAssertion(() =>

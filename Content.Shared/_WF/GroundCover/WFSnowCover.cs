@@ -98,6 +98,13 @@ public sealed class WFSnowCoverChunksMessage : EntityEventArgs
     public List<WFSnowChunkData> Chunks = new();
 }
 
+/// <summary>A client dropped its snow for these grids, as after a full state resync; the server sends it again.</summary>
+[Serializable, NetSerializable]
+public sealed class WFSnowCoverForgetMessage : EntityEventArgs
+{
+    public List<NetEntity> Grids = new();
+}
+
 /// <summary>One chunk's tile depths, or null when it has no snow left.</summary>
 [Serializable, NetSerializable]
 public record struct WFSnowChunkData(Vector2i Index, byte[]? Depths);

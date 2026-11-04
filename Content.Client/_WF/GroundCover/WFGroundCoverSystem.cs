@@ -131,11 +131,23 @@ public sealed class WFGroundCoverSystem : EntitySystem
                 _gone.Add(net);
         }
 
-        foreach (var net in _gone)
+        if (_gone.Count > 0)
+            Forget(_gone);
+    }
+
+    /// <summary>
+    /// Drops the snow of these grids and tells the server, which still counts it as sent: if a grid comes back, as after
+    /// a full state resync, its snow is sent again rather than predicted as bare ground.
+    /// </summary>
+    public void Forget(List<NetEntity> grids)
+    {
+        foreach (var net in grids)
         {
             _snow.Remove(net);
             _missing.Remove(net);
-            Version++;
         }
+
+        Version++;
+        RaiseNetworkEvent(new WFSnowCoverForgetMessage { Grids = new List<NetEntity>(grids) });
     }
 }

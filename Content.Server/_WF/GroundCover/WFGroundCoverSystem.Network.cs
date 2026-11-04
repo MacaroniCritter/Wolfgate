@@ -28,6 +28,26 @@ public sealed partial class WFGroundCoverSystem
     private void InitializeNetwork()
     {
         _player.PlayerStatusChanged += OnPlayerStatusChanged;
+        SubscribeNetworkEvent<WFSnowCoverForgetMessage>(OnForget);
+    }
+
+    /// <summary>Forgets what a session was sent of grids its client dropped, so their snow goes again.</summary>
+    private void OnForget(WFSnowCoverForgetMessage message, EntitySessionEventArgs args)
+    {
+        if (!_sent.TryGetValue(args.SenderSession, out var sent))
+            return;
+
+        _stale.Clear();
+        foreach (var key in sent.Keys)
+        {
+            if (message.Grids.Contains(GetNetEntity(key.Grid)))
+                _stale.Add(key);
+        }
+
+        foreach (var key in _stale)
+        {
+            sent.Remove(key);
+        }
     }
 
     private void ShutdownNetwork()
