@@ -4,6 +4,7 @@ using System.Linq;
 using Content.IntegrationTests.Pair;
 using Content.Server._WF.Remade.Conversion;
 using Content.Server._WF.Remade.Limbs;
+using Content.Server.Damage.Systems;
 using Content.Shared._WF.Remade;
 using Content.Shared._WF.Remade.Limbs;
 using Content.Shared.CCVar;
@@ -270,7 +271,9 @@ public sealed class VariantsTest
         {
             server.CfgMan.SetCVar(CCVars.NPCEnabled, true);
             WFRemadeDirectorTest.LayDeck(pair, map);
-            WFRemadeDirectorTest.SpawnCrewman(pair, WFRemadeDirectorTest.At(map, 0, 0));
+            var crewman = WFRemadeDirectorTest.SpawnCrewman(pair, WFRemadeDirectorTest.At(map, 0, 0));
+            // The slasher comes round through the gap; a dead crewman puts the brute to sleep before it reaches the wall.
+            entMan.System<GodmodeSystem>().EnableGodmode(crewman);
         });
 
         // Railings the pathfinder can't see, tagged as walls: what a wall the navmesh missed would be.
