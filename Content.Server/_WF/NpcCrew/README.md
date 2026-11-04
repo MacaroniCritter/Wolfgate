@@ -274,6 +274,7 @@ simulated counterpart of `WFPilotDockedEvent`.
 - [`Content.Server/_WF/NpcCrew/Components/WFCrewShipProfileComponent.cs`](Components/WFCrewShipProfileComponent.cs)
 - [`Content.Server/_WF/NpcCrew/Components/WFCrewSpawnPointComponent.cs`](Components/WFCrewSpawnPointComponent.cs)
 - [`Content.Server/_WF/NpcCrew/Components/WFCrewSuitUpComponent.cs`](Components/WFCrewSuitUpComponent.cs)
+- [`Content.Server/_WF/NpcCrew/Components/WFCrewSurrenderedComponent.cs`](Components/WFCrewSurrenderedComponent.cs)
 - [`Content.Server/_WF/NpcCrew/Components/WFCrewVirtualShipComponent.cs`](Components/WFCrewVirtualShipComponent.cs)
 - [`Content.Server/_WF/NpcCrew/Components/WFCrewVoidKitComponent.cs`](Components/WFCrewVoidKitComponent.cs)
 - [`Content.Server/_WF/NpcCrew/Components/WFCrewWeaponComponent.cs`](Components/WFCrewWeaponComponent.cs)

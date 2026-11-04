@@ -6,6 +6,8 @@ using Content.Server._WF.Encounters.Components;
 using Content.Server._WF.NpcCrew;
 using Content.Server._WF.NpcCrew.Components;
 using Content.Server._WF.NpcCrew.Systems;
+using Content.Server._WF.NpcDialogue;
+using Content.Server._WF.NpcDialogue.Systems;
 using Content.Server.Chat.Systems;
 using Content.Server.NPC.Components;
 using Content.Server.NPC.Systems;
@@ -56,7 +58,7 @@ public sealed partial class WFEncounterSystem : EntitySystem
     [Dependency] private Content.Server.Shuttles.Systems.ShuttleSystem _shuttles = default!;
     [Dependency] private LinkedLifecycleGridSystem _lifecycle = default!;
     [Dependency] private ChatSystem _chat = default!;
-    [Dependency] private RadioSystem _radio = default!;
+    [Dependency] private WFNpcRadioSystem _npcRadio = default!;
     [Dependency] private MetaDataSystem _meta = default!;
     [Dependency] private MobStateSystem _mobs = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
@@ -233,9 +235,11 @@ public sealed partial class WFEncounterSystem : EntitySystem
 
     /// <summary>
     /// Has someone aboard say something on a channel for the ship: its radio officer, else its captain, else its
-    /// pilot, else any living crewman. False if nobody is left to.
+    /// pilot, else any living crewman. False if nobody is left to, or the radio budget dropped the line. With
+    /// <paramref name="near"/> the line is heard only around the ship and that vessel.
     /// </summary>
-    public bool TrySay(WFEncounterShipState ship, ProtoId<RadioChannelPrototype> channel, string text)
+    public bool TrySay(WFEncounterShipState ship, ProtoId<RadioChannelPrototype> channel, string text,
+        EntityUid? near = null, WFNpcRadioPriority priority = WFNpcRadioPriority.Normal)
     {
         if (TerminatingOrDeleted(ship.Grid))
             return false;
@@ -264,8 +268,7 @@ public sealed partial class WFEncounterSystem : EntitySystem
 
         // Whoever makes the call is heard without a telecom server on the map, as a radio officer is.
         EnsureComp<TelecomExemptComponent>(voice);
-        _radio.SendRadioMessage(voice, text, channel, voice);
-        return true;
+        return _npcRadio.Send(voice, text, channel, priority, near);
     }
 
     /// <summary>
@@ -1050,6 +1053,10 @@ public sealed partial class WFEncounterSystem : EntitySystem
                 continue;
             }
 
+            // A ship that surrendered holds still and does nothing of its own until it is let go or fights again.
+            if (ship.Surrendered)
+                continue;
+
             if (ship.Flees > 0f && encounter.Comp.Begun)
                 Flee(encounter, key, ship);
             if (ship.Abduct != null && encounter.Comp.Begun)
@@ -1174,7 +1181,8 @@ public sealed partial class WFEncounterSystem : EntitySystem
         if (ship.Derelict)
             return !TerminatingOrDeleted(ship.Grid);
 
-        return !TerminatingOrDeleted(ship.Grid) && (IsStranded(ship) || !_status.IsDisabled(ship.Grid))
+        // A ship that surrendered is beaten, its crew alive or not.
+        return !ship.Surrendered && !TerminatingOrDeleted(ship.Grid) && (IsStranded(ship) || !_status.IsDisabled(ship.Grid))
             && HasLivingCrew(ship, anywhere: true)
             && (ship.NoPilotSince is not { } since || _timing.CurTime - since < NoPilotGrace);
     }
