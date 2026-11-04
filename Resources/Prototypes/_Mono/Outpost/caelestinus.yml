@@ -40,6 +40,8 @@
         - type: TradeCrateDestination
           destinationProto: Trade
         # WOLFGATE END
+        # WOLFGATE(Janitorial): skip roundstart trash and puddles here
+        - type: StationVariationHasRun
         - type: ExtraStationInformation
           icon: /Textures/_Mono/Logo/icon/icon-256x256.png # used the biggest one, looks better when downscaling than upscaling
           stationSubtext: 'frontier-lobby-frontier-subtext'
@@ -58,7 +60,7 @@
             #StationTrafficController: [ 2, 2 ]
             SecurityGuard: [ 3, 3 ]
             CCServiceWorker: [ 4, 4 ]
-            #NFJanitor: [ 2, 2 ]
+            NFJanitor: [ 2, 2 ] # WOLFGATE(Janitorial): janitors are back on Caelestinus
             #MailCarrier: [ 2, 2 ]
             DirectorOfCare: [ 1, 1 ]
             MdMedic: [ -1, -1 ]
