@@ -72,15 +72,30 @@ public sealed class WFTestDummyTest
         await pair.RunTicksSync(5);
 
         await server.WaitAssertion(() =>
-        {
-            var state = dummies.Snapshot();
-            Assert.That(state.Entries[0].Answer, Is.EqualTo(WFTestDummyAnswer.OptedIn));
+            Assert.That(dummies.Snapshot().Entries[0].Answer, Is.EqualTo(WFTestDummyAnswer.OptedIn)));
 
-            // A second answer, or one for a stale call, changes nothing.
+        // A second answer, and one for a stale call, change nothing.
+        await client.WaitPost(() =>
+        {
+            client.EntMan.RaisePredictiveEvent(new WFTestDummyAnswerEvent(callId, false));
+            client.EntMan.RaisePredictiveEvent(new WFTestDummyAnswerEvent(callId - 1, false));
+        });
+        await pair.RunTicksSync(5);
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(dummies.Snapshot().Entries[0].Answer, Is.EqualTo(WFTestDummyAnswer.OptedIn), "a repeated or stale answer must not count");
+
             dummies.End();
             Assert.That(dummies.Active, Is.False);
             Assert.That(dummies.Snapshot().Entries, Has.Count.EqualTo(1), "ending keeps the list");
         });
+
+        // An answer after the call ended changes nothing either.
+        await client.WaitPost(() => client.EntMan.RaisePredictiveEvent(new WFTestDummyAnswerEvent(callId, false)));
+        await pair.RunTicksSync(5);
+        await server.WaitAssertion(() =>
+            Assert.That(dummies.Snapshot().Entries[0].Answer, Is.EqualTo(WFTestDummyAnswer.OptedIn), "an answer after End must not count"));
 
         await pair.CleanReturnAsync();
     }
