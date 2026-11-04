@@ -77,6 +77,7 @@ Small fixes for hot spots found in live server profiles, kept as narrow hooks in
 - [`Content.Server/_WF/Performance/GCQueuePrototype.WFMinAge.cs`](GCQueuePrototype.WFMinAge.cs)
 - [`Content.Server/_WF/Performance/GCQueueSystem.WFMinAge.cs`](GCQueueSystem.WFMinAge.cs)
 - [`Content.Server/_WF/Performance/IgnitionSourceSystem.WFLit.cs`](IgnitionSourceSystem.WFLit.cs)
+- [`Content.Server/_WF/Performance/LocalityLoaderSystem.WFDespawn.cs`](LocalityLoaderSystem.WFDespawn.cs)
 - [`Content.Server/_WF/Performance/NavMapSystem.WFRemoved.cs`](NavMapSystem.WFRemoved.cs)
 - [`Content.Server/_WF/Performance/RadarBlipSystem.WFCache.cs`](RadarBlipSystem.WFCache.cs)
 - [`Content.Server/_WF/Performance/ShipSteererComponent.WFStagger.cs`](ShipSteererComponent.WFStagger.cs)
@@ -84,6 +85,7 @@ Small fixes for hot spots found in live server profiles, kept as narrow hooks in
 - [`Content.Server/_WF/Performance/WFAsteroidCullSystem.cs`](WFAsteroidCullSystem.cs)
 - [`Content.Server/_WF/Performance/WFDockIndexSystem.cs`](WFDockIndexSystem.cs)
 - [`Content.Server/_WF/Performance/WFGridDeleteWatchSystem.cs`](WFGridDeleteWatchSystem.cs)
+- [`Content.Server/_WF/Performance/WFSerializerWarmupSystem.cs`](WFSerializerWarmupSystem.cs)
 - [`Content.Server/_WF/Performance/WorldControllerSystem.WFUnloadGrace.cs`](WorldControllerSystem.WFUnloadGrace.cs)
 
 ### Shared
@@ -157,6 +159,18 @@ Small fixes for hot spots found in live server profiles, kept as narrow hooks in
   - weightlessness now refreshes half a second after gravity changes
   - batched weightlessness refresh
 - [`Content.Server/_CE/ZLevels/Core/CEZLevelsSystem.GroundFriction.cs`](../../_CE/ZLevels/Core/CEZLevelsSystem.GroundFriction.cs): reuse a parked grid's sample instead of re-walking its hull every tick
+- [`Content.Server/_CE/ZLevels/Core/CEZLevelsSystem.Transit.cs`](../../_CE/ZLevels/Core/CEZLevelsSystem.Transit.cs)
+  - grids are force-sent and nearby viewers get transit z-eyes; a global override recursed every hull child each tick
+  - the matching add was removed
+- [`Content.Server/_Crescent/ShipShields/ShipShieldsSystem.cs`](../../_Crescent/ShipShields/ShipShieldsSystem.cs): unused, and the lookup is costly
+- [`Content.Server/_EinsteinEngines/Silicon/Charge/Systems/SiliconChargeSystem.cs`](../../_EinsteinEngines/Silicon/Charge/Systems/SiliconChargeSystem.cs)
+  - drain pass timing
+  - a battery swap is handled on the next tick instead of waiting for the 1 s pass
+  - make the next drain pass due immediately
+  - every silicon drains on a 1 s accumulator; NPCs keep their cvar delay
+  - drainTime replaces frameTime
+  - the event fan-out and speed refresh only matter when the state changes
+- [`Content.Server/_EinsteinEngines/Silicon/Death/Systems/SiliconChargeDeathSystem.cs`](../../_EinsteinEngines/Silicon/Death/Systems/SiliconChargeDeathSystem.cs): already dead, nothing to redo
 - [`Content.Server/_Mono/Detection/ThermalSignatureSystem.cs`](../../_Mono/Detection/ThermalSignatureSystem.cs): off the tick other one-second systems run on
 - [`Content.Server/_Mono/NPC/HTN/ShipSteeringSystem.cs`](../../_Mono/NPC/HTN/ShipSteeringSystem.cs)
   - how often steering works out a new input
@@ -173,7 +187,10 @@ Small fixes for hot spots found in live server profiles, kept as narrow hooks in
   - how often a ship's guns are aimed; a shot attempt lasts 0.2 s, so they keep firing between
   - each turn covers the whole period
   - each ship aims on its own tick of the period
-- [`Content.Server/_Mono/Radar/RadarBlipSystem.cs`](../../_Mono/Radar/RadarBlipSystem.cs): every radar on a map shares one walk of the blips per tick
+- [`Content.Server/_Mono/Radar/RadarBlipSystem.cs`](../../_Mono/Radar/RadarBlipSystem.cs)
+  - removals go only to sessions that asked recently
+  - send removals only to recent radar users, none during round cleanup
+  - every radar on a map shares one walk of the blips per tick
 - [`Content.Server/_Mono/Temperature/Systems/EntityRadiusHeaterSystem.cs`](../../_Mono/Temperature/Systems/EntityRadiusHeaterSystem.cs)
   - each heater takes its own tick of the second, not all on one
   - what a fire warms is loose; skipping anchored and stored things skips the trees round a planet's fires
@@ -220,7 +237,18 @@ Small fixes for hot spots found in live server profiles, kept as narrow hooks in
   - wizden#44340, tile entities carry their fixtures
   - wizden#44340, resolve transforms and hard fixtures once per tile
   - wizden#44340, iterate the cached hard fixtures
-- [`Content.Server/Physics/Controllers/MoverController.cs`](../../Physics/Controllers/MoverController.cs): Enum.GetValues allocated every tick per shuttle
+- [`Content.Server/NPC/Systems/NPCSystem.cs`](../../NPC/Systems/NPCSystem.cs)
+  - replaced by a snapshot pass spread over ~60 ticks
+  - see above
+  - process the next slice of the sleep/wake snapshot
+- [`Content.Server/Physics/Controllers/MoverController.cs`](../../Physics/Controllers/MoverController.cs)
+  - gauge of sleeping movers skipped
+  - idle-mover skip
+  - movers skipped this tick for being asleep with no input
+  - reset idle-skip counter
+  - a sleeping, input-less, player-less mover has nothing to move
+  - idle movers skipped
+  - Enum.GetValues allocated every tick per shuttle
 - [`Content.Server/Pinpointer/NavMapSystem.cs`](../../Pinpointer/NavMapSystem.cs)
   - back in use, so no longer a removal
   - deltas name removed chunks; the rebuild below takes back any still in use
@@ -241,6 +269,9 @@ Small fixes for hot spots found in live server profiles, kept as narrow hooks in
   - fixed list instead of Enum.GetValues on every call
   - idle shuttles call this every tick with everything already off
 - [`Content.Server/Sound/EmitSoundSystem.cs`](../../Sound/EmitSoundSystem.cs): finding what's due walks every spammer; NextSound keeps the rate
+- [`Content.Server/Weapons/Ranged/Systems/GunSystem.AutoFire.cs`](../../Weapons/Ranged/Systems/GunSystem.AutoFire.cs)
+  - guns mid-burst, filled from OnBurstActivated
+  - only visit bursting guns and auto-shoot guns, not every GunComponent
 - [`Content.Server/Worldgen/Systems/GC/GCQueueSystem.cs`](../../Worldgen/Systems/GC/GCQueueSystem.cs)
   - queue minimum age
   - leave entities queued until the queue's minimum age has passed
@@ -248,6 +279,7 @@ Small fixes for hot spots found in live server profiles, kept as narrow hooks in
 - [`Content.Server/Worldgen/Systems/LocalityLoaderSystem.cs`](../../Worldgen/Systems/LocalityLoaderSystem.cs)
   - each loader checks twice a second on its own tick; a player can't outrun that
   - see above
+  - restrictions come from a per-tick index, and the player scans run only if the grid holds one
 - [`Content.Server/Worldgen/Systems/WorldControllerSystem.cs`](../../Worldgen/Systems/WorldControllerSystem.cs)
   - chunk unload grace
   - drop a deleted chunk's unload grace timer
@@ -255,9 +287,15 @@ Small fixes for hot spots found in live server profiles, kept as narrow hooks in
 - [`Content.Shared/_CE/ZLevels/Core/Components/CEZPhysicsComponent.cs`](../../../Content.Shared/_CE/ZLevels/Core/Components/CEZPhysicsComponent.cs): raises AfterAutoHandleState so the client notes a height from the server
 - [`Content.Shared/_CE/ZLevels/Core/EntitySystems/CESharedZLevelsSystem.Activation.cs`](../../../Content.Shared/_CE/ZLevels/Core/EntitySystems/CESharedZLevelsSystem.Activation.cs): a deleted entity leaves the sprite passes
 - [`Content.Shared/_CE/ZLevels/Core/EntitySystems/CESharedZLevelsSystem.Movement.cs`](../../../Content.Shared/_CE/ZLevels/Core/EntitySystems/CESharedZLevelsSystem.Movement.cs)
+  - reused by OnTileChanged
   - List.Contains per MoveEvent went quadratic in battles
+  - below this a z set is a no-op
+  - one typed query over the union of the changed tiles instead of an untyped query per tile
   - set lookup instead of List.Contains
+  - skip the dirty and wake when a convoy or parachute re-sets the same height
   - raised entities join the sprite passes
+  - skip the dirty and wake when the velocity is unchanged
+  - recompute ground height only when the tile changed
   - release a battle's oversized set afterwards
 - [`Content.Shared/_CE/ZLevels/Core/EntitySystems/CESharedZLevelsSystem.Update.cs`](../../../Content.Shared/_CE/ZLevels/Core/EntitySystems/CESharedZLevelsSystem.Update.cs): predicted height joins the sprite passes
 - [`Content.Shared/_Mono/Fixtures/FixtureDamageDealerSystem.cs`](../../../Content.Shared/_Mono/Fixtures/FixtureDamageDealerSystem.cs): off the tick other one-second systems start on
@@ -305,8 +343,10 @@ Small fixes for hot spots found in live server profiles, kept as narrow hooks in
   - was AutoGenerateComponentState; WFDeletedRefStateSystem sends Target, which can be deleted first
   - networked by WFDeletedRefStateSystem
 - [`Content.Shared/Weapons/Ranged/Systems/SharedGunSystem.cs`](../../../Content.Shared/Weapons/Ranged/Systems/SharedGunSystem.cs)
+  - lets the server track bursting guns
   - wizden#36641, gunUid was not nullable
   - wizden#36641, a projectile may have no shooter
+  - server hook so auto-fire only walks bursting guns
 - [`Resources/Prototypes/_CE/Entities/Structures/water.yml`](../../../Resources/Prototypes/_CE/Entities/Structures/water.yml): bottomless pools never need refilling, and each tile cost a check every tick
 - [`Resources/Prototypes/_NF/Entities/Tiles/water.yml`](../../../Resources/Prototypes/_NF/Entities/Tiles/water.yml): bottomless pools never need refilling, and each tile cost a check every tick
 - [`Resources/Prototypes/Entities/Tiles/water.yml`](../../../Resources/Prototypes/Entities/Tiles/water.yml): bottomless pools never need refilling, and each tile cost a check every tick

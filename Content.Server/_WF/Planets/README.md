@@ -234,7 +234,9 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 
 - [`Content.Server/_WF/Planets/Administration/PlanetControlCommand.cs`](Administration/PlanetControlCommand.cs)
 - [`Content.Server/_WF/Planets/Administration/PlanetControlSystem.cs`](Administration/PlanetControlSystem.cs)
+- [`Content.Server/_WF/Planets/Atmosphere/AtmosphereSystem.WFMapAir.cs`](Atmosphere/AtmosphereSystem.WFMapAir.cs)
 - [`Content.Server/_WF/Planets/Atmosphere/AtmosphereSystem.WFTerrain.cs`](Atmosphere/AtmosphereSystem.WFTerrain.cs)
+- [`Content.Server/_WF/Planets/Atmosphere/WFMapAirSwapComponent.cs`](Atmosphere/WFMapAirSwapComponent.cs)
 - [`Content.Server/_WF/Planets/Atmosphere/WFTerrainAtmosphereComponent.cs`](Atmosphere/WFTerrainAtmosphereComponent.cs)
 - [`Content.Server/_WF/Planets/Atmosphere/WFTerrainAtmosphereSystem.cs`](Atmosphere/WFTerrainAtmosphereSystem.cs)
 - [`Content.Server/_WF/Planets/Atmosphere/WFTerrainOpenTilesEvent.cs`](Atmosphere/WFTerrainOpenTilesEvent.cs)
@@ -788,6 +790,7 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Content.Server/Parallax/BiomeSystem.ConfigManager.cs`](../../Parallax/BiomeSystem.ConfigManager.cs): the loader's spawner rolls follow reloaded entity prototypes
 - [`Content.Server/Parallax/BiomeSystem.cs`](../../Parallax/BiomeSystem.cs)
   - a chunk's own entities need no bookkeeping as its unload deletes them
+  - a biome grid being deleted needs no bookkeeping; the chunk walk below is per entity
   - planet layers unload on their own schedule, see BiomeSystem.WFUnload.cs
   - a planet layer is left to its own unloader
   - the far part of a planet layer's load area is put off

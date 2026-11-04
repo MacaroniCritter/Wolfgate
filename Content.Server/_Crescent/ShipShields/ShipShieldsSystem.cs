@@ -81,7 +81,7 @@ public sealed partial class ShipShieldsSystem : EntitySystem
             if (parent == null)
                 continue;
 
-            var filter = _station.GetInOwningStation(uid);
+            // var filter = _station.GetInOwningStation(uid); // WOLFGATE(Performance): unused, and the lookup is costly
 
             if (emitter.Damage > emitter.DamageLimit)
                 emitter.OverloadAccumulator = emitter.DamageOverloadTimePunishment;

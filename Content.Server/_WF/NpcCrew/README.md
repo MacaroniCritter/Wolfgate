@@ -294,6 +294,7 @@ simulated counterpart of `WFPilotDockedEvent`.
 - [`Content.Server/_WF/NpcCrew/HTN/WFReloadOperator.cs`](HTN/WFReloadOperator.cs)
 - [`Content.Server/_WF/NpcCrew/HTN/WFTakeGunneryOperator.cs`](HTN/WFTakeGunneryOperator.cs)
 - [`Content.Server/_WF/NpcCrew/HTN/WFTakeHelmOperator.cs`](HTN/WFTakeHelmOperator.cs)
+- [`Content.Server/_WF/NpcCrew/NPCSystem.Sleep.cs`](NPCSystem.Sleep.cs)
 - [`Content.Server/_WF/NpcCrew/Systems/FireControlSystem.Crew.cs`](Systems/FireControlSystem.Crew.cs)
 - [`Content.Server/_WF/NpcCrew/Systems/NPCCombatSystem.Crew.cs`](Systems/NPCCombatSystem.Crew.cs)
 - [`Content.Server/_WF/NpcCrew/Systems/NPCSteeringSystem.Access.cs`](Systems/NPCSteeringSystem.Access.cs)
