@@ -21,6 +21,8 @@ public abstract partial class CESharedZLevelsSystem
     private readonly HashSet<EntityUid> _wfDirtyMovementSet = new(); // WOLFGATE(Performance): List.Contains per MoveEvent went quadratic in battles
 
     private const float WFZEpsilon = 0.0001f; // WOLFGATE(Performance): below this a z set is a no-op
+    private readonly HashSet<EntityUid> _wfOnSlope = new(); // WOLFGATE(Performance): bodies whose ground varies within their tile
+    private bool _wfLastSloped; // WOLFGATE(Performance): set by ComputeGroundHeightInternal on a stair curve
 
     private void InitializeMovement()
     {
@@ -160,12 +162,18 @@ public abstract partial class CESharedZLevelsSystem
     {
         var tile = _transform.GetGridOrMapTilePosition(entity);
 
-        if (tile == entity.Comp.CachedTile && !force)
+        if (tile == entity.Comp.CachedTile && !force && !_wfOnSlope.Contains(entity)) // WOLFGATE(Performance): stair height and stickiness change within a tile
             return;
 
         entity.Comp.CachedTile = tile;
         entity.Comp.CachedGroundHeight = ComputeGroundHeightInternal((entity, entity), out var sticky);
         entity.Comp.CachedStickyGround = sticky;
+        // WOLFGATE(Performance) START: remember who stands on a stair curve
+        if (_wfLastSloped)
+            _wfOnSlope.Add(entity);
+        else
+            _wfOnSlope.Remove(entity);
+        // WOLFGATE END
     }
 
     private void OnMoveEvent(Entity<CEZPhysicsComponent> entity, ref MoveEvent args)
@@ -191,6 +199,7 @@ public abstract partial class CESharedZLevelsSystem
     private float ComputeGroundHeightInternal(Entity<CEZPhysicsComponent?> target, out bool stickyGround, int maxFloors = 1)
     {
         stickyGround = false;
+        _wfLastSloped = false; // WOLFGATE(Performance): reset the stair flag for this lookup
 
         if (!Resolve(target, ref target.Comp, false))
             return 0;
@@ -254,6 +263,7 @@ public abstract partial class CESharedZLevelsSystem
                     return -floor + groundY;
                 }
 
+                _wfLastSloped = true; // WOLFGATE(Performance): this ground varies within the tile
                 var step = 1f / (curve.Count - 1);
                 var index = (int)(t / step);
                 var frac = (t - index * step) / step;
