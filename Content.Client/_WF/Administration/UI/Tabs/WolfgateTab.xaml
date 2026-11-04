@@ -24,6 +24,7 @@
             <cc:UICommandButton Command="ertbuilder" Text="{Loc wf-admin-tab-ert}" WindowType="{x:Type ert:ErtBuilderWindow}" />
             <cc:UICommandButton Command="planetcontrol" Text="{Loc wf-admin-tab-planet-control}" WindowType="{x:Type planets:PlanetControlWindow}" />
             <cc:CommandButton Command="testdummies" Text="{Loc wf-test-dummy-button}" />
+            <cc:CommandButton Command="nukedesigner" Text="{Loc wf-nuke-designer-button}" />
         </GridContainer>
     </BoxContainer>
 </Control>
