@@ -22,7 +22,7 @@ public sealed class WFDefconGatherEvent(WFDefconProfilePrototype profile, TimeSp
     }
 }
 
-/// <summary>Raised (broadcast) after the DEFCON level changes.</summary>
+/// <summary>Raised (broadcast) after the DEFCON level changes, or DEFCON is turned on or off.</summary>
 public sealed class WFDefconChangedEvent(int old, int level) : EntityEventArgs
 {
     public readonly int Old = old;

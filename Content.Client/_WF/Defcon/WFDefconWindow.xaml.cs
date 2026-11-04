@@ -19,6 +19,9 @@ public sealed partial class WFDefconWindow : DefaultWindow
     public event Action? OnEvaluate;
 
     private bool _biasEdited;
+    private bool _lockEdited;
+    private bool _hasState;
+    private int? _lastLocked;
 
     public WFDefconWindow()
     {
@@ -29,6 +32,7 @@ public sealed partial class WFDefconWindow : DefaultWindow
         BiasEdit.OnTextChanged += _ => _biasEdited = true;
         BiasEdit.OnTextEntered += _ => SendBias();
         BiasButton.OnPressed += _ => SendBias();
+        LockCheck.OnToggled += _ => _lockEdited = true;
     }
 
     private void SendBias()
@@ -57,7 +61,15 @@ public sealed partial class WFDefconWindow : DefaultWindow
 
         UnlockButton.Disabled = state.Locked == null;
         if (!_biasEdited)
-            BiasEdit.Text = state.Bias.ToString("0.#", CultureInfo.InvariantCulture);
+            BiasEdit.Text = state.Bias.ToString("R", CultureInfo.InvariantCulture);
+
+        // Follow the server's lock unless the admin has changed the box since it last moved.
+        if (!_hasState || state.Locked != _lastLocked)
+            _lockEdited = false;
+        if (!_lockEdited)
+            LockCheck.Pressed = state.Locked != null;
+        _lastLocked = state.Locked;
+        _hasState = true;
 
         LevelButtons.RemoveAllChildren();
         foreach (var level in state.Levels)
@@ -72,7 +84,11 @@ public sealed partial class WFDefconWindow : DefaultWindow
                 ToggleMode = true,
             };
             var number = level.Level;
-            button.OnPressed += _ => OnSetLevel?.Invoke(number, LockCheck.Pressed, AnnounceCheck.Pressed);
+            button.OnPressed += _ =>
+            {
+                _lockEdited = false;
+                OnSetLevel?.Invoke(number, LockCheck.Pressed, AnnounceCheck.Pressed);
+            };
             LevelButtons.AddChild(button);
         }
 

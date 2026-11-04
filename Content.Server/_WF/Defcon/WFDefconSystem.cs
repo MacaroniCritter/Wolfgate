@@ -53,7 +53,18 @@ public sealed partial class WFDefconSystem : EntitySystem
     {
         base.Initialize();
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnCleanup);
-        Subs.CVar(_cfg, DefconCVars.Enabled, value => _enabled = value, true);
+        _enabled = _cfg.GetCVar(DefconCVars.Enabled);
+        Subs.CVar(_cfg, DefconCVars.Enabled, OnEnabledChanged);
+    }
+
+    private void OnEnabledChanged(bool value)
+    {
+        if (_enabled == value)
+            return;
+
+        _enabled = value;
+        DirtyPanels();
+        RaiseLocalEvent(new WFDefconChangedEvent(_tracker.Level, _tracker.Level));
     }
 
     private void OnCleanup(RoundRestartCleanupEvent ev)
@@ -67,6 +78,7 @@ public sealed partial class WFDefconSystem : EntitySystem
         _queued.Clear();
         Floor = WFDefconTracker.Calmest;
         Contributions = Array.Empty<WFDefconContribution>();
+        DirtyPanels();
         if (old != WFDefconTracker.Calmest)
             RaiseLocalEvent(new WFDefconChangedEvent(old, WFDefconTracker.Calmest));
     }
