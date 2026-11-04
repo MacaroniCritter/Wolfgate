@@ -232,6 +232,9 @@ unmarked:
   - path: Resources/Fonts/_Starlight/
     module: Species
     reason: Starlight fonts, ported in #14 (Customisation Update).
+  - path: Resources/Fonts/_DS13/
+    module: Remade
+    reason: DS13's Shage Marker-script font (CC-BY 3.0, BlueNexus) for the Monolith Tap's glyphs.
   - path: Resources/Maps/_Mono/ShuttleEvent/Xeno/
     module: Xenoborgs
     reason: Xenoborg shuttle event maps, ported from Monolith #4558.
