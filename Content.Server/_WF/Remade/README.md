@@ -443,6 +443,7 @@ does on its own. `wf_remade outbreak [uid]` forces an outbreak.
 - [`Content.IntegrationTests/Tests/_WF/Remade/SectorTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Remade/SectorTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Remade/SignalsTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Remade/SignalsTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Remade/StructuresTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Remade/StructuresTest.cs)
+- [`Content.IntegrationTests/Tests/_WF/Remade/SyntheticConversionTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Remade/SyntheticConversionTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Remade/TormentTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Remade/TormentTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Remade/VariantsTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Remade/VariantsTest.cs)
 - [`Content.IntegrationTests/Tests/_WF/Remade/WardTest.cs`](../../../Content.IntegrationTests/Tests/_WF/Remade/WardTest.cs)
