@@ -1,4 +1,3 @@
-using Content.Shared._WF.Announcements;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._WF.Defcon;
@@ -98,9 +97,9 @@ public sealed partial class WFDefconLevel
     [DataField]
     public Color Color = Color.White;
 
-    /// <summary>The chip style when the level is reached.</summary>
+    /// <summary>How many times the alarm sounds before the callout.</summary>
     [DataField]
-    public WFAnnounceChipLevel Chip = WFAnnounceChipLevel.Advisory;
+    public int Alarms = 1;
 
     /// <summary>The level's callout, played after the alarm.</summary>
     [DataField]

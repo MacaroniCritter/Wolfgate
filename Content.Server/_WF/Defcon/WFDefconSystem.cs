@@ -233,14 +233,20 @@ public sealed partial class WFDefconSystem : EntitySystem
         return profile.Levels.GetValueOrDefault(level);
     }
 
-    /// <summary>Plays the alarm and any siren now, and queues the level's callout for when the alarm ends.</summary>
+    /// <summary>Plays the alarm (repeated as the level asks) and any siren, then queues the level's callout for when the alarms end.</summary>
     private void PlaySounds(WFDefconProfilePrototype profile, WFDefconLevel? info)
     {
         var delay = TimeSpan.Zero;
         if (Valid(profile.Alarm) is { } alarm)
         {
+            var length = _audio.GetAudioLength(_audio.ResolveSound(new SoundPathSpecifier(alarm)));
             Play(alarm, profile.Volume);
-            delay = _audio.GetAudioLength(_audio.ResolveSound(new SoundPathSpecifier(alarm)));
+            for (var i = 1; i < Math.Max(1, info?.Alarms ?? 1); i++)
+            {
+                _queued.Add((_timing.CurTime + length * i, alarm, profile.Volume));
+            }
+
+            delay = length * Math.Max(1, info?.Alarms ?? 1);
         }
 
         if (Valid(info?.Siren) is { } siren)
@@ -314,7 +320,7 @@ public sealed partial class WFDefconSystem : EntitySystem
             PostToChat = true,
             SoundMode = WFAnnounceSoundMode.None,
             ShowChip = true,
-            ChipLevel = rising ? info?.Chip ?? WFAnnounceChipLevel.Warning : WFAnnounceChipLevel.Info,
+            ChipLevel = WFAnnounceChipLevel.Custom,
             ChipTitle = Loc.GetString("wf-defcon-chip-title", ("level", level)),
             ChipText = name,
             ChipDuration = rising ? 20f : 10f,
