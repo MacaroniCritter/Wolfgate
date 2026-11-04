@@ -966,8 +966,7 @@ public sealed partial class WFEncounterSystem : EntitySystem
     {
         Log.Info($"Encounter ship {ToPrettyString(ship.Grid)} could not dock; it loiters a while and moves on.");
         _objectives.Control(ship.Grid, ship.Group, WFCrewSetupAction.Skip);
-        var rest = _objectives.Snapshot().FirstOrDefault(crew => crew.Grid == net && crew.Group == ship.Group)?.Objectives
-                   ?? new List<WFCrewObjective>();
+        _objectives.TryGetQueue(ship.Grid, ship.Group, out var rest);
         var queue = new List<WFCrewObjective>(rest);
         if (queue.Count == 0 || queue[0].Kind != WFCrewObjectiveKind.Hold)
             queue.Insert(0, new WFCrewObjective { Kind = WFCrewObjectiveKind.Hold, Duration = DockFailedLoiter });
@@ -995,8 +994,9 @@ public sealed partial class WFEncounterSystem : EntitySystem
                 continue;
 
             var net = GetNetEntity(ship.Grid);
-            var head = _objectives.Snapshot().FirstOrDefault(crew => crew.Grid == net && crew.Group == ship.Group)
-                ?.Objectives.FirstOrDefault()?.Kind;
+            WFCrewObjectiveKind? head = _objectives.TryGetQueue(ship.Grid, ship.Group, out var headQueue) && headQueue.Count > 0
+                ? headQueue[0].Kind
+                : null;
             var stop = head is WFCrewObjectiveKind.Dock or WFCrewObjectiveKind.Loot or WFCrewObjectiveKind.Resupply
                 or WFCrewObjectiveKind.Salvage;
             if (stop && status == "dock-failed")
@@ -1010,17 +1010,15 @@ public sealed partial class WFEncounterSystem : EntitySystem
             // A stop that is gone is passed over whole: the wait there and the casting off go with it.
             for (var i = 0; stop && i < 2; i++)
             {
-                var crew = _objectives.Snapshot().FirstOrDefault(crew => crew.Grid == net && crew.Group == ship.Group);
-                if (crew == null || crew.Objectives.Count == 0
-                    || crew.Objectives[0].Kind is not (WFCrewObjectiveKind.Hold or WFCrewObjectiveKind.Undock))
+                if (!_objectives.TryGetQueue(ship.Grid, ship.Group, out var next) || next.Count == 0
+                    || next[0].Kind is not (WFCrewObjectiveKind.Hold or WFCrewObjectiveKind.Undock))
                     break;
 
                 _objectives.Control(ship.Grid, ship.Group, WFCrewSetupAction.Skip);
             }
 
             // Skipped to the end: a skip leaves the queue reading "pending", never "complete".
-            var rest = _objectives.Snapshot().FirstOrDefault(crew => crew.Grid == net && crew.Group == ship.Group);
-            if (rest == null || rest.Objectives.Count == 0)
+            if (!_objectives.TryGetQueue(ship.Grid, ship.Group, out var left) || left.Count == 0)
                 ship.Flown = true;
         }
     }

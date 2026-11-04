@@ -291,6 +291,7 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Content.Server/_WF/Planets/Flight/WFPlanetDragSystem.cs`](Flight/WFPlanetDragSystem.cs)
 - [`Content.Server/_WF/Planets/Flight/WFSkidComponent.cs`](Flight/WFSkidComponent.cs)
 - [`Content.Server/_WF/Planets/Flight/WFThrustAmbienceSystem.cs`](Flight/WFThrustAmbienceSystem.cs)
+- [`Content.Server/_WF/Planets/Flight/WFThrusterIndexSystem.cs`](Flight/WFThrusterIndexSystem.cs)
 - [`Content.Server/_WF/Planets/Forecast/WFWeatherForecastConsoleSystem.cs`](Forecast/WFWeatherForecastConsoleSystem.cs)
 - [`Content.Server/_WF/Planets/GameTicker.WFRoundHold.cs`](GameTicker.WFRoundHold.cs)
 - [`Content.Server/_WF/Planets/Hop/WFPlanetHopComponent.cs`](Hop/WFPlanetHopComponent.cs)
@@ -538,6 +539,7 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Resources/Prototypes/_WF/Planets/planet_surfaces.yml`](../../../Resources/Prototypes/_WF/Planets/planet_surfaces.yml)
 - [`Resources/Prototypes/_WF/Planets/planet_weather.yml`](../../../Resources/Prototypes/_WF/Planets/planet_weather.yml)
 - [`Resources/Prototypes/_WF/Planets/planets.yml`](../../../Resources/Prototypes/_WF/Planets/planets.yml)
+- [`Resources/Prototypes/_WF/Planets/road_tiles.yml`](../../../Resources/Prototypes/_WF/Planets/road_tiles.yml)
 - [`Resources/Prototypes/_WF/Planets/timepiece.yml`](../../../Resources/Prototypes/_WF/Planets/timepiece.yml)
 
 ### Localization
@@ -798,6 +800,8 @@ cargo weight into lift and gravgen support. The flight panel shows a cargo row w
 - [`Content.Server/Parallax/BiomeSystem.PlayerTracker.cs`](../../Parallax/BiomeSystem.PlayerTracker.cs)
   - a planet layer loads nearest its loaders first
   - less loads at once round an eye than round a body
+  - an eye on a cavern loads a box sized to its view
+  - an eye may load a smaller box
 - [`Content.Server/Physics/Controllers/MoverController.cs`](../../Physics/Controllers/MoverController.cs): planet lift and cargo load scale thrust
 - [`Content.Server/Pinpointer/PinpointerSystem.cs`](../../Pinpointer/PinpointerSystem.cs)
   - a hop moves the pinpointer's map like a jump

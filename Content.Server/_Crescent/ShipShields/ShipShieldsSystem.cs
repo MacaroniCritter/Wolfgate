@@ -268,7 +268,10 @@ public sealed partial class ShipShieldsSystem : EntitySystem
         _physicsSystem.WakeBody(shield, body: shieldPhysics);
         _physicsSystem.SetSleepingAllowed(shield, shieldPhysics, false);
 
-        _pvsSys.AddGlobalOverride(shield);
+        // WOLFGATE(Performance) START: nearby sessions only, not a global override
+        // _pvsSys.AddGlobalOverride(shield);
+        AddWolfgateShieldPvs(shield, entity);
+        // WOLFGATE END
 
         var shieldedComp = EnsureComp<ShipShieldedComponent>(entity);
         shieldedComp.Shield = shield;

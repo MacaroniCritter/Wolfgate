@@ -34,6 +34,7 @@ public sealed partial class WFCrewAlertSystem : EntitySystem
     private readonly Dictionary<(EntityUid Grid, string Group), Alert> _alerts = new();
     private readonly List<EntityUid> _expired = new();
     private TimeSpan _nextPoll;
+    [Dependency] private Robust.Shared.Random.IRobustRandom _random = default!;
 
     private bool _zoneReport;
 
@@ -52,6 +53,7 @@ public sealed partial class WFCrewAlertSystem : EntitySystem
         base.Initialize();
         SubscribeLocalEvent<WFCrewHullHitEvent>(OnHullHit);
         SubscribeLocalEvent<WFShipShieldAttackedEvent>(OnShieldHit);
+        _nextPoll = _timing.CurTime + TimeSpan.FromSeconds(_random.NextFloat()); // random phase so the 1 Hz crew sweeps don't share a tick
     }
 
     /// <summary>Returns vessels with unexpired incoming fire or an active hostile docking response.</summary>

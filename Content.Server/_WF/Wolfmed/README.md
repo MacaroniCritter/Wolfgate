@@ -1213,8 +1213,11 @@ Skipped ("dirty-disposed").
   - the lung alert is only shown at the threshold, so a breathing body skips the walk.
   - skip the damage pipeline when there is no suffocation damage to recover.
 - [`Content.Server/Body/Systems/StomachSystem.cs`](../../Body/Systems/StomachSystem.cs)
+  - spreads first updates
   - playtest 1
   - salted food and water must not form saline
+  - a random first update spreads stomachs spawned together over the interval.
+  - an empty stomach with nothing digesting has nothing to move.
   - reaction products were stuck in the stomach for good
   - playtest 1: painkillers absorb fast
 - [`Content.Server/Chat/EmoteOnDamageComponent.cs`](../../Chat/EmoteOnDamageComponent.cs)
@@ -1575,6 +1578,7 @@ Skipped ("dirty-disposed").
 - [`Content.Shared/Body/Systems/SharedBodySystem.Parts.cs`](../../../Content.Shared/Body/Systems/SharedBodySystem.Parts.cs)
   - playtest 2, a wound host with no working leg drags itself on its arms.
   - playtest 2
+- [`Content.Shared/Damage/Components/DamageableComponent.cs`](../../../Content.Shared/Damage/Components/DamageableComponent.cs): one shared default instead of a list and a dictionary on every damageable entity.
 - [`Content.Shared/Damage/Systems/DamageableSystem.cs`](../../../Content.Shared/Damage/Systems/DamageableSystem.cs)
   - Wolfmed routing seam event (DamageDealtEvent).
   - Wolfmed routing seam gate (WoundHostComponent).
