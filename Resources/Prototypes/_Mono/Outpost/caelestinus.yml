@@ -40,8 +40,6 @@
         - type: TradeCrateDestination
           destinationProto: Trade
         # WOLFGATE END
-        # WOLFGATE(Janitorial): skip roundstart trash and puddles here
-        - type: StationVariationHasRun
         - type: ExtraStationInformation
           icon: /Textures/_Mono/Logo/icon/icon-256x256.png # used the biggest one, looks better when downscaling than upscaling
           stationSubtext: 'frontier-lobby-frontier-subtext'
