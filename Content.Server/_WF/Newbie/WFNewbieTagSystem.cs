@@ -3,6 +3,7 @@ using Content.Shared._NF.Shipyard.Components;
 using Content.Shared._WF.Newbie;
 using Content.Shared.Ghost;
 using Content.Shared.Players.PlayTimeTracking;
+using Content.Shared.Shuttles.Components;
 using Content.Shared.Traits;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
@@ -27,6 +28,8 @@ public sealed partial class WFNewbieTagSystem : EntitySystem
     [Dependency] private PlayTimeTrackingManager _playTime = default!;
 
     private TimeSpan _nextRefresh;
+    private readonly Dictionary<EntityUid, bool> _ships = new();
+    private readonly List<EntityUid> _untag = new();
 
     public override void Initialize()
     {
@@ -47,22 +50,51 @@ public sealed partial class WFNewbieTagSystem : EntitySystem
     }
 
     /// <summary>
-    /// Brings every attached body and owned ship in line with its player's tag.
+    /// Brings every attached body in line with its player's tag, and tags each ship a new player owns or is flying.
     /// </summary>
     public void RefreshAll()
     {
+        // Ship to whether its owner is new; a ship only a new pilot flies maps to false.
+        _ships.Clear();
         foreach (var session in _players.Sessions)
         {
-            if (session.AttachedEntity is { } body)
-                SetTag(body, IsTagged(session));
+            if (session.AttachedEntity is not { } body)
+                continue;
+
+            var tagged = IsTagged(session);
+            SetTag(body, tagged);
+            if (tagged && TryComp<PilotComponent>(body, out var pilot) && pilot.Console is { } console
+                && Transform(console).GridUid is { } piloted)
+                _ships.TryAdd(piloted, false);
         }
 
-        var ships = EntityQueryEnumerator<ShipOwnershipComponent>();
-        while (ships.MoveNext(out var ship, out var owner))
+        var owned = EntityQueryEnumerator<ShipOwnershipComponent>();
+        while (owned.MoveNext(out var ship, out var owner))
         {
-            // An offline owner keeps whatever tag their ship last had.
-            if (_players.TryGetSessionById(owner.OwnerUserId, out var session))
-                SetShipTag(ship, IsTagged(session));
+            // An offline owner keeps whatever owner tag their ship last had.
+            var ownerTagged = _players.TryGetSessionById(owner.OwnerUserId, out var session)
+                ? IsTagged(session)
+                : CompOrNull<WFNewbieShipComponent>(ship)?.OwnerTagged ?? false;
+            if (ownerTagged)
+                _ships[ship] = true;
+        }
+
+        _untag.Clear();
+        var shown = EntityQueryEnumerator<WFNewbieShipComponent>();
+        while (shown.MoveNext(out var ship, out _))
+        {
+            if (!_ships.ContainsKey(ship))
+                _untag.Add(ship);
+        }
+
+        foreach (var ship in _untag)
+        {
+            RemComp<WFNewbieShipComponent>(ship);
+        }
+
+        foreach (var (ship, ownerTagged) in _ships)
+        {
+            EnsureComp<WFNewbieShipComponent>(ship).OwnerTagged = ownerTagged;
         }
     }
 
@@ -122,13 +154,5 @@ public sealed partial class WFNewbieTagSystem : EntitySystem
             EnsureComp<WFNewbieComponent>(body);
         else
             RemComp<WFNewbieComponent>(body);
-    }
-
-    private void SetShipTag(EntityUid ship, bool tagged)
-    {
-        if (tagged)
-            EnsureComp<WFNewbieShipComponent>(ship);
-        else
-            RemComp<WFNewbieShipComponent>(ship);
     }
 }
