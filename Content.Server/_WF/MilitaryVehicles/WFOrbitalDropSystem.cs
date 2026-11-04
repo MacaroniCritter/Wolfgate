@@ -77,8 +77,9 @@ public sealed class WFOrbitalDropSystem : EntitySystem
         if (ent.Comp.LandsAt != null)
             return;
 
-        // Checked where the user stands, before the beacon leaves the hand, so a bad spot keeps it in hand.
-        if (CheckDropZone(ent, Transform(args.User).Coordinates, out var thing) is { } refusal)
+        // Checked where the user stands, before the beacon leaves the hand, so a bad spot keeps it in hand. People can
+        // walk off in the countdown, so only the touchdown counts them.
+        if (CheckDropZone(ent, Transform(args.User).Coordinates, out var thing, mobs: false) is { } refusal)
         {
             _popup.PopupEntity(Loc.GetString(refusal, ("thing", thing ?? ent.Owner)), args.User, args.User, PopupType.MediumCaution);
             return;
@@ -145,7 +146,7 @@ public sealed class WFOrbitalDropSystem : EntitySystem
     /// Why a vehicle can't drop at a spot, as a locale id, with the thing in the way when it is one; null when it can:
     /// open ground on a planet's ground layer, no roof or upper level over its room and nothing solid in it.
     /// </summary>
-    public string? CheckDropZone(Entity<WFOrbitalDropBeaconComponent> ent, EntityCoordinates coords, out EntityUid? thing)
+    public string? CheckDropZone(Entity<WFOrbitalDropBeaconComponent> ent, EntityCoordinates coords, out EntityUid? thing, bool mobs = true)
     {
         thing = null;
         var map = _transform.GetMap(coords);
@@ -167,7 +168,7 @@ public sealed class WFOrbitalDropSystem : EntitySystem
         if (Roofed((mapUid, gridComp), room))
             return "wf-orbital-drop-roofed";
 
-        if (_shop.FindBlocker(mapSpot, _transform.GetWorldRotation(mapUid), footprint, ent) is { } blocker)
+        if (_shop.FindBlocker(mapSpot, _transform.GetWorldRotation(mapUid), footprint, ent, mobs) is { } blocker)
         {
             thing = blocker;
             return "wf-orbital-drop-blocked";

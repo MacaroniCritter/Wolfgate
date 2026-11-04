@@ -293,12 +293,12 @@ public sealed class WFVehicleShopSystem : EntitySystem
     }
 
     /// <summary>The first solid thing inside a vehicle's room about a spot, turned with the deck it stands on.</summary>
-    public EntityUid? FindBlocker(MapCoordinates coords, Angle deckRotation, Box2 footprint, EntityUid ignore)
+    public EntityUid? FindBlocker(MapCoordinates coords, Angle deckRotation, Box2 footprint, EntityUid ignore, bool mobs = true)
     {
         var area = new Box2Rotated(footprint.Translated(coords.Position), deckRotation, coords.Position);
         foreach (var other in _lookup.GetEntitiesIntersecting(coords.MapId, area, LookupFlags.Dynamic | LookupFlags.Static))
         {
-            if (Blocks(other, ignore))
+            if ((mobs || !HasComp<MobStateComponent>(other)) && Blocks(other, ignore))
                 return other;
         }
 

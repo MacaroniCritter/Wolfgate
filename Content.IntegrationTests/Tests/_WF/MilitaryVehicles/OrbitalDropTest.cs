@@ -85,6 +85,12 @@ public sealed class OrbitalDropTest
             Assert.That(thing, Is.EqualTo(crate), "The drop named the wrong thing in the way.");
             entMan.DeleteEntity(crate);
 
+            // Whoever sets it off stands on the spot: that arms it, and only blocks the touchdown.
+            var caller = entMan.SpawnEntity("MobHuman", at);
+            Assert.That(drops.CheckDropZone(ent, at, out _, mobs: false), Is.Null, "The one calling the drop blocked it.");
+            Assert.That(drops.CheckDropZone(ent, at, out _), Is.EqualTo("wf-orbital-drop-blocked"), "Someone under the drop didn't block it.");
+            entMan.DeleteEntity(caller);
+
             drops.Arm(ent, user);
         });
 
