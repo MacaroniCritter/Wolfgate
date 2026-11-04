@@ -5500,3 +5500,30 @@ Entries:
   id: 100339
   time: '2026-11-04T04:50:42.0000000+00:00'
   url: https://github.com/VanguardControl/Wolfgate/pull/476
+- author: DriftingSkies
+  changes:
+    - type: Add
+      message: Sol Common to TSF Contractors by default. (Again.)
+  id: 100340
+  time: '2026-11-04T08:37:27.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/482
+- author: Gandalf2k15
+  changes:
+    - type: Tweak
+      message: >-
+        Server performance pass: planet drag, climate, NPC and body simulation,
+        auto-fire, silicon charge and mass-delete costs are reduced.
+    - type: Tweak
+      message: >-
+        Planets form in the lobby at a lower budget so the lobby stays
+        responsive.
+  id: 100341
+  time: '2026-11-04T08:38:23.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/479
+- author: Gandalf2k15
+  changes:
+    - type: Add
+      message: The remade....
+  id: 100342
+  time: '2026-11-04T08:48:50.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/472
