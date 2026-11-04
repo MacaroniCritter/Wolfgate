@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Content.Client._WF.Announcements;
 using Content.Server._WF.Announcements;
 using Content.Shared._WF.Announcements;
@@ -11,6 +13,16 @@ namespace Content.IntegrationTests.Tests._WF.Announcements;
 [TestFixture]
 public sealed class WFAnnounceTest
 {
+    /// <summary>A packaged server has only this metadata for a sound, not the file.</summary>
+    private const string PackagedOnlySound = "/Audio/_WF/Announcements/packaged-only.ogg";
+
+    [TestPrototypes]
+    private const string Prototypes = $@"
+- type: audioMetadata
+  id: {PackagedOnlySound}
+  length: 1
+";
+
     [Test]
     public async Task ChecksRejectBadRequests()
     {
@@ -23,6 +35,7 @@ public sealed class WFAnnounceTest
             {
                 Assert.That(announce.IsValidSound(WFAnnounceFormat.DefaultSound));
                 Assert.That(announce.IsValidSound("/Audio/Announcements/nope.ogg"), Is.False);
+                Assert.That(announce.IsValidSound(PackagedOnlySound));
                 Assert.That(announce.IsValidSound("/Textures/Logo/icon.png"), Is.False);
                 Assert.That(announce.IsValidSound("/Audio/../Textures/Logo/icon.png"), Is.False);
 
@@ -111,12 +124,25 @@ public sealed class WFAnnounceTest
         await pair.RunTicksSync(10);
         Assert.That(chips.ChipCount, Is.EqualTo(1));
 
+        var sounds = new List<string>();
         await pair.Client.WaitAssertion(() =>
         {
             var window = new WFAnnounceWindow();
             window.OpenCentered();
-            Assert.That(window.SoundCount, Is.GreaterThan(0));
+            sounds.AddRange(window.Sounds);
             window.Close();
+
+            var res = pair.Client.ResolveDependency<Robust.Shared.ContentPack.IResourceManager>();
+            var missing = sounds.Where(sound => !res.ContentFileExists(new ResPath(sound))).ToList();
+            Assert.That(missing, Is.Empty, "client: " + string.Join(", ", missing.Take(10)));
+        });
+
+        // Every sound the picker lists must pass the server's check.
+        await pair.Server.WaitAssertion(() =>
+        {
+            Assert.That(sounds, Is.Not.Empty);
+            var bad = sounds.Where(sound => !announce.IsValidSound(sound)).ToList();
+            Assert.That(bad, Is.Empty, string.Join(", ", bad.Take(10)));
         });
 
         await pair.CleanReturnAsync();

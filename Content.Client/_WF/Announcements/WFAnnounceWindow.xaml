@@ -19,8 +19,10 @@
                             <OptionButton Name="AccentSelect" HorizontalExpand="True" />
                             <LineEdit Name="AccentHex" MinWidth="90" />
                             <PanelContainer Name="AccentSwatch" MinSize="24 24" />
+                            <Button Name="AccentPickButton" Text="{Loc wf-announce-accent-pick}" ToggleMode="True" />
                         </BoxContainer>
                     </GridContainer>
+                    <ColorSelectorSliders Name="AccentPicker" Visible="False" IsAlphaVisible="False" HorizontalExpand="True" />
                     <TextEdit Name="BodyEdit" MinHeight="140" HorizontalExpand="True" />
                     <CheckBox Name="MarkupCheck" Text="{Loc wf-announce-allow-markup}" ToolTip="{Loc wf-announce-allow-markup-tooltip}" />
 

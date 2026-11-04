@@ -8,6 +8,7 @@ using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
 namespace Content.Server._WF.Announcements;
@@ -17,6 +18,7 @@ public sealed partial class WFAnnounceSystem : EntitySystem
 {
     [Dependency] private IAdminLogManager _adminLog = default!;
     [Dependency] private IChatManager _chat = default!;
+    [Dependency] private IPrototypeManager _prototypes = default!;
     [Dependency] private IResourceManager _resources = default!;
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private TransformSystem _transform = default!;
@@ -113,7 +115,10 @@ public sealed partial class WFAnnounceSystem : EntitySystem
         return null;
     }
 
-    /// <summary>Whether a path is an existing sound file under /Audio.</summary>
+    /// <summary>
+    /// Whether a path is a sound file under /Audio. Packaged servers drop the audio files and keep only their
+    /// <see cref="AudioMetadataPrototype"/>, so either counts.
+    /// </summary>
     public bool IsValidSound(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -123,6 +128,6 @@ public sealed partial class WFAnnounceSystem : EntitySystem
         return resPath.IsRooted
             && resPath.TryRelativeTo(AudioRoot, out _)
             && resPath.Extension is "ogg" or "wav"
-            && _resources.ContentFileExists(resPath);
+            && (_resources.ContentFileExists(resPath) || _prototypes.HasIndex<AudioMetadataPrototype>(resPath.ToString()));
     }
 }

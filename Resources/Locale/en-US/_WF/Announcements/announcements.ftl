@@ -22,6 +22,7 @@ wf-announce-accent-corporate = Corporate green
 wf-announce-accent-syndicate = Syndicate crimson
 wf-announce-accent-grey = Grey
 wf-announce-accent-custom = Custom
+wf-announce-accent-pick = Pick...
 
 wf-announce-section-delivery = Delivery
 wf-announce-target = Send to
@@ -79,4 +80,6 @@ wf-announce-error-nothing = Turn on chat, a sound or the chip.
 wf-announce-error-empty-body = The announcement text is empty.
 wf-announce-error-empty-chip = The chip text is empty.
 wf-announce-error-bad-number = Bad volume or duration.
-wf-announce-error-bad-sound = That sound file does not exist.
+wf-announce-error-bad-sound = The server can't find that sound file.
+wf-announce-error-preview-missing = Can't find {$path} on your client.
+wf-announce-error-preview-failed = Couldn't play {$path}. Check the console for the error.

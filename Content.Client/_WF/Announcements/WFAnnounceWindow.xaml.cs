@@ -95,6 +95,9 @@ public sealed partial class WFAnnounceWindow : DefaultWindow
         MarkupCheck.OnToggled += _ => Refresh();
         AccentSelect.OnItemSelected += OnAccentSelected;
         AccentHex.OnTextChanged += OnAccentHexChanged;
+        AccentPickButton.OnToggled += args => AccentPicker.Visible = args.Pressed;
+        AccentPicker.SelectorType = ColorSelectorSliders.ColorSelectorType.Hsv;
+        AccentPicker.OnColorChanged += color => SetAccent(color, updateHex: true, updatePicker: false);
         TargetSelect.OnItemSelected += args => Select(TargetSelect, args.Id);
         ChatCheck.OnToggled += _ => Refresh();
         SoundModeSelect.OnItemSelected += args => Select(SoundModeSelect, args.Id);
@@ -120,11 +123,11 @@ public sealed partial class WFAnnounceWindow : DefaultWindow
         OnClose += StopPreview;
 
         LoadSounds();
-        SetAccent(Color.Gold, true);
+        SetAccent(Color.Gold, updateHex: true, updatePicker: true);
     }
 
     /// <summary>Sound files the picker found under /Audio.</summary>
-    public int SoundCount => _sounds.Count;
+    public IReadOnlyList<string> Sounds => _sounds;
 
     /// <summary>Shows the server's answer to the last send.</summary>
     public void SetStatus(string? status, bool error)
@@ -149,7 +152,7 @@ public sealed partial class WFAnnounceWindow : DefaultWindow
     {
         AccentSelect.SelectId(args.Id);
         if (args.Id < AccentPresets.Length)
-            SetAccent(AccentPresets[args.Id].Color, true);
+            SetAccent(AccentPresets[args.Id].Color, updateHex: true, updatePicker: true);
     }
 
     private void OnAccentHexChanged(LineEdit.LineEditEventArgs args)
@@ -157,17 +160,23 @@ public sealed partial class WFAnnounceWindow : DefaultWindow
         if (!Color.TryFromHex(args.Text, out var color))
             return;
 
-        var preset = Array.FindIndex(AccentPresets, p => p.Color.ToHexNoAlpha() == color.ToHexNoAlpha());
-        AccentSelect.SelectId(preset >= 0 ? preset : AccentPresets.Length);
-        SetAccent(color, false);
+        SetAccent(color, updateHex: false, updatePicker: true);
     }
 
-    private void SetAccent(Color color, bool updateHex)
+    /// <summary>Sets the colour and syncs the preset list, hex box and sliders that didn't make the change.</summary>
+    private void SetAccent(Color color, bool updateHex, bool updatePicker)
     {
         _accent = color.WithAlpha(1f);
         _swatch.BackgroundColor = _accent;
+
+        var hex = _accent.ToHexNoAlpha();
+        var preset = Array.FindIndex(AccentPresets, p => p.Color.ToHexNoAlpha() == hex);
+        AccentSelect.SelectId(preset >= 0 ? preset : AccentPresets.Length);
+
         if (updateHex)
-            AccentHex.Text = _accent.ToHexNoAlpha();
+            AccentHex.Text = hex;
+        if (updatePicker)
+            AccentPicker.Color = _accent;
         Refresh();
     }
 
@@ -220,7 +229,17 @@ public sealed partial class WFAnnounceWindow : DefaultWindow
         if (CurrentSound() is not { } sound)
             return;
 
+        if (!_resources.ContentFileExists(new ResPath(sound)))
+        {
+            SetStatus(Loc.GetString("wf-announce-error-preview-missing", ("path", sound)), true);
+            return;
+        }
+
         _previewStream = _audio.PlayGlobal(new SoundPathSpecifier(sound), Filter.Local(), false, AudioParams.Default.WithVolume(VolumeSpin.Value))?.Entity;
+        if (_previewStream == null)
+            SetStatus(Loc.GetString("wf-announce-error-preview-failed", ("path", sound)), true);
+        else
+            SetStatus(null, false);
     }
 
     private void StopPreview()
