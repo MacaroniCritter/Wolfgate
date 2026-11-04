@@ -1,0 +1,35 @@
+- type: wfDefconProfile
+  id: WFDefault
+  alarm: /Audio/_WF/Defcon/defcon_alarm.ogg
+  levels:
+    5:
+      name: wf-defcon-name-5
+      description: wf-defcon-desc-5
+      callout: /Audio/_WF/Defcon/defcon_5.ogg
+      color: "#4caf50"
+      chip: Info
+    4:
+      name: wf-defcon-name-4
+      description: wf-defcon-desc-4
+      callout: /Audio/_WF/Defcon/defcon_4.ogg
+      color: "#2f9fff"
+      chip: Advisory
+    3:
+      name: wf-defcon-name-3
+      description: wf-defcon-desc-3
+      callout: /Audio/_WF/Defcon/defcon_3.ogg
+      color: "#f5c518"
+      chip: Advisory
+    2:
+      name: wf-defcon-name-2
+      description: wf-defcon-desc-2
+      callout: /Audio/_WF/Defcon/defcon_2.ogg
+      color: "#ff8c1a"
+      chip: Warning
+    1:
+      name: wf-defcon-name-1
+      description: wf-defcon-desc-1
+      callout: /Audio/_WF/Defcon/defcon_1.ogg
+      siren: /Audio/Misc/gamma.ogg
+      color: "#e8283c"
+      chip: Warning
