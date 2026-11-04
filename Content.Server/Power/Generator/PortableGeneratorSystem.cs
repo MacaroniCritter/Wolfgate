@@ -225,7 +225,7 @@ public sealed partial class PortableGeneratorSystem : SharedPortableGeneratorSys
         var query = EntityQueryEnumerator<ActiveUserInterfaceComponent, PortableGeneratorComponent, FuelGeneratorComponent, PowerSupplierComponent>();
         // WOLFGATE END
 
-        while (query.MoveNext(out var uid, out _, out var portGen, out var fuelGen, out var powerSupplier))
+        while (query.MoveNext(out var uid, out _, out var portGen, out var fuelGen, out var powerSupplier)) // WOLFGATE(Performance): skip the ActiveUserInterfaceComponent slot
         {
             UpdateUI(uid, portGen, fuelGen, powerSupplier);
         }

@@ -324,10 +324,12 @@ Small fixes for hot spots found in live server profiles, kept as narrow hooks in
 - [`Content.Server/Power/EntitySystems/BatteryInterfaceSystem.cs`](../../Power/EntitySystems/BatteryInterfaceSystem.cs)
   - UI state is pushed at 4 Hz, and only for interfaces with a viewer
   - ActiveUserInterfaceComponent is the engine's open-UI marker
+  - skip the ActiveUserInterfaceComponent slot
 - [`Content.Server/Power/EntitySystems/BatterySystem.cs`](../../Power/EntitySystems/BatterySystem.cs): was -= _updateAccumulator, which zeroed it
 - [`Content.Server/Power/Generator/PortableGeneratorSystem.cs`](../../Power/Generator/PortableGeneratorSystem.cs)
   - UI state is pushed at 4 Hz, and only for generators with a viewer
   - ActiveUserInterfaceComponent is the engine's open-UI marker
+  - skip the ActiveUserInterfaceComponent slot
 - [`Content.Server/Shuttles/Systems/DockingSystem.Shuttle.cs`](../../Shuttles/Systems/DockingSystem.Shuttle.cs)
   - rule out pairs that land elsewhere before the tile walk, not after
   - chunk-first walk, same result; this ran per dock pair for every fixture

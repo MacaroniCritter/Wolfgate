@@ -80,7 +80,7 @@ public sealed partial class BatteryInterfaceSystem : EntitySystem
         var query = EntityQueryEnumerator<ActiveUserInterfaceComponent, BatteryInterfaceComponent, BatteryComponent, PowerNetworkBatteryComponent>();
         // WOLFGATE END
 
-        while (query.MoveNext(out var uid, out _, out var batteryInterface, out var battery, out var netBattery))
+        while (query.MoveNext(out var uid, out _, out var batteryInterface, out var battery, out var netBattery)) // WOLFGATE(Performance): skip the ActiveUserInterfaceComponent slot
         {
             UpdateUI(uid, batteryInterface, battery, netBattery);
         }
