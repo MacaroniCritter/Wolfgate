@@ -307,6 +307,7 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
 - [`Content.Shared/Gibbing/Systems/GibbingSystem.cs`](../../Content.Shared/Gibbing/Systems/GibbingSystem.cs)
   - bodiless giblets are skipped when flung.
   - bodiless dropped contents are skipped instead of flung.
+- [`Content.Shared/Gravity/SharedGravitySystem.cs`](../../Content.Shared/Gravity/SharedGravitySystem.cs): dolls and items lack GravityAffected; no error spam
 - [`Content.Shared/Lightning/Components/SharedLightningComponent.cs`](../../Content.Shared/Lightning/Components/SharedLightningComponent.cs): restore the licence header removed by Kill Spdx
 - [`Content.Shared/MachineLinking/SharedSignalTimerComponent.cs`](../../Content.Shared/MachineLinking/SharedSignalTimerComponent.cs): restore the licence header removed by Kill Spdx
 - [`Content.Shared/Maps/ContentTileDefinition.cs`](../../Content.Shared/Maps/ContentTileDefinition.cs): Monolith#4804 made this true, which draws weather inside ships and buildings
