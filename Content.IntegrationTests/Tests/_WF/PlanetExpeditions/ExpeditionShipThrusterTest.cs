@@ -12,7 +12,7 @@ using Robust.Shared.Maths;
 
 namespace Content.IntegrationTests.Tests._WF.PlanetExpeditions;
 
-/// <summary>A bought hull with an expedition console gets landing thrusters; one without keeps its stock thrusters.</summary>
+/// <summary>A hull with an expedition console gets landing thrusters, on purchase and as they are built; one without keeps its stock thrusters.</summary>
 [TestFixture]
 [TestOf(typeof(WFExpeditionShipSystem))]
 public sealed class ExpeditionShipThrusterTest
@@ -58,6 +58,43 @@ public sealed class ExpeditionShipThrusterTest
                 Assert.That(entMan.HasComponent<WFLandingThrusterComponent>(gyro), Is.False, "The gyroscope was converted.");
             });
 
+            entMan.DeleteEntity(map);
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>A thruster built on a ship that already carries the console is converted by the periodic sweep.</summary>
+    [Test]
+    public async Task ThrusterBuiltLaterIsConverted()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var maps = server.System<SharedMapSystem>();
+        var tileDefs = server.ResolveDependency<ITileDefinitionManager>();
+
+        var map = EntityUid.Invalid;
+        EntityUid linear = default;
+
+        await server.WaitPost(() =>
+        {
+            map = maps.CreateMap(out var mapId);
+            var ship = maps.CreateGridEntity(mapId);
+            var floor = new Tile(tileDefs["FloorSteel"].TileId);
+            for (var x = 0; x < 2; x++)
+                maps.SetTile(ship.Owner, ship.Comp, new Vector2i(x, 0), floor);
+
+            entMan.SpawnEntity("ComputerSalvageExpedition", new EntityCoordinates(ship.Owner, 1.5f, 0.5f));
+            linear = entMan.SpawnEntity("Thruster", new EntityCoordinates(ship.Owner, 0.5f, 0.5f));
+        });
+
+        // The sweep runs every two seconds.
+        await server.WaitRunTicks(150);
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(entMan.HasComponent<WFLandingThrusterComponent>(linear), "The thruster built aboard was not converted.");
             entMan.DeleteEntity(map);
         });
 
