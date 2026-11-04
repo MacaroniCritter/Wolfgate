@@ -9,14 +9,64 @@ wf-warhead-examine-fuze-two-person = It needs two keys turned together.
 wf-warhead-examine-fuze-remote = It has a remote detonation port.
 wf-warhead-examine-fuze-impact = It goes off on impact.
 
-wf-warhead-verb-category-timer = Set timer
-wf-warhead-verb-timer-option = {$seconds} seconds
-wf-warhead-verb-arm = Start countdown
-wf-warhead-verb-key = Turn key
-wf-warhead-verb-safety-off = Take safety off
-wf-warhead-verb-safety-on = Put safety on
+wf-warhead-class-tactical = TACTICAL / SUB-KILOTON
+wf-warhead-class-field = FIELD / MULTI-KILOTON
+wf-warhead-class-strategic = STRATEGIC / MEGATON
+wf-warhead-class-scuttle = SCUTTLING CHARGE
+wf-warhead-class-custom = CUSTOM PAYLOAD
 
-wf-warhead-timer-set = Timer set to {$seconds} seconds.
+wf-warhead-ui-status-safe = SAFETY ENGAGED
+wf-warhead-ui-status-armed = SAFETY OFF - AWAITING SIGNAL
+wf-warhead-ui-status-countdown = COUNTDOWN IN PROGRESS
+wf-warhead-ui-status-final = DETONATION IMMINENT
+wf-warhead-ui-lamp-safe = SAFE
+wf-warhead-ui-lamp-armed = ARMED
+wf-warhead-ui-lamp-countdown = COUNT
+wf-warhead-ui-lamp-final = FINAL
+wf-warhead-ui-caption-timer = TIMER SETTING
+wf-warhead-ui-caption-counting = TIME TO DETONATION
+
+wf-warhead-ui-timer-heading = TIMER FUZE
+wf-warhead-ui-timer-minus-minute = -1 min
+wf-warhead-ui-timer-minus-ten = -10 s
+wf-warhead-ui-timer-plus-ten = +10 s
+wf-warhead-ui-timer-plus-minute = +1 min
+wf-warhead-ui-minutes = {$minutes} min
+wf-warhead-ui-seconds = {$seconds} s
+wf-warhead-ui-cover-closed = Lift safety cover
+wf-warhead-ui-cover-open = Cover open
+wf-warhead-ui-arm = START COUNTDOWN
+
+wf-warhead-ui-keys-heading = TWO-PERSON ARMING
+wf-warhead-ui-turn-key = Turn your key
+wf-warhead-ui-key-off = OFF
+wf-warhead-ui-key-turned = TURNED
+wf-warhead-ui-key-turned-by = TURNED: {$name}
+wf-warhead-ui-key-waiting = TURN NOW
+
+wf-warhead-ui-remote-heading = REMOTE FUZE
+wf-warhead-ui-remote-safe = Safety on. Signals are ignored.
+wf-warhead-ui-remote-armed = Safety off. A signal starts the countdown.
+wf-warhead-ui-remote-counting = Signal received.
+wf-warhead-ui-remote-links = Linked detonators: {$links}. Countdown on signal: {$seconds} s.
+wf-warhead-ui-safety-off = Take safety off
+wf-warhead-ui-safety-on = Put safety on
+
+wf-warhead-ui-impact-heading = IMPACT FUZE
+wf-warhead-ui-impact-body = Goes off when it hits something.
+
+wf-warhead-ui-specs-heading = PAYLOAD
+wf-warhead-ui-spec-blast = Blast radius
+wf-warhead-ui-spec-flash = Flash range
+wf-warhead-ui-spec-fallout = Fallout
+wf-warhead-ui-spec-emp = EMP range
+wf-warhead-ui-spec-grid = Grid
+wf-warhead-ui-spec-grid-value = DESTROYED OUTRIGHT
+wf-warhead-ui-spec-tiles = ~{$tiles} tiles
+wf-warhead-ui-spec-fallout-value = {$sources} sources over ~{$tiles} tiles
+wf-warhead-ui-spec-none = none
+wf-warhead-ui-footer = To abort, use a multitool on the device. Not possible in the last 10 seconds.
+
 wf-warhead-armed = Countdown started: {$seconds} seconds.
 wf-warhead-key-denied = Your key doesn't fit.
 wf-warhead-key-first = Key turned. The second key has {$window} seconds.

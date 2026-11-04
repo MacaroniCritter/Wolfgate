@@ -195,4 +195,16 @@ public sealed class WFWarheadTest
 
         await pair.CleanReturnAsync();
     }
+
+    [Test]
+    public void BlastRadiusEstimateGrowsWithYield()
+    {
+        var none = new WFWarheadPayload { ExplosionType = null, TotalIntensity = 1000f };
+        var small = new WFWarheadPayload { ExplosionType = "Default", TotalIntensity = 40000f, IntensitySlope = 4f, MaxIntensity = 60f };
+        var big = new WFWarheadPayload { ExplosionType = "Default", TotalIntensity = 1500000f, IntensitySlope = 3f, MaxIntensity = 150f };
+
+        Assert.That(WFWarheadSystem.EstimateBlastRadius(none), Is.Zero);
+        Assert.That(WFWarheadSystem.EstimateBlastRadius(small), Is.InRange(5f, 30f));
+        Assert.That(WFWarheadSystem.EstimateBlastRadius(big), Is.GreaterThan(WFWarheadSystem.EstimateBlastRadius(small)));
+    }
 }

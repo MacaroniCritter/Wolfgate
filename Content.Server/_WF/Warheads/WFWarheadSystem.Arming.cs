@@ -23,22 +23,15 @@ public sealed partial class WFWarheadSystem
     [Dependency] private MobStateSystem _mobState = default!;
     [Dependency] private SharedToolSystem _tool = default!;
 
-    private static readonly VerbCategory TimerCategory =
-        new("wf-warhead-verb-category-timer", "/Textures/Interface/VerbIcons/clock.svg.192dpi.png");
-
     private void InitializeArming()
     {
         SubscribeLocalEvent<WFWarheadComponent, ExaminedEvent>(OnExamined);
         SubscribeLocalEvent<WFWarheadComponent, InteractUsingEvent>(OnInteractUsing);
         SubscribeLocalEvent<WFWarheadComponent, WFWarheadDisarmDoAfterEvent>(OnDisarmDoAfter);
 
-        SubscribeLocalEvent<WFTimerFuzeComponent, GetVerbsEvent<Verb>>(OnTimerVerbs);
         SubscribeLocalEvent<WFTimerFuzeComponent, WFWarheadArmDoAfterEvent>(OnArmDoAfter);
 
-        SubscribeLocalEvent<WFTwoPersonArmingComponent, GetVerbsEvent<AlternativeVerb>>(OnKeyVerbs);
-
         SubscribeLocalEvent<WFRemoteFuzeComponent, MapInitEvent>(OnRemoteMapInit);
-        SubscribeLocalEvent<WFRemoteFuzeComponent, GetVerbsEvent<Verb>>(OnSafetyVerbs);
         SubscribeLocalEvent<WFRemoteFuzeComponent, WFWarheadSafetyDoAfterEvent>(OnSafetyDoAfter);
         SubscribeLocalEvent<WFRemoteFuzeComponent, SignalReceivedEvent>(OnSignal);
 
@@ -112,47 +105,6 @@ public sealed partial class WFWarheadSystem
         _popup.PopupEntity(Loc.GetString("wf-warhead-disarmed"), ent, args.User);
     }
 
-    private void OnTimerVerbs(Entity<WFTimerFuzeComponent> ent, ref GetVerbsEvent<Verb> args)
-    {
-        if (!args.CanAccess || !args.CanInteract || !TryComp<WFWarheadComponent>(ent, out var warhead)
-            || warhead.State != WFWarheadState.Safe)
-            return;
-
-        var user = args.User;
-        var priority = 0;
-        foreach (var seconds in ent.Comp.Options)
-        {
-            var time = seconds;
-            args.Verbs.Add(new Verb
-            {
-                Text = Loc.GetString("wf-warhead-verb-timer-option", ("seconds", (int) time)),
-                Category = TimerCategory,
-                Priority = priority--,
-                Act = () =>
-                {
-                    warhead.Timer = time;
-                    Dirty(ent, warhead);
-                    _popup.PopupEntity(Loc.GetString("wf-warhead-timer-set", ("seconds", (int) time)), ent, user);
-                },
-            });
-        }
-
-        args.Verbs.Add(new Verb
-        {
-            Text = Loc.GetString("wf-warhead-verb-arm"),
-            Priority = 1,
-            Act = () =>
-            {
-                _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, user, ent.Comp.ArmDelay,
-                    new WFWarheadArmDoAfterEvent(), ent, target: ent)
-                {
-                    BreakOnMove = true,
-                    NeedHand = true,
-                });
-            },
-        });
-    }
-
     private void OnArmDoAfter(Entity<WFTimerFuzeComponent> ent, ref WFWarheadArmDoAfterEvent args)
     {
         if (args.Cancelled || args.Handled || !TryComp<WFWarheadComponent>(ent, out var warhead)
@@ -162,20 +114,6 @@ public sealed partial class WFWarheadSystem
         args.Handled = true;
         StartCountdown((ent, warhead), args.User);
         _popup.PopupEntity(Loc.GetString("wf-warhead-armed", ("seconds", (int) warhead.Timer)), ent, args.User);
-    }
-
-    private void OnKeyVerbs(Entity<WFTwoPersonArmingComponent> ent, ref GetVerbsEvent<AlternativeVerb> args)
-    {
-        if (!args.CanAccess || !args.CanInteract || !TryComp<WFWarheadComponent>(ent, out var warhead)
-            || warhead.State is not (WFWarheadState.Safe or WFWarheadState.Armed))
-            return;
-
-        var user = args.User;
-        args.Verbs.Add(new AlternativeVerb
-        {
-            Text = Loc.GetString("wf-warhead-verb-key"),
-            Act = () => TurnKey(ent, (ent, warhead), user),
-        });
     }
 
     /// <summary>One key turn. A second, different person within the window starts the countdown.</summary>
@@ -197,6 +135,7 @@ public sealed partial class WFWarheadSystem
             keys.Comp.FirstKey = user;
             keys.Comp.FirstKeyTime = now;
             _popup.PopupEntity(Loc.GetString("wf-warhead-key-first", ("window", (int) keys.Comp.Window)), keys, user);
+            UpdateUi(warhead, warhead.Comp);
             return;
         }
 
@@ -208,30 +147,6 @@ public sealed partial class WFWarheadSystem
     private void OnRemoteMapInit(Entity<WFRemoteFuzeComponent> ent, ref MapInitEvent args)
     {
         _deviceLink.EnsureSinkPorts(ent, ent.Comp.Port);
-    }
-
-    private void OnSafetyVerbs(Entity<WFRemoteFuzeComponent> ent, ref GetVerbsEvent<Verb> args)
-    {
-        if (!args.CanAccess || !args.CanInteract || !TryComp<WFWarheadComponent>(ent, out var warhead)
-            || warhead.State is not (WFWarheadState.Safe or WFWarheadState.Armed))
-            return;
-
-        var user = args.User;
-        args.Verbs.Add(new Verb
-        {
-            Text = Loc.GetString(warhead.State == WFWarheadState.Safe
-                ? "wf-warhead-verb-safety-off"
-                : "wf-warhead-verb-safety-on"),
-            Act = () =>
-            {
-                _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, user, ent.Comp.SafetyDelay,
-                    new WFWarheadSafetyDoAfterEvent(), ent, target: ent)
-                {
-                    BreakOnMove = true,
-                    NeedHand = true,
-                });
-            },
-        });
     }
 
     private void OnSafetyDoAfter(Entity<WFRemoteFuzeComponent> ent, ref WFWarheadSafetyDoAfterEvent args)

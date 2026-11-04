@@ -15,6 +15,7 @@ public sealed partial class WFWarheadSystem
         var warhead = EnsureComp<WFWarheadComponent>(uid);
         warhead.CustomPayload = design.Payload.Clone();
         warhead.Timer = Math.Max(design.Timer, 0f);
+        warhead.YieldClass = "wf-warhead-class-custom";
         Dirty(uid, warhead);
 
         SetFuze<WFTimerFuzeComponent>(uid, design.Fuzes.HasFlag(WFWarheadFuzes.Timer));

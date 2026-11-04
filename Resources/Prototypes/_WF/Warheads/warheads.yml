@@ -20,6 +20,12 @@
         - HalfWallLayer
   - type: Appearance
   - type: InteractionOutline
+  - type: ActivatableUI
+    key: enum.WFWarheadUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.WFWarheadUiKey.Key:
+        type: WFWarheadBoundUserInterface
   - type: Anchorable
     delay: 5
   - type: Pullable
@@ -70,6 +76,7 @@
           Final: { visible: true, state: nuclearbomb_exploding }
   - type: WFWarhead
     payload: WFPayloadTactical
+    yieldClass: wf-warhead-class-tactical
     timer: 60
     disarmDelay: 15
   - type: WFTimerFuze
@@ -111,6 +118,7 @@
   - type: WFWarhead
     payload: WFPayloadField
     timer: 180
+    yieldClass: wf-warhead-class-field
   - type: WFTimerFuze
     options: [ 60, 120, 180, 300, 600 ]
   - type: WFTwoPersonArming
@@ -140,6 +148,7 @@
         - HalfWallLayer
   - type: WFWarhead
     payload: WFPayloadStrategic
+    yieldClass: wf-warhead-class-strategic
     timer: 300
     disarmDelay: 60
   - type: WFTwoPersonArming
@@ -180,6 +189,7 @@
   - type: WFWarhead
     payload: WFPayloadField
     timer: 120
+    yieldClass: wf-warhead-class-scuttle
   - type: WFTwoPersonArming
   - type: WFRemoteFuze
     signalTimer: 30

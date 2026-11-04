@@ -15,6 +15,11 @@ Warheads are admin and antag only for now. Chassis:
 - `WFWarheadScuttleTerminal`: Skyrat's terminal, two keys or a remote signal.
 - Mono's Atlant missile now detonates `WFPayloadMissile` on impact.
 
+Clicking a warhead opens its control panel (`WFWarheadWindow`): hazard stripes, a radiation trefoil that spins
+while it counts, status lamps, a seven-segment timer, and a section per fuze it has: timer presets and a covered
+start button, two key cylinders with the second key's window draining, a safety lever for the remote fuze, and a
+payload readout (rough blast radius, flash, fallout, EMP, grid deletion).
+
 Arming mechanisms are separate components: `WFTimerFuze` (set a timer, start the countdown), `WFTwoPersonArming`
 (two different people with access turn keys within a few seconds), `WFRemoteFuze` (take the safety off, then a
 signal on the Detonate port starts a short countdown; link a remote signaller or a `WFDeadManSwitch`), and
@@ -49,6 +54,7 @@ Entry points: `WFWarheadSystem` (countdowns, detonation, arming, designer spawns
 - [`Content.Server/_WF/Warheads/WFWarheadSystem.Arming.cs`](WFWarheadSystem.Arming.cs)
 - [`Content.Server/_WF/Warheads/WFWarheadSystem.cs`](WFWarheadSystem.cs)
 - [`Content.Server/_WF/Warheads/WFWarheadSystem.Designer.cs`](WFWarheadSystem.Designer.cs)
+- [`Content.Server/_WF/Warheads/WFWarheadSystem.Ui.cs`](WFWarheadSystem.Ui.cs)
 
 ### Shared
 
@@ -58,9 +64,13 @@ Entry points: `WFWarheadSystem` (countdowns, detonation, arming, designer spawns
 - [`Content.Shared/_WF/Warheads/WFWarheadComponent.cs`](../../../Content.Shared/_WF/Warheads/WFWarheadComponent.cs)
 - [`Content.Shared/_WF/Warheads/WFWarheadEvents.cs`](../../../Content.Shared/_WF/Warheads/WFWarheadEvents.cs)
 - [`Content.Shared/_WF/Warheads/WFWarheadPayloadPrototype.cs`](../../../Content.Shared/_WF/Warheads/WFWarheadPayloadPrototype.cs)
+- [`Content.Shared/_WF/Warheads/WFWarheadUi.cs`](../../../Content.Shared/_WF/Warheads/WFWarheadUi.cs)
 
 ### Client
 
+- [`Content.Client/_WF/Warheads/UI/WFWarheadBoundUserInterface.cs`](../../../Content.Client/_WF/Warheads/UI/WFWarheadBoundUserInterface.cs)
+- [`Content.Client/_WF/Warheads/UI/WFWarheadControls.cs`](../../../Content.Client/_WF/Warheads/UI/WFWarheadControls.cs)
+- [`Content.Client/_WF/Warheads/UI/WFWarheadWindow.cs`](../../../Content.Client/_WF/Warheads/UI/WFWarheadWindow.cs)
 - [`Content.Client/_WF/Warheads/WFCountdownOverlay.cs`](../../../Content.Client/_WF/Warheads/WFCountdownOverlay.cs)
 - [`Content.Client/_WF/Warheads/WFNuclearBlastOverlay.cs`](../../../Content.Client/_WF/Warheads/WFNuclearBlastOverlay.cs)
 - [`Content.Client/_WF/Warheads/WFNuclearFlashOverlay.cs`](../../../Content.Client/_WF/Warheads/WFNuclearFlashOverlay.cs)

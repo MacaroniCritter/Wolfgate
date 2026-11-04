@@ -56,6 +56,7 @@ public sealed partial class WFWarheadSystem : EntitySystem
     {
         base.Initialize();
         InitializeArming();
+        InitializeUi();
         SubscribeLocalEvent<WFWarheadComponent, MapInitEvent>(OnMapInit);
     }
 
@@ -126,6 +127,7 @@ public sealed partial class WFWarheadSystem : EntitySystem
     private void UpdateAppearance(Entity<WFWarheadComponent> ent)
     {
         _appearance.SetData(ent, WFWarheadVisuals.State, ent.Comp.State);
+        UpdateUi(ent, ent.Comp);
     }
 
     private void SetDisplay(EntityUid uid, TimeSpan? end)

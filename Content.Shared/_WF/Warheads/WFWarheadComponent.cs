@@ -42,6 +42,10 @@ public sealed partial class WFWarheadComponent : Component
 
     [DataField]
     public bool FinalPhaseStarted;
+
+    /// <summary>Loc ID of the yield class the control panel shows.</summary>
+    [DataField]
+    public LocId YieldClass = "wf-warhead-class-field";
 }
 
 [Serializable, NetSerializable]
