@@ -54,7 +54,7 @@ public sealed class OrbitalDropTest
         var drops = server.System<WFOrbitalDropSystem>();
         var ticksPerSecond = (int) Math.Round(1 / server.Timing.TickPeriod.TotalSeconds);
         var groundMap = entMan.GetComponent<TransformComponent>(ground).MapID;
-        EntityUid beacon = default, user = default;
+        EntityUid beacon = default, user = default, caller = default;
 
         await server.WaitAssertion(() =>
         {
@@ -85,11 +85,10 @@ public sealed class OrbitalDropTest
             Assert.That(thing, Is.EqualTo(crate), "The drop named the wrong thing in the way.");
             entMan.DeleteEntity(crate);
 
-            // Whoever sets it off stands on the spot: that arms it, and only blocks the touchdown.
-            var caller = entMan.SpawnEntity("MobHuman", at);
+            // Whoever sets it off stands on the spot: that arms it, and the touchdown throws them clear (report 452).
+            caller = entMan.SpawnEntity("MobHuman", at);
             Assert.That(drops.CheckDropZone(ent, at, out _, mobs: false), Is.Null, "The one calling the drop blocked it.");
-            Assert.That(drops.CheckDropZone(ent, at, out _), Is.EqualTo("wf-orbital-drop-blocked"), "Someone under the drop didn't block it.");
-            entMan.DeleteEntity(caller);
+            Assert.That(drops.CheckDropZone(ent, at, out _), Is.EqualTo("wf-orbital-drop-blocked"), "Someone under the drop isn't seen.");
 
             drops.Arm(ent, user);
         });
@@ -108,8 +107,13 @@ public sealed class OrbitalDropTest
             {
                 using (Assert.EnterMultipleScope())
                 {
-                    Assert.That(CountVehicles(entMan, groundMap), Is.EqualTo(1), "The vehicle didn't land.");
+                    Assert.That(CountVehicles(entMan, groundMap), Is.EqualTo(1), "The vehicle didn't land on the one who called it.");
                     Assert.That(entMan.Deleted(beacon), Is.True, "The used beacon is still there.");
+
+                    var footprint = server.System<Content.Server._WF.VehicleShop.WFVehicleShopSystem>().Footprint(new[] { (EntProtoId) Vehicle });
+                    var callerAt = server.System<SharedTransformSystem>().GetWorldPosition(caller) - new Vector2(Site.X + 0.5f, Site.Y + 0.5f);
+                    Assert.That(footprint.Contains(callerAt), Is.False, $"The caller is still under the vehicle at {callerAt}.");
+                    Assert.That(entMan.HasComponent<Content.Shared.Stunnable.KnockedDownComponent>(caller), Is.True, "The caller wasn't knocked down by the landing.");
 
                     var vehicle = entMan.EntityQuery<MetaDataComponent>().First(meta => meta.EntityPrototype?.ID == Vehicle).Owner;
                     var keyId = entMan.GetComponent<VehicleLockComponent>(vehicle).KeyId;
@@ -126,6 +130,20 @@ public sealed class OrbitalDropTest
         }
 
         await pair.CleanReturnAsync();
+    }
+
+    /// <summary>Someone inside the vehicle's room leaves by the nearest edge, a tile past it; the very middle goes right.</summary>
+    [Test]
+    public void ExitPointLeavesByTheNearestEdge()
+    {
+        var room = new Box2(-2f, -1f, 2f, 1f);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(WFOrbitalDropSystem.ExitPoint(room, Vector2.Zero), Is.EqualTo(new Vector2(3f, 0f)));
+            Assert.That(WFOrbitalDropSystem.ExitPoint(room, new Vector2(-1.5f, 0.2f)), Is.EqualTo(new Vector2(-3f, 0.2f)));
+            Assert.That(WFOrbitalDropSystem.ExitPoint(room, new Vector2(0.5f, -0.9f)), Is.EqualTo(new Vector2(0.5f, -2f)));
+            Assert.That(WFOrbitalDropSystem.ExitPoint(room, new Vector2(1f, 0.6f)), Is.EqualTo(new Vector2(1f, 2f)));
+        }
     }
 
     [Test]

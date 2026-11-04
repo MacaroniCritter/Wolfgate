@@ -1,3 +1,4 @@
+using System.Numerics;
 using Content.Server.Administration.Logs;
 using Content.Server.Cargo.Systems;
 using Content.Server._WF.VehicleShop;
@@ -14,7 +15,9 @@ using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Light.Components;
 using Content.Shared.Light.EntitySystems;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
+using Content.Shared.Stunnable;
 using Robust.Server.Audio;
 using Robust.Shared.Audio;
 using Robust.Shared.Containers;
@@ -27,7 +30,8 @@ namespace Content.Server._WF.MilitaryVehicles;
 
 /// <summary>
 /// Orbital drop beacons: set off on a planet's open ground, they count down and the vehicle drops from orbit onto them,
-/// square to the ground, with the key handed to whoever set it off. Indoors, off the ground or blocked, they say why.
+/// square to the ground, with the key handed to whoever set it off. Indoors, off the ground or blocked, they say why;
+/// people still standing where it lands are thrown clear instead.
 /// Sold from a catalogue that lists the beacons themselves.
 /// </summary>
 public sealed class WFOrbitalDropSystem : EntitySystem
@@ -41,6 +45,12 @@ public sealed class WFOrbitalDropSystem : EntitySystem
     /// <summary>How far the landing is heard.</summary>
     private const float SoundRange = 25f;
 
+    /// <summary>How long someone thrown clear of the landing stays down.</summary>
+    private static readonly TimeSpan ThrownDownTime = TimeSpan.FromSeconds(2);
+
+    /// <summary>How far past the vehicle's edge someone is thrown.</summary>
+    private const float ThrowClearance = 1f;
+
     [Dependency] private IAdminLogManager _adminLog = default!;
     [Dependency] private SharedAppearanceSystem _appearance = default!;
     [Dependency] private AudioSystem _audio = default!;
@@ -48,17 +58,20 @@ public sealed class WFOrbitalDropSystem : EntitySystem
     [Dependency] private SharedHandsSystem _hands = default!;
     [Dependency] private WFLandingSurveySystem _landing = default!;
     [Dependency] private VehicleLockSystem _locks = default!;
+    [Dependency] private EntityLookupSystem _lookup = default!;
     [Dependency] private SharedMapSystem _map = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private PricingSystem _pricing = default!;
     [Dependency] private IPrototypeManager _proto = default!;
     [Dependency] private SharedRoofSystem _roof = default!;
     [Dependency] private WFVehicleShopSystem _shop = default!;
+    [Dependency] private SharedStunSystem _stun = default!;
     [Dependency] private IGameTiming _timing = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private CESharedZLevelsSystem _zLevels = default!;
 
     private List<Entity<MapGridComponent>> _gridsAbove = new();
+    private HashSet<Entity<MobStateComponent>> _people = new();
 
     /// <inheritdoc/>
     public override void Initialize()
@@ -202,7 +215,10 @@ public sealed class WFOrbitalDropSystem : EntitySystem
         return _gridsAbove.Count > 0;
     }
 
-    /// <summary>Drops the vehicle onto the beacon if the spot is still good; otherwise says why and stops.</summary>
+    /// <summary>
+    /// Drops the vehicle onto the beacon if the spot is still good; otherwise says why and stops. Whoever is standing in
+    /// its room is thrown clear first: the one who set it off is right on top of it, and a heavy vehicle's room is wide.
+    /// </summary>
     private void TryLand(Entity<WFOrbitalDropBeaconComponent> ent)
     {
         var xform = Transform(ent);
@@ -212,6 +228,8 @@ public sealed class WFOrbitalDropSystem : EntitySystem
             Disarm(ent);
             return;
         }
+
+        ThrowClear(ent, xform);
 
         if (CheckDropZone(ent, xform.Coordinates, out var thing) is { } refusal)
         {
@@ -249,6 +267,46 @@ public sealed class WFOrbitalDropSystem : EntitySystem
         _adminLog.Add(LogType.EntitySpawn, LogImpact.Low,
             $"{ToPrettyString(ent):beacon} armed by {ToPrettyString(ent.Comp.ArmedBy):actor} dropped {ToPrettyString(vehicle)}");
         QueueDel(ent);
+    }
+
+    /// <summary>Moves everyone inside the vehicle's room to just past its nearest edge and knocks them down.</summary>
+    private void ThrowClear(Entity<WFOrbitalDropBeaconComponent> ent, TransformComponent xform)
+    {
+        var centre = _transform.ToMapCoordinates(xform.Coordinates);
+        var footprint = _shop.Footprint(new[] { ent.Comp.Vehicle });
+        var rotation = xform.GridUid is { } grid ? _transform.GetWorldRotation(grid) : Angle.Zero;
+        var room = new Box2Rotated(footprint.Translated(centre.Position), rotation, centre.Position);
+
+        _people.Clear();
+        _lookup.GetEntitiesIntersecting(centre.MapId, room, _people, LookupFlags.Dynamic | LookupFlags.Static);
+        foreach (var person in _people)
+        {
+            var from = (-rotation).RotateVec(_transform.GetWorldPosition(person) - centre.Position);
+            var to = centre.Position + rotation.RotateVec(ExitPoint(footprint, from));
+            _transform.SetWorldPosition(person.Owner, to);
+            _stun.TryKnockdown(person, ThrownDownTime, true);
+            _popup.PopupEntity(Loc.GetString("wf-orbital-drop-thrown"), person, person, PopupType.MediumCaution);
+        }
+    }
+
+    /// <summary>
+    /// Where someone at a point inside a vehicle's room ends up: straight out through the nearest edge, a tile past it.
+    /// The room is about the origin; someone at its very middle goes out the right-hand side.
+    /// </summary>
+    public static Vector2 ExitPoint(Box2 room, Vector2 from)
+    {
+        var centre = room.Center;
+        var offset = from - centre;
+        var half = room.Size / 2f;
+        if (offset == Vector2.Zero)
+            offset = new Vector2(1f, 0f);
+
+        // The axis whose edge is proportionally nearest is the one to leave by.
+        var alongX = MathF.Abs(offset.X) / MathF.Max(half.X, 0.01f);
+        var alongY = MathF.Abs(offset.Y) / MathF.Max(half.Y, 0.01f);
+        return alongX >= alongY
+            ? new Vector2(centre.X + MathF.CopySign(half.X + ThrowClearance, offset.X), from.Y)
+            : new Vector2(from.X, centre.Y + MathF.CopySign(half.Y + ThrowClearance, offset.Y));
     }
 
     /// <summary>An unused beacon sells as the vehicle would at a terminal's pad, never above its listing.</summary>

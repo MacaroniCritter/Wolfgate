@@ -6,6 +6,7 @@ wf-orbital-drop-not-planet = Orbital drops only land on a planet's open ground.
 wf-orbital-drop-on-grid = It has to be set off on bare ground, not on a ship, station or building.
 wf-orbital-drop-roofed = There is a roof overhead. Take it outside, under open sky.
 wf-orbital-drop-blocked = No room for the drop: {THE($thing)} is in the way.
+wf-orbital-drop-thrown = The landing throws you clear.
 
 wf-military-repair-kit-intact = {CAPITALIZE(THE($vehicle))} needs no repairs.
 wf-military-repair-kit-crewed = {CAPITALIZE(THE($vehicle))} still has a living crew aboard.

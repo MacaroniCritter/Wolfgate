@@ -7,7 +7,6 @@ using Content.Shared._WF.Planets;
 using Content.Shared._WF.PlanetScan;
 using Content.Shared._WF.PlanetSignals;
 using Robust.Client.Graphics;
-using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
 
@@ -28,6 +27,7 @@ public partial class ShuttleNavControl
     private readonly List<string> _wfDepots = new();
 
     private float _wfViewScale = 1f;
+    private Matrix3x2 _wfWorldToView = Matrix3x2.Identity;
     private Vector2? _wfPressedAt;
     private WFPlanetSignalsWindow? _wfSignalsWindow;
 
@@ -39,6 +39,7 @@ public partial class ShuttleNavControl
     private void DrawWfPlanetSignals(DrawingHandleScreen handle, Matrix3x2 worldToView, TransformComponent xform)
     {
         _wfPlanetHits.Clear();
+        _wfWorldToView = worldToView;
         _wfViewScale = MathF.Sqrt(worldToView.M11 * worldToView.M11 + worldToView.M12 * worldToView.M12);
 
         if (!ShowIFF || xform.MapUid is not { } mapUid || WfSignalsOfLayer(mapUid) is not { } signals)
@@ -118,7 +119,10 @@ public partial class ShuttleNavControl
         }
     }
 
-    /// <summary>Over a world's name on the radar out in space: how many vessels, sites and people it holds, and whether the ship's expedition is there.</summary>
+    /// <summary>
+    /// Over a world's name on the radar out in space: how many vessels, sites and people it holds, and whether the ship's
+    /// expedition is there. A world drawn here is off the scope or has no scope circle, so only its blip and name take a click.
+    /// </summary>
     private void WfDrawPlanetSignalTag(DrawingHandleScreen handle, EntityUid body, Vector2 uiPosition, Vector2 labelOffset, string label)
     {
         if (!EntManager.TryGetComponent<WFPlanetSignalsComponent>(body, out var signals))
@@ -126,7 +130,7 @@ public partial class ShuttleNavControl
 
         var labelAt = (uiPosition + labelOffset) * UIScale;
         var labelSize = handle.GetDimensions(Font, label, UIScale * 0.9f);
-        _wfPlanetHits.Add((body, uiPosition * UIScale, MathF.Max(16f * UIScale, WfPlanetRadius(body)), UIBox2.FromDimensions(labelAt, labelSize)));
+        _wfPlanetHits.Add((body, uiPosition * UIScale, 16f * UIScale, UIBox2.FromDimensions(labelAt, labelSize)));
 
         int vessels = 0, sites = 0;
         var ours = WfOurGrid();
@@ -195,21 +199,27 @@ public partial class ShuttleNavControl
         return false;
     }
 
-    private List<Entity<MapGridComponent>> _wfClickGrids = new();
-
-    /// <summary>Whether a grid lies within a few pixels of a click, a planet's own ground aside.</summary>
+    /// <summary>
+    /// Whether a grid the radar draws lies within a few pixels of a click, a planet's own ground aside: its drawn outline
+    /// is tested on the screen, so a tiny or distant grid counts the same as a large one.
+    /// </summary>
     private bool WfGridUnderClick(Vector2 relative)
     {
-        var coords = EntManager.System<SharedTransformSystem>().ToMapCoordinates(GetMouseEntityCoordinates(relative));
-        if (coords.MapId == MapId.Nullspace)
-            return false;
-
-        var reach = 8f * UIScale / MathF.Max(_wfViewScale, 0.0001f);
-        _wfClickGrids.Clear();
-        EntManager.System<SharedMapSystem>().FindGridsIntersecting(coords.MapId, Box2.CenteredAround(coords.Position, new Vector2(reach * 2f)), ref _wfClickGrids);
-        foreach (var grid in _wfClickGrids)
+        var pixel = relative * UIScale;
+        var reach = 8f * UIScale;
+        var transform = EntManager.System<SharedTransformSystem>();
+        foreach (var grid in _grids)
         {
-            if (!EntManager.HasComponent<MapComponent>(grid.Owner))
+            if (EntManager.HasComponent<MapComponent>(grid.Owner))
+                continue;
+
+            var gridToView = transform.GetWorldMatrix(grid.Owner) * _wfWorldToView;
+            var local = grid.Comp.LocalAABB;
+            var box = new Box2(Vector2.Transform(local.BottomLeft, gridToView), Vector2.Transform(local.BottomLeft, gridToView));
+            box = box.ExtendToContain(Vector2.Transform(local.BottomRight, gridToView));
+            box = box.ExtendToContain(Vector2.Transform(local.TopLeft, gridToView));
+            box = box.ExtendToContain(Vector2.Transform(local.TopRight, gridToView));
+            if (box.Enlarged(reach).Contains(pixel))
                 return true;
         }
 
