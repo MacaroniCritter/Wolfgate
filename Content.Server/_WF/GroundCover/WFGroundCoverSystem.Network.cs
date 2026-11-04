@@ -21,6 +21,7 @@ public sealed partial class WFGroundCoverSystem
 
     private readonly Dictionary<EntityUid, WFSnowCoverChunksMessage> _messages = new();
     private readonly List<(EntityUid Grid, Vector2i Chunk)> _stale = new();
+    private readonly HashSet<EntityUid> _forgotten = new();
     private List<Entity<MapGridComponent>> _grids = new();
     private TimeSpan _nextSend;
     private TimeSpan _nextPrune;
@@ -37,10 +38,18 @@ public sealed partial class WFGroundCoverSystem
         if (!_sent.TryGetValue(args.SenderSession, out var sent))
             return;
 
+        // Resolved this way round: a grid in the record may already be deleted, with no net entity left.
+        _forgotten.Clear();
+        foreach (var net in message.Grids)
+        {
+            if (TryGetEntity(net, out var grid))
+                _forgotten.Add(grid.Value);
+        }
+
         _stale.Clear();
         foreach (var key in sent.Keys)
         {
-            if (message.Grids.Contains(GetNetEntity(key.Grid)))
+            if (_forgotten.Contains(key.Grid))
                 _stale.Add(key);
         }
 
