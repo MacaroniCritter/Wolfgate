@@ -508,7 +508,7 @@ public partial class ShuttleNavControl : BaseShuttleControl // Mono
         _isMouseDown = false;
 
         // WOLFGATE(PlanetSignals): a click on a world lists its signals.
-        if (WfTryOpenPlanetSignals(args.RelativePixelPosition))
+        if (WfTryOpenPlanetSignals(args.RelativePixelPosition, args.RelativePosition))
             return;
 
         var coords = GetMouseEntityCoordinates(args.RelativePosition);

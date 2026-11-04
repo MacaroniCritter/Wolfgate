@@ -10,6 +10,7 @@ using Content.Server.Procedural;
 using Content.Shared._WF.CCVar;
 using Content.Shared._WF.PlanetPois;
 using Content.Shared._WF.Planets;
+using Content.Shared.Ghost;
 using Content.Shared.Light.EntitySystems;
 using Content.Shared.Parallax.Biomes;
 using Robust.Server.Player;
@@ -113,7 +114,9 @@ public sealed partial class WFPlanetPoiSystem : EntitySystem
 
             foreach (var session in _players.Sessions)
             {
+                // Ghosts and admin observers only look; a site is found by someone there in body.
                 if (session.AttachedEntity is not { } player
+                    || HasComp<GhostComponent>(player)
                     || Transform(player).MapUid != signal.Ground
                     || Vector2.DistanceSquared(_transform.GetWorldPosition(player), site) > signal.RevealRange * signal.RevealRange)
                     continue;

@@ -7,6 +7,8 @@ using Content.Shared._WF.Planets;
 using Content.Shared._WF.PlanetScan;
 using Content.Shared._WF.PlanetSignals;
 using Robust.Client.Graphics;
+using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
 
 namespace Content.Client.Shuttles.UI;
@@ -168,12 +170,16 @@ public partial class ShuttleNavControl
         handle.DrawString(Font, at, expedition, UIScale * 0.7f, WfExpeditionColor);
     }
 
-    /// <summary>Opens the signal list of the world under a click. False when nothing was hit, the press was a drag, or this radar's clicks aim guns.</summary>
-    private bool WfTryOpenPlanetSignals(Vector2 pixel)
+    /// <summary>
+    /// Opens the signal list of the world under a click. False when nothing was hit, the press was a drag, this radar's
+    /// clicks aim guns, or a grid is under the click: a ship or drone over a world's circle is what was clicked.
+    /// </summary>
+    private bool WfTryOpenPlanetSignals(Vector2 pixel, Vector2 relative)
     {
         var pressed = _wfPressedAt;
         _wfPressedAt = null;
-        if (OnRadarClick != null || pressed is not { } down || (down - pixel).Length() > 6f * UIScale)
+        if (OnRadarClick != null || pressed is not { } down || (down - pixel).Length() > 6f * UIScale
+            || WfGridUnderClick(relative))
             return false;
 
         foreach (var (body, centre, radius, label) in _wfPlanetHits)
@@ -184,6 +190,27 @@ public partial class ShuttleNavControl
             _wfSignalsWindow ??= new WFPlanetSignalsWindow();
             _wfSignalsWindow.Show(body, WfOurGrid());
             return true;
+        }
+
+        return false;
+    }
+
+    private List<Entity<MapGridComponent>> _wfClickGrids = new();
+
+    /// <summary>Whether a grid lies within a few pixels of a click, a planet's own ground aside.</summary>
+    private bool WfGridUnderClick(Vector2 relative)
+    {
+        var coords = EntManager.System<SharedTransformSystem>().ToMapCoordinates(GetMouseEntityCoordinates(relative));
+        if (coords.MapId == MapId.Nullspace)
+            return false;
+
+        var reach = 8f * UIScale / MathF.Max(_wfViewScale, 0.0001f);
+        _wfClickGrids.Clear();
+        EntManager.System<SharedMapSystem>().FindGridsIntersecting(coords.MapId, Box2.CenteredAround(coords.Position, new Vector2(reach * 2f)), ref _wfClickGrids);
+        foreach (var grid in _wfClickGrids)
+        {
+            if (!EntManager.HasComponent<MapComponent>(grid.Owner))
+                return true;
         }
 
         return false;

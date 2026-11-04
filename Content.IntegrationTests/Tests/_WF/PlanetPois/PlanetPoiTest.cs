@@ -144,6 +144,16 @@ public sealed class PlanetPoiTest
             });
 
             var middle = entMan.GetComponent<WFPoiSignalComponent>(site.Signal).Origin;
+
+            // A ghost on the spot finds nothing.
+            var ghost = await PlanetFixture.AttachViewer(pair, ground, new Vector2(middle.X + 0.5f, middle.Y + 0.5f), "AdminObserver");
+            await pair.RunTicksSync(pair.SecondsToTicks(2.5f));
+            await server.WaitPost(() =>
+            {
+                Assert.That(entMan.GetComponent<WFPoiSignalComponent>(site.Signal).Revealed, Is.False, "A ghost identified the site's signal.");
+                entMan.DeleteEntity(ghost);
+            });
+
             await PlanetFixture.AttachViewer(pair, ground, new Vector2(middle.X + 0.5f, middle.Y + 0.5f));
             await pair.RunTicksSync(pair.SecondsToTicks(2.5f));
 
