@@ -71,10 +71,9 @@ public sealed partial class WFNewbieTagSystem : EntitySystem
         var owned = EntityQueryEnumerator<ShipOwnershipComponent>();
         while (owned.MoveNext(out var ship, out var owner))
         {
-            // An offline owner keeps whatever owner tag their ship last had.
-            var ownerTagged = _players.TryGetSessionById(owner.OwnerUserId, out var session)
-                ? IsTagged(session)
-                : CompOrNull<WFNewbieShipComponent>(ship)?.OwnerTagged ?? false;
+            // An offline owner, or one whose playtime hasn't loaded, keeps whatever owner tag their ship last had.
+            if (!_players.TryGetSessionById(owner.OwnerUserId, out var session) || !TryGetTagged(session, out var ownerTagged))
+                ownerTagged = CompOrNull<WFNewbieShipComponent>(ship)?.OwnerTagged ?? false;
             if (ownerTagged)
                 _ships[ship] = true;
         }
@@ -103,15 +102,25 @@ public sealed partial class WFNewbieTagSystem : EntitySystem
     /// </summary>
     public bool IsTagged(ICommonSession session)
     {
+        // Playtime loads from the database after connecting; until then nobody is tagged.
+        return TryGetTagged(session, out var tagged) && tagged;
+    }
+
+    /// <summary>
+    /// Whether a player is tagged, or false if that isn't known yet because their playtime hasn't loaded.
+    /// </summary>
+    public bool TryGetTagged(ICommonSession session, out bool tagged)
+    {
+        tagged = false;
         var hours = _cfg.GetCVar(WFNewbieCVars.Hours);
         if (hours <= 0 || session.Status != SessionStatus.InGame)
+            return true;
+
+        if (!TryGetPlaytime(session, out var playtime))
             return false;
 
-        // Playtime loads from the database after connecting; until then nobody is tagged.
-        if (!TryGetPlaytime(session, out var playtime) || playtime >= TimeSpan.FromHours(hours))
-            return false;
-
-        return _netCfg.GetClientCVar(session.Channel, WFNewbieCVars.ShowTag);
+        tagged = playtime < TimeSpan.FromHours(hours) && _netCfg.GetClientCVar(session.Channel, WFNewbieCVars.ShowTag);
+        return true;
     }
 
     /// <summary>

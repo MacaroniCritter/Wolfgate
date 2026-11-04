@@ -20,6 +20,7 @@ using Content.Shared.Traits;
 using NUnit.Framework;
 using Robust.Shared.Configuration;
 using Robust.Shared.GameObjects;
+using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 
 namespace Content.IntegrationTests.Tests._WF.Newbie;
@@ -158,6 +159,8 @@ public sealed class WFNewbieTagTest : GameTest
             _body = SEntMan.SpawnEntity("MobHuman", map.GridCoords);
             minds.TransferTo(minds.CreateMind(session.UserId).Owner, _body);
             helm = SEntMan.SpawnEntity("ComputerShuttle", map.GridCoords);
+            // Someone else, offline and never tagged, owns the ship.
+            SEntMan.EnsureComponent<ShipOwnershipComponent>(_ship).OwnerUserId = new NetUserId(Guid.NewGuid());
             SEntMan.EnsureComponent<PilotComponent>(_body);
         });
         await RunTicksSync(30);
@@ -173,7 +176,7 @@ public sealed class WFNewbieTagTest : GameTest
 
         Assert.Multiple(() =>
         {
-            Assert.That(idle.Ship, Is.False, "an unowned ship nobody flies was tagged.");
+            Assert.That(idle.Ship, Is.False, "a veteran's ship nobody new flies was tagged.");
             Assert.That(flying.Ship, Is.True, "a ship a new player flies was not tagged.");
             Assert.That(clientLabel, Does.Contain("(L)"), "the client's radar label has no newbie tag.");
             Assert.That(landed.Ship, Is.False, "the ship kept the tag after its new pilot left the helm.");
