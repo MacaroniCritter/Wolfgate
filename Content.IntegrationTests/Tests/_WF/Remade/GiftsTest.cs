@@ -8,6 +8,7 @@ using Content.Server._WF.Remade.Gifts;
 using Content.Server._WF.Remade.Monolith;
 using Content.Server._WF.Remade.Structures;
 using Content.Server._WF.Wolfmed.Life;
+using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Cargo.Components;
 using Content.Server.Cargo.Systems;
@@ -58,6 +59,9 @@ public sealed class GiftsTest
         moles[(int) Gas.Oxygen] = 21.824779f;
         moles[(int) Gas.Nitrogen] = 82.10312f;
         server.System<AtmosphereSystem>().SetMapAtmosphere(map.MapUid, false, new GasMixture(moles, Atmospherics.T20C));
+
+        // Laying the deck gives the grid its own atmosphere, whose new tiles are vacuum; without it the deck breathes the map's air.
+        server.EntMan.RemoveComponent<GridAtmosphereComponent>(map.Grid.Owner);
     }
 
     private static void Power(RobustIntegrationTest.ServerIntegrationInstance server, EntityUid uid)
