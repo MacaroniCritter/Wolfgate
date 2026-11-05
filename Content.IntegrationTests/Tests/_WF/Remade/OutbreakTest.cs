@@ -133,8 +133,12 @@ public sealed class OutbreakTest
         {
             var subject = entMan.GetComponent<WFDreadSubjectComponent>(crewman);
             var xform = entMan.GetComponent<TransformComponent>(crewman);
+            var stones = string.Join(", ", entMan.AllEntities<WFMonolithComponent>().Select(s =>
+                $"{entMan.ToPrettyString(s.Owner)} {s.Comp.Stage} local {s.Comp.Local} map {entMan.GetComponent<TransformComponent>(s.Owner).MapID} grid {entMan.GetComponent<TransformComponent>(s.Owner).GridUid}"));
             Assert.That(subject.Level, Is.Zero, $"the splinter's dread reached another ship: crewman on {xform.GridUid} at "
-                + $"{entMan.System<SharedTransformSystem>().GetWorldPosition(crewman)}, splinter on {entMan.GetComponent<TransformComponent>(splinter).GridUid}, ship {ship.Owner}.");
+                + $"{entMan.System<SharedTransformSystem>().GetWorldPosition(crewman)}, splinter on {entMan.GetComponent<TransformComponent>(splinter).GridUid}, ship {ship.Owner}; "
+                + $"crewman map {xform.MapID}, dead {entMan.System<Content.Shared.Mobs.Systems.MobStateSystem>().IsDead(crewman)}, actor {entMan.HasComponent<Robust.Shared.Player.ActorComponent>(crewman)}, "
+                + $"sector {server.CfgMan.GetCVar(Content.Shared._WF.Remade.Dread.WFDreadCVars.Sector)}; stones {stones}.");
             Assert.That(subject.Bed, Is.Zero);
         });
         await pair.CleanReturnAsync();

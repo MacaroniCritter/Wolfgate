@@ -258,8 +258,13 @@ public sealed class EnvironmentTest
         });
 
         var morgues = entMan.System<WFMorgueSystem>();
+        // The count lives as long as the pooled server, so only this test's bursts are counted.
+        var burstsBefore = morgues.Bursts;
         var startTime = server.ResolveDependency<IGameTiming>().CurTime;
-        await pair.RunSeconds(2f);
+        // The morgue scans every 2 s from wherever its timer stood, so give it a few scans rather than exactly one.
+        for (var i = 0; i < 12 && !entMan.HasComponent<WFMorgueTurningComponent>(body); i++)
+            await pair.RunTicksSync(30);
+
         await server.WaitAssertion(() =>
         {
             Assert.That(entMan.HasComponent<WFMorgueTurningComponent>(body), Is.True, "the body in the tray wasn't marked to turn.");
@@ -288,7 +293,7 @@ public sealed class EnvironmentTest
             elapsed = server.ResolveDependency<IGameTiming>().CurTime - startTime;
             Assert.That(entMan.Deleted(body), Is.True, $"the body never turned in {elapsed.TotalSeconds:F0} s.");
             Assert.That(entMan.GetComponent<EntityStorageComponent>(morgue).Open, Is.True, "the tray didn't burst open.");
-            Assert.That(morgues.Bursts, Is.EqualTo(1));
+            Assert.That(morgues.Bursts - burstsBefore, Is.EqualTo(1));
             var remade = Remade(entMan);
             Assert.That(remade, Has.Count.EqualTo(1), "no Remade climbed out.");
             var transforms = entMan.System<SharedTransformSystem>();

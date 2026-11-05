@@ -289,10 +289,17 @@ public sealed class RosterTest
 
         await server.WaitPost(() =>
         {
+            // The row has to hold still for the blast; the cvar is whatever the last test on this server left it at.
+            server.CfgMan.SetCVar(CCVars.NPCEnabled, false);
             WFRemadeDirectorTest.LayDeck(pair, map);
             var shooter = entMan.SpawnEntity("MobCarp", WFRemadeDirectorTest.At(map, 12, 0));
             for (var i = 0; i < 5; i++)
                 row.Add(entMan.SpawnEntity(i % 2 == 0 ? Exploder : ExploderEnhanced, WFRemadeDirectorTest.At(map, i, 0)));
+
+            // The blast throws the first neighbour, which shoves the rest down the row before the blast spreads that far.
+            var physics = entMan.System<Robust.Shared.Physics.Systems.SharedPhysicsSystem>();
+            foreach (var neighbour in row.Skip(1))
+                physics.SetBodyType(neighbour, Robust.Shared.Physics.BodyType.Static);
 
             LimbsTest.Hit(pair, row[0], "Piercing", 40, TargetBodyPart.LeftArm, shooter);
         });
@@ -302,7 +309,12 @@ public sealed class RosterTest
         {
             Assert.That(entMan.GetComponent<WFRemadeExploderComponent>(row[0]).Detonated, Is.True, "the shot one didn't burst.");
             Assert.That(entMan.Deleted(row[1]) || LimbsTest.Total(pair, row[1]) > 0f, Is.True, "the blast didn't touch the exploder beside it.");
-            Assert.That(entMan.Deleted(row[2]) || LimbsTest.Total(pair, row[2]) > 0f, Is.True, "the blast didn't reach two tiles.");
+            var xforms = entMan.System<SharedTransformSystem>();
+            var state = string.Join("; ", row.Select(e => entMan.Deleted(e)
+                ? "deleted"
+                : $"{xforms.GetWorldPosition(e)} dmg {LimbsTest.Total(pair, e)} dead {entMan.System<MobStateSystem>().IsDead(e)}"));
+            Assert.That(entMan.Deleted(row[2]) || LimbsTest.Total(pair, row[2]) > 0f, Is.True, $"the blast didn't reach two tiles: {state}");
+            server.CfgMan.SetCVar(CCVars.NPCEnabled, true);
         });
         await pair.CleanReturnAsync();
     }

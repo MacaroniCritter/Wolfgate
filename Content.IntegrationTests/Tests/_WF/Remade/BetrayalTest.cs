@@ -266,14 +266,17 @@ public sealed class BetrayalTest
         });
         await pair.RunTicksSync(5);
 
+        // The count lives as long as the pooled server, so only moves from here on are counted.
+        var movedBefore = 0;
         await server.WaitAssertion(() =>
         {
+            movedBefore = corpses.Moved;
             for (var i = 0; i < 25; i++)
             {
                 corpses.Pass(force: true);
             }
 
-            Assert.That(corpses.Moved, Is.EqualTo(0), "a corpse moved with a player looking straight at it.");
+            Assert.That(corpses.Moved - movedBefore, Is.EqualTo(0), "a corpse moved with a player looking straight at it.");
             Assert.That(transforms.GetWorldPosition(corpse), Is.EqualTo(before.Item1));
             Assert.That(transforms.GetWorldRotation(corpse), Is.EqualTo(before.Item2));
         });
@@ -290,7 +293,7 @@ public sealed class BetrayalTest
             }
 
             var after = (transforms.GetWorldPosition(corpse), transforms.GetWorldRotation(corpse));
-            Assert.That(corpses.Moved, Is.GreaterThan(0), "a corpse out of every player's sight never moved.");
+            Assert.That(corpses.Moved - movedBefore, Is.GreaterThan(0), "a corpse out of every player's sight never moved.");
             Assert.That(after, Is.Not.EqualTo(before), "the corpse is where it was, though it was moved.");
         });
         await pair.CleanReturnAsync();

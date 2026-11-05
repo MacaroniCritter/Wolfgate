@@ -238,7 +238,13 @@ public sealed class GiftsTest
         {
             Assert.That(mobState.IsDead(corpse), Is.True, "the corpse didn't die, so reviving it proves nothing.");
             Assert.That(mobState.IsDead(headless), Is.True, "the headless body didn't die.");
-            Assert.That(TotalDamage(entMan, ally), Is.LessThan(before), "Flesh healed nobody in reach.");
+            Assert.That(mobState.IsDead(ally), Is.False, "the hurt ally died, so Flesh tried to raise them instead of healing.");
+            var monoliths = entMan.System<WFMonolithSystem>();
+            Assert.That(TotalDamage(entMan, ally), Is.LessThan(before),
+                $"Flesh healed nobody in reach: dial {monoliths.GetDial(scion, WFGift.Flesh)}, barred {monoliths.IsBarred(scion)}, "
+                + $"stage {scion.Comp.Stage}, resonance {scion.Comp.Resonance}, damage {before} -> {TotalDamage(entMan, ally)} "
+                + $"({string.Join(", ", entMan.GetComponent<DamageableComponent>(ally).Damage.DamageDict.Where(d => d.Value > 0).Select(d => $"{d.Key} {d.Value}"))}), "
+                + $"ally at {entMan.System<SharedTransformSystem>().GetWorldPosition(ally)}, scion at {entMan.System<SharedTransformSystem>().GetWorldPosition(scion)}.");
         });
 
         // About 27 s to raise a body at this resonance.
