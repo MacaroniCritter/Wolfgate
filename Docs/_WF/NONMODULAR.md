@@ -183,6 +183,7 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
   - microwaves leave emags in hand
   - an emag is used on a machine, so it stays in hand instead of going in with the food
 - [`Content.Server/Lightning/LightningSystem.cs`](../../Content.Server/Lightning/LightningSystem.cs): restore the licence header removed by Kill Spdx
+- [`Content.Server/Mind/MindSystem.cs`](../../Content.Server/Mind/MindSystem.cs): a session whose data is already gone (a client torn down mid-delete) failed the asserts with a KeyNotFoundException
 - [`Content.Server/Mining/MiningSystem.cs`](../../Content.Server/Mining/MiningSystem.cs): restore the licence header removed by Kill Spdx
 - [`Content.Server/Movement/Systems/LagCompensationSystem.cs`](../../Content.Server/Movement/Systems/LagCompensationSystem.cs): restore the licence header removed by Kill Spdx
 - [`Content.Server/Nutrition/EntitySystems/DrinkSystem.cs`](../../Content.Server/Nutrition/EntitySystems/DrinkSystem.cs): restore the licence header removed by Kill Spdx
