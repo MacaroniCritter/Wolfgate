@@ -33,12 +33,13 @@ namespace Content.IntegrationTests.Tests._WF.Feedback;
 [TestFixture]
 public sealed class WFFeedbackBatch1104bTest
 {
-    /// <summary>
-    /// Report 477: with no spawner of their own, a player falls back onto the station's other spawn points, but never
-    /// onto another job's (the godfather's) while one is left. Diplomat has no role loadout to validate without a session.
-    /// </summary>
+    /// <summary>A job with no role loadout, which can't be validated without a session.</summary>
     private const string Job = "Diplomat";
 
+    /// <summary>
+    /// Report 477: with no spawner of their own, a player falls back onto the station's other spawn points, but never
+    /// onto another job's (the godfather's) while one is left.
+    /// </summary>
     [Test]
     public async Task FallbackSkipsOtherJobsSpawners()
     {
