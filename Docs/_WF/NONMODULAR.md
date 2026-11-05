@@ -55,6 +55,7 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
 - [`Content.Client/Shuttles/UI/BaseShuttleControl.xaml.cs`](../../Content.Client/Shuttles/UI/BaseShuttleControl.xaml.cs)
   - v291 Box2 asserts on inverted corners in debug builds; order them
   - batch radar edges so huge grids don't overflow the game thread stack
+- [`Content.Client/Shuttles/UI/ShuttleMapControl.xaml.cs`](../../Content.Client/Shuttles/UI/ShuttleMapControl.xaml.cs): zoom out past the 5-25k FTL drive ranges
 - [`Content.Client/Stealth/StealthSystem.cs`](../../Content.Client/Stealth/StealthSystem.cs)
   - post-shader flags are set through SpriteSystem since engine 291
   - engine 291 ignores the sprite-wide GetScreenTexture/RaiseShaderEvent; they are per post-shader now
@@ -214,6 +215,10 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
   - closed UIs skip updates, so refresh on open
   - refresh the state on open; the update loop skips closed UIs
   - skip closed UIs; each update re-sent the whole UI component, a large radar state on admin ghosts
+- [`Content.Server/Spawners/EntitySystems/SpawnPointSystem.cs`](../../Content.Server/Spawners/EntitySystems/SpawnPointSystem.cs)
+  - fallback ordering
+  - prefer spawners that aren't another job's, e.g. not the godfather's office for a fugitive
+  - other jobs' spawners only when nothing else is left
 - [`Content.Server/VendingMachines/VendingMachineSystem.cs`](../../Content.Server/VendingMachines/VendingMachineSystem.cs)
   - restore the licence header removed by Kill Spdx
   - a free vend skips the cash payment, which logs a zero amount as invalid
@@ -327,7 +332,11 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
 - [`Content.Shared/Projectiles/ProjectileComponent.cs`](../../Content.Shared/Projectiles/ProjectileComponent.cs): restore the licence header removed by Kill Spdx
 - [`Content.Shared/Projectiles/SharedProjectileSystem.cs`](../../Content.Shared/Projectiles/SharedProjectileSystem.cs): the client replays a thrown embed's collision in prediction, and the projectile is already in
 - [`Content.Shared/Stacks/StackComponent.cs`](../../Content.Shared/Stacks/StackComponent.cs): restore the licence header removed by Kill Spdx
-- [`Content.Shared/Storage/EntitySystems/MaterialReclaimerMagnetPickupSystem.cs`](../../Content.Shared/Storage/EntitySystems/MaterialReclaimerMagnetPickupSystem.cs): restore the licence header removed by Kill Spdx
+- [`Content.Shared/Storage/EntitySystems/MaterialReclaimerMagnetPickupSystem.cs`](../../Content.Shared/Storage/EntitySystems/MaterialReclaimerMagnetPickupSystem.cs)
+  - restore the licence header removed by Kill Spdx
+  - server-only pickup
+  - a client-predicted pickup played a looping crush sound that nothing on the client stopped
+  - no user to predict for
 - [`Content.Shared/Storage/EntitySystems/MaterialStorageMagnetPickupSystem.cs`](../../Content.Shared/Storage/EntitySystems/MaterialStorageMagnetPickupSystem.cs): restore the licence header removed by Kill Spdx
 - [`Content.Shared/Strip/Components/ThievingComponent.cs`](../../Content.Shared/Strip/Components/ThievingComponent.cs): restore the licence header removed by Kill Spdx
 - [`Content.Shared/Strip/SharedStrippableSystem.cs`](../../Content.Shared/Strip/SharedStrippableSystem.cs): restore the licence header removed by Kill Spdx
@@ -364,6 +373,7 @@ Standalone edits outside `_WF` that serve no module: files with an untagged `WOL
   - the map has one UndergroundVend, not four
 - [`Resources/Locale/en-US/_Mono/prototypes/access/accesses.ftl`](../../Resources/Locale/en-US/_Mono/prototypes/access/accesses.ftl): Monolith#4816 shipped the Underground access levels without names
 - [`Resources/Locale/en-US/_Mono/store/pdv-uplink-catalog.ftl`](../../Resources/Locale/en-US/_Mono/store/pdv-uplink-catalog.ftl): the uplink had no 5.56 for the Vympel it sells
+- [`Resources/Locale/en-US/construction/conditions/wallmount.ftl`](../../Resources/Locale/en-US/construction/conditions/wallmount.ftl): say the ghost must face the builder, the usual reason a wallmount is refused
 - [`Resources/Maps/_Mono/Bluespace/prefracture.yml`](../../Resources/Maps/_Mono/Bluespace/prefracture.yml): Hardpoints mapped under the Unidentified Vessel's Scythe, Sunder and Flayer guns so gunnery links them.
 - [`Resources/Maps/_Mono/Crocus/jianghui_industrial_0.yml`](../../Resources/Maps/_Mono/Crocus/jianghui_industrial_0.yml): Removed every chasm.
 - [`Resources/Maps/_Mono/Crocus/jianghui_industrial_1.yml`](../../Resources/Maps/_Mono/Crocus/jianghui_industrial_1.yml): Removed every chasm.
