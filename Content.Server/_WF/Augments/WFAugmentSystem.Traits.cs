@@ -37,7 +37,8 @@ public sealed partial class WFAugmentSystem
                 if (WFAugmentRules.Sprite(style, layer, digitigrade, under, _proto) is not { } sprite)
                     continue;
 
-                var info = new CustomBaseLayerInfo(sprite);
+                // White, so a layer drawn before in skin tint doesn't keep it.
+                var info = new CustomBaseLayerInfo(sprite, Color.White);
                 humanoid.CustomBaseLayers[layer] = info;
                 humanoid.AugmentLayers[layer] = info;
             }

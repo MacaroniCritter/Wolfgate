@@ -190,6 +190,12 @@ public sealed class WFFeedbackBatch1104bTest
             Assert.That(cem.System<CustomMarkingSystem>().TryGetArt(hash, out var whole), Is.True);
             Assert.That(sprites.LayerMapTryGet((uid, sprite), CustomMarkingSystem.LayerKey(0), out var index, false), Is.True, "the marking isn't drawn");
             Assert.That(((SpriteComponent.Layer) sprite[index]).ActualRsi, Is.SameAs(whole), "part of the marking was cut off");
+            Assert.That(sprite[index].Visible, Is.True, "the marking is hidden");
+            foreach (var arm in new[] { HumanoidVisualLayers.LArm, HumanoidVisualLayers.RArm })
+            {
+                Assert.That(sprites.LayerMapTryGet((uid, sprite), arm, out var armIndex, false), Is.True);
+                Assert.That(index, Is.GreaterThan(armIndex), $"the marking draws under the prosthetic {arm}");
+            }
         });
 
         await pair.CleanReturnAsync();
