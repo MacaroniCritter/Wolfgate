@@ -31,7 +31,7 @@ namespace Content.Client.VendingMachines.UI
         public event Action<List<Color>?>? OnRecolorConfirmed;
 
         private readonly StyleBoxFlat _styleBox = new() { BackgroundColor = new Color(70, 73, 102) };
-        private List<Color>? _recolorDefaults;
+        private List<Color>? _recolorDefaults; // WOLFGATE(Gags): defaults for the open recolour item
 
         public VendingMachineMenu()
         {

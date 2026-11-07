@@ -1,3 +1,4 @@
+<!-- WOLFGATE(Gags) START: xmlns:gags for the vending colour editor -->
 <controls:FancyWindow
     xmlns="https://spacestation14.io"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -7,6 +8,7 @@
     xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
     SetSize="360 400"
     MinSize="360 320"> <!-- Frontier: added SetSize, MinSize, remove MinHeight="210" -->
+    <!-- WOLFGATE END -->
     <BoxContainer Orientation="Vertical">
         <PanelContainer VerticalExpand="True" HorizontalExpand="True" Margin="6 6 6 6">
             <PanelContainer.PanelOverride>

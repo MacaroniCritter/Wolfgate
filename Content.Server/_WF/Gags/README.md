@@ -58,10 +58,13 @@ MeridianClothing module is where the recolourable items come from.
 
 - [`Content.Client/Lobby/LobbyUIController.cs`](../../../Content.Client/Lobby/LobbyUIController.cs): picked colours on the preview
 - [`Content.Client/Lobby/UI/HumanoidProfileEditor.xaml.cs`](../../../Content.Client/Lobby/UI/HumanoidProfileEditor.xaml.cs): colours picked for a recolourable item
-- [`Content.Client/VendingMachines/UI/VendingMachineMenu.xaml`](../../../Content.Client/VendingMachines/UI/VendingMachineMenu.xaml): choose colours before buying recolourable clothing
+- [`Content.Client/VendingMachines/UI/VendingMachineMenu.xaml`](../../../Content.Client/VendingMachines/UI/VendingMachineMenu.xaml)
+  - xmlns:gags for the vending colour editor
+  - choose colours before buying recolourable clothing
 - [`Content.Client/VendingMachines/UI/VendingMachineMenu.xaml.cs`](../../../Content.Client/VendingMachines/UI/VendingMachineMenu.xaml.cs)
   - use the existing GAGS colour editor for vending purchases
   - send the selected colours when the user confirms a purchase
+  - defaults for the open recolour item
   - confirmation is separate from selecting a recolourable item
   - show the editor for one recolourable product
 - [`Content.Client/VendingMachines/VendingMachineBoundUserInterface.cs`](../../../Content.Client/VendingMachines/VendingMachineBoundUserInterface.cs)
