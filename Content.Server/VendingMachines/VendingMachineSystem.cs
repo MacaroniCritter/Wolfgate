@@ -73,6 +73,8 @@ using Content.Shared._NF.Bank.BUI; // Frontier
 using Content.Server._Mono.VendingMachine;
 using Content.Shared._Mono.Traits.Physical;
 using Content.Shared._Mono.Economy; // Mono - Seperation of cash payment from VendingMachineComp
+// WOLFGATE(Gags): receive returns sent to their vending machine
+using Content.Shared.Interaction;
 // WOLFGATE(Gags): validate and apply vending recolours
 using Content.Shared._WF.Gags;
 
@@ -100,6 +102,7 @@ namespace Content.Server.VendingMachines
         // WOLFGATE(Gags) START: hold colours only until the selected item is dispensed
         [Dependency] private SharedWFGagsSystem _gags = default!;
         private readonly Dictionary<EntityUid, List<Color>> _pendingColors = new();
+        private readonly Dictionary<EntityUid, (InventoryType Type, string ItemId)> _pendingReturnItems = new();
         // WOLFGATE END
 
         private const float WallVendEjectDistanceFromWall = 1f;
@@ -117,6 +120,8 @@ namespace Content.Server.VendingMachines
             //SubscribeLocalEvent<VendingMachineComponent, EntRemovedFromContainerMessage>(OnEntityRemoved); // Frontier //Mono: Moved this logic to CreditReceiverSystem
 
             SubscribeLocalEvent<VendingMachineComponent, ActivatableUIOpenAttemptEvent>(OnActivatableUIOpenAttempt);
+            // WOLFGATE(Gags): accept only products originally dispensed by this return-enabled vendor
+            SubscribeLocalEvent<VendingMachineComponent, AfterInteractUsingEvent>(OnAfterInteractUsing);
 
             Subs.BuiEvents<VendingMachineComponent>(VendingMachineUiKey.Key, subs =>
             {
@@ -164,6 +169,44 @@ namespace Content.Server.VendingMachines
             if (component.Broken)
                 args.Cancel();
         }
+
+        // WOLFGATE(Gags) START: restore stock for a purchased item returned to its original vendor
+        private void OnAfterInteractUsing(EntityUid uid, VendingMachineComponent component, AfterInteractUsingEvent args)
+        {
+            if (args.Handled || !component.CanReturnItems ||
+                !TryComp<WFGagsVendorReturnItemComponent>(args.Used, out var returnItem))
+                return;
+
+            args.Handled = true;
+
+            if (returnItem.Vendor != uid)
+            {
+                _popupSystem.PopupEntity(Loc.GetString("wf-gags-vending-return-wrong-vendor"), args.User);
+                return;
+            }
+
+            var inventory = returnItem.Type switch
+            {
+                InventoryType.Regular => component.Inventory,
+                InventoryType.Emagged => component.EmaggedInventory,
+                InventoryType.Contraband => component.ContrabandInventory,
+                _ => null,
+            };
+
+            if (inventory == null || !inventory.TryGetValue(returnItem.ItemId, out var entry))
+            {
+                _popupSystem.PopupEntity(Loc.GetString("wf-gags-vending-return-invalid"), args.User);
+                return;
+            }
+
+            if (entry.Amount != uint.MaxValue)
+                entry.Amount++;
+
+            Dirty(uid, component);
+            _popupSystem.PopupEntity(Loc.GetString("wf-gags-vending-return-success"), args.User);
+            Del(args.Used);
+        }
+        // WOLFGATE END
 
         private void OnInventoryEjectMessage(EntityUid uid, VendingMachineComponent component, VendingMachineEjectMessage args)
         {
@@ -422,6 +465,10 @@ namespace Content.Server.VendingMachines
 
                 if (TryEjectVendorItem(uid, type, itemId, component.CanShoot, component))
                 {
+                    // WOLFGATE(Gags): attach return provenance only after a purchase starts successfully
+                    if (component.CanReturnItems)
+                        _pendingReturnItems[uid] = (type, itemId);
+
                     if (component.CanRecolor &&
                         _gags.DefaultColors(new EntProtoId(itemId)) != null &&
                         WFGagsColors.Sanitize(colors) is { } safeColors)
@@ -585,6 +632,18 @@ namespace Content.Server.VendingMachines
             }
 
             var ent = Spawn(vendComponent.NextItemToEject, spawnCoordinates);
+
+            // WOLFGATE(Gags) START: remember the vendor and stock entry for returns
+            if (_pendingReturnItems.Remove(uid, out var returnDetails) &&
+                vendComponent.CanReturnItems &&
+                returnDetails.ItemId == vendComponent.NextItemToEject)
+            {
+                var returnItem = AddComp<WFGagsVendorReturnItemComponent>(ent);
+                returnItem.Vendor = uid;
+                returnItem.Type = returnDetails.Type;
+                returnItem.ItemId = returnDetails.ItemId;
+            }
+            // WOLFGATE END
 
             // WOLFGATE(Gags) START: apply colours only to the item whose purchase passed server validation
             if (_pendingColors.Remove(uid, out var colors))

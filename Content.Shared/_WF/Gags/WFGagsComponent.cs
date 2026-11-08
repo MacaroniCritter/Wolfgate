@@ -1,4 +1,5 @@
 using Robust.Shared.GameStates;
+using Content.Shared.VendingMachines;
 
 namespace Content.Shared._WF.Gags;
 
@@ -12,4 +13,13 @@ public sealed partial class WFGagsComponent : Component
     /// <summary>One colour per slot; the prototype's are the defaults.</summary>
     [DataField(required: true), AutoNetworkedField]
     public List<Color> Colors = new();
+}
+
+/// <summary>Provenance that lets a vending machine accept its dispensed item back into stock.</summary>
+[RegisterComponent]
+public sealed partial class WFGagsVendorReturnItemComponent : Component
+{
+    public EntityUid Vendor;
+    public InventoryType Type;
+    public string ItemId = string.Empty;
 }

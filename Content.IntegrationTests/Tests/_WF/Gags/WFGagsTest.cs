@@ -6,10 +6,12 @@ using Content.Client._WF.Gags;
 using Content.Shared._WF.Gags;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Inventory;
+using Content.Shared.Interaction;
 using Content.Shared.Item;
 using Content.Shared.Preferences.Loadouts;
 using Content.Shared.Roles;
 using Content.Shared.Station;
+using Content.Shared.VendingMachines;
 using Robust.Client.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
@@ -117,6 +119,68 @@ public sealed class WFGagsTest
             Assert.That(equalAfter, Is.False, $"Recolouring {itemId} in a loadout should count as a change.");
             Assert.That(worn, Is.Not.Null, $"{itemId} was not put on or is not recolourable.");
             Assert.That(worn![0], Is.EqualTo(Picked), "The picked colour, made opaque, should be the item's first.");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>Purchased clothing returns only to its original vendor and replenishes its stock.</summary>
+    [Test]
+    public async Task PurchasedClothingReturnsToItsVendorTest()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var entMan = server.EntMan;
+        var gags = entMan.System<SharedWFGagsSystem>();
+        var map = await pair.CreateTestMap();
+        const string itemId = "WFMeridianClothingSuitToggleJacketNovaFlannelGags";
+
+        await server.WaitAssertion(() =>
+        {
+            var coordinates = map.GridCoords;
+            var vendor = entMan.SpawnEntity("VendingMachineClothing", coordinates);
+            var otherVendor = entMan.SpawnEntity("VendingMachineTheater", coordinates);
+            var user = entMan.SpawnEntity("MobHuman", coordinates);
+            var item = entMan.SpawnEntity(itemId, coordinates);
+            var vendorComponent = entMan.GetComponent<VendingMachineComponent>(vendor);
+            var originalAmount = vendorComponent.Inventory[itemId].Amount;
+
+            Assert.That(vendorComponent.CanReturnItems, Is.True);
+            Assert.That(entMan.GetComponent<WFGagsComponent>(item).Colors.Count, Is.GreaterThan(0));
+
+            var defaults = gags.DefaultColors(new EntProtoId(itemId))!;
+            var changed = defaults.ToList();
+            changed[0] = changed[0] == Picked ? Color.FromHex("#E35D6A") : Picked;
+            gags.SetColors((item, entMan.GetComponent<WFGagsComponent>(item)), changed);
+
+            var returnInfo = entMan.AddComponent<WFGagsVendorReturnItemComponent>(item);
+            returnInfo.Vendor = vendor;
+            returnInfo.Type = InventoryType.Regular;
+            returnInfo.ItemId = itemId;
+
+            var wrongVendor = new AfterInteractUsingEvent(user, item, otherVendor, coordinates, true);
+            entMan.EventBus.RaiseLocalEvent(otherVendor, wrongVendor);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(wrongVendor.Handled, Is.True);
+                Assert.That(entMan.EntityExists(item), Is.True, "A different vendor must not take the item.");
+                Assert.That(vendorComponent.Inventory[itemId].Amount, Is.EqualTo(originalAmount));
+            });
+
+            var correctVendor = new AfterInteractUsingEvent(user, item, vendor, coordinates, true);
+            entMan.EventBus.RaiseLocalEvent(vendor, correctVendor);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(correctVendor.Handled, Is.True);
+                Assert.That(entMan.Deleted(item), Is.True);
+                Assert.That(vendorComponent.Inventory[itemId].Amount, Is.EqualTo(originalAmount + 1));
+            });
+
+            var repurchased = entMan.SpawnEntity(itemId, coordinates);
+            Assert.That(entMan.GetComponent<WFGagsComponent>(repurchased).Colors, Is.EqualTo(defaults),
+                "A later customer should receive a fresh item and choose new colours.");
         });
 
         await pair.CleanReturnAsync();

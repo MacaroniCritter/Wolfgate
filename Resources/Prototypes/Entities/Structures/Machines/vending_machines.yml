@@ -380,6 +380,8 @@
     # WOLFGATE(Gags) START: allow recolouring clothes before purchase
     canRecolor: true
     # WOLFGATE END
+    # WOLFGATE(Gags): allow purchased clothing to be returned
+    canReturnItems: true
     offState: off
     brokenState: broken
     normalState: normal-unshaded
@@ -1230,6 +1232,8 @@
     # WOLFGATE(Gags) START: allow recolouring costumes before purchase
     canRecolor: true
     # WOLFGATE END
+    # WOLFGATE(Gags): allow purchased costumes to be returned
+    canReturnItems: true
     offState: off
     brokenState: broken
     normalState: normal-unshaded

@@ -37,6 +37,10 @@ namespace Content.Shared.VendingMachines
         [DataField, AutoNetworkedField]
         public bool CanRecolor;
 
+        // WOLFGATE(Gags): enable returning purchased clothing to its vendor
+        [DataField, AutoNetworkedField]
+        public bool CanReturnItems;
+
         // Frontier: random ejection
         /// <summary>
         /// Used by the server to determine how many items the machine allowed to eject from random triggers. (Default 2)

@@ -11,6 +11,9 @@ shown on the character preview, and put on the item when the loadout spawns it.
 
 ClothesMate and AutoDrobe also let players select colours for a recolourable product before confirming its
 purchase. The server applies those colours only after the normal vending authorization and purchase checks.
+Purchased products can be returned to their original vendor to restore one stock count; the returned entity is
+removed, so the next customer receives a fresh item and can choose different colours. Returns restore stock but
+do not refund the original purchase.
 
 Entry points: `WFGagsComponent`, `SharedWFGagsSystem` (`SetColors`, `ApplyLoadout`), the client `WFGagsSystem`
 that tints, `WFGagsColorRow` (the loadout window's swatches) and `WFGagsColors` (saving and checking colours). The
@@ -78,21 +81,30 @@ MeridianClothing module is where the recolourable items come from.
 - [`Content.Server/Database/ServerDbBase.cs`](../../Database/ServerDbBase.cs)
 - [`Content.Server/Station/Systems/StationSpawningSystem.cs`](../../Station/Systems/StationSpawningSystem.cs): the colours picked in the loadout window
 - [`Content.Server/VendingMachines/VendingMachineSystem.cs`](../../VendingMachines/VendingMachineSystem.cs)
+  - receive returns sent to their vending machine
   - validate and apply vending recolours
   - hold colours only until the selected item is dispensed
+  - accept only products originally dispensed by this return-enabled vendor
+  - restore stock for a purchased item returned to its original vendor
   - pass colour options through the normal purchase checks
   - keep recolouring behind the regular price, stock and access checks
+  - attach return provenance only after a purchase starts successfully
+  - remember the vendor and stock entry for returns
   - apply colours only to the item whose purchase passed server validation
 - [`Content.Shared/Preferences/Loadouts/RoleLoadout.cs`](../../../Content.Shared/Preferences/Loadouts/RoleLoadout.cs)
   - picked colours sent by a client are capped and made opaque
   - a colour change is a change to save
 - [`Content.Shared/Station/SharedStationSpawningSystem.cs`](../../../Content.Shared/Station/SharedStationSpawningSystem.cs): the colours picked in the loadout window
-- [`Content.Shared/VendingMachines/VendingMachineComponent.cs`](../../../Content.Shared/VendingMachines/VendingMachineComponent.cs): enable recolouring items before purchase
+- [`Content.Shared/VendingMachines/VendingMachineComponent.cs`](../../../Content.Shared/VendingMachines/VendingMachineComponent.cs)
+  - enable recolouring items before purchase
+  - enable returning purchased clothing to its vendor
 - [`Content.Shared/VendingMachines/VendingMachineInterfaceState.cs`](../../../Content.Shared/VendingMachines/VendingMachineInterfaceState.cs)
   - carry chosen clothing colours with a purchase
   - recolour an eligible item before it is dispensed
 - [`Resources/Prototypes/Entities/Structures/Machines/vending_machines.yml`](../../../Resources/Prototypes/Entities/Structures/Machines/vending_machines.yml)
   - allow recolouring clothes before purchase
+  - allow purchased clothing to be returned
   - allow recolouring costumes before purchase
+  - allow purchased costumes to be returned
 
 <!-- WOLFGATE-GENERATED END -->
