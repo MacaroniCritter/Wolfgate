@@ -75,6 +75,8 @@ using Content.Shared._Mono.Traits.Physical;
 using Content.Shared._Mono.Economy; // Mono - Seperation of cash payment from VendingMachineComp
 // WOLFGATE(Gags): receive returns sent to their vending machine
 using Content.Shared.Interaction;
+// WOLFGATE(Gags): refuse returns with stored items
+using Content.Shared.Storage;
 // WOLFGATE(Gags): validate and apply vending recolours
 using Content.Shared._WF.Gags;
 
@@ -122,6 +124,8 @@ namespace Content.Server.VendingMachines
             SubscribeLocalEvent<VendingMachineComponent, ActivatableUIOpenAttemptEvent>(OnActivatableUIOpenAttempt);
             // WOLFGATE(Gags): accept only products originally dispensed by this return-enabled vendor
             SubscribeLocalEvent<VendingMachineComponent, AfterInteractUsingEvent>(OnAfterInteractUsing);
+            // WOLFGATE(Gags): drop pending vend state when the vendor goes away
+            SubscribeLocalEvent<VendingMachineComponent, ComponentShutdown>(OnVendorShutdown);
 
             Subs.BuiEvents<VendingMachineComponent>(VendingMachineUiKey.Key, subs =>
             {
@@ -199,12 +203,24 @@ namespace Content.Server.VendingMachines
                 return;
             }
 
+            if (TryComp<StorageComponent>(args.Used, out var storage) && storage.Container.ContainedEntities.Count > 0)
+            {
+                _popupSystem.PopupEntity(Loc.GetString("wf-gags-vending-return-not-empty"), args.User);
+                return;
+            }
+
             if (entry.Amount != uint.MaxValue)
                 entry.Amount++;
 
             Dirty(uid, component);
             _popupSystem.PopupEntity(Loc.GetString("wf-gags-vending-return-success"), args.User);
-            Del(args.Used);
+            QueueDel(args.Used);
+        }
+
+        private void OnVendorShutdown(EntityUid uid, VendingMachineComponent component, ComponentShutdown args)
+        {
+            _pendingColors.Remove(uid);
+            _pendingReturnItems.Remove(uid);
         }
         // WOLFGATE END
 

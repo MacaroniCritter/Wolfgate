@@ -82,9 +82,11 @@ MeridianClothing module is where the recolourable items come from.
 - [`Content.Server/Station/Systems/StationSpawningSystem.cs`](../../Station/Systems/StationSpawningSystem.cs): the colours picked in the loadout window
 - [`Content.Server/VendingMachines/VendingMachineSystem.cs`](../../VendingMachines/VendingMachineSystem.cs)
   - receive returns sent to their vending machine
+  - refuse returns with stored items
   - validate and apply vending recolours
   - hold colours only until the selected item is dispensed
   - accept only products originally dispensed by this return-enabled vendor
+  - drop pending vend state when the vendor goes away
   - restore stock for a purchased item returned to its original vendor
   - pass colour options through the normal purchase checks
   - keep recolouring behind the regular price, stock and access checks

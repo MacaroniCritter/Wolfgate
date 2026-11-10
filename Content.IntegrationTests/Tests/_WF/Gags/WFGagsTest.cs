@@ -11,7 +11,9 @@ using Content.Shared.Item;
 using Content.Shared.Preferences.Loadouts;
 using Content.Shared.Roles;
 using Content.Shared.Station;
+using Content.Shared.Storage;
 using Content.Shared.VendingMachines;
+using Robust.Shared.Containers;
 using Robust.Client.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
@@ -168,13 +170,30 @@ public sealed class WFGagsTest
                 Assert.That(vendorComponent.Inventory[itemId].Amount, Is.EqualTo(originalAmount));
             });
 
+            var containers = entMan.System<SharedContainerSystem>();
+            var pockets = entMan.GetComponent<StorageComponent>(item).Container;
+            var pen = entMan.SpawnEntity("Pen", coordinates);
+            Assert.That(containers.Insert(pen, pockets), Is.True);
+
+            var fullPockets = new AfterInteractUsingEvent(user, item, vendor, coordinates, true);
+            entMan.EventBus.RaiseLocalEvent(vendor, fullPockets);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(fullPockets.Handled, Is.True);
+                Assert.That(entMan.IsQueuedForDeletion(item), Is.False, "Items in the pockets must not be deleted.");
+                Assert.That(vendorComponent.Inventory[itemId].Amount, Is.EqualTo(originalAmount));
+            });
+
+            Assert.That(containers.Remove(pen, pockets), Is.True);
+
             var correctVendor = new AfterInteractUsingEvent(user, item, vendor, coordinates, true);
             entMan.EventBus.RaiseLocalEvent(vendor, correctVendor);
 
             Assert.Multiple(() =>
             {
                 Assert.That(correctVendor.Handled, Is.True);
-                Assert.That(entMan.Deleted(item), Is.True);
+                Assert.That(entMan.IsQueuedForDeletion(item), Is.True);
                 Assert.That(vendorComponent.Inventory[itemId].Amount, Is.EqualTo(originalAmount + 1));
             });
 

@@ -15,8 +15,8 @@ public sealed partial class WFGagsComponent : Component
     public List<Color> Colors = new();
 }
 
-/// <summary>Provenance that lets a vending machine accept its dispensed item back into stock.</summary>
-[RegisterComponent]
+/// <summary>Provenance that lets a vending machine accept its dispensed item back into stock. Not saved, so a reloaded item can't be returned.</summary>
+[RegisterComponent, UnsavedComponent]
 public sealed partial class WFGagsVendorReturnItemComponent : Component
 {
     public EntityUid Vendor;
