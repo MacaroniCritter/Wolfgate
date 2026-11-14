@@ -1,0 +1,40 @@
+# Vessel prototype made in mapping mode from "Snake Eater". Check every field before it goes in the game.
+# Grid: put Snake Eater.yml at Resources/SharedMaps/_WF/Community/vg_snake_eater.yml
+# Prototype: put this file, Snake Eater.vessel.yml, at Resources/Prototypes/_WF/Community/vg_snake_eater.yml
+# Guessed from the grid (651 tiles), not set by the mapper: price, engine. Check them.
+# Set by the mapper in the export wizard: name, description, category, class, group, access, requireCrew.
+
+- type: vessel
+  id: WFVGSnakeEater
+  parent: BaseVessel
+  name: 'VG Snake Eater'
+  description: 'A salvage vessel doubling as a broadsiding corvette. Comes with a salvage dock and clinic. Armed with two Dravon 57x460mm and 2 AK57s autocannons. Rear towing harpoon included.'
+  price: 110000 # appraised at 84231
+  category: Medium # 651 tiles
+  group: Viper
+  access: Viper
+  shuttlePath: /SharedMaps/_WF/Community/vg_snake_eater.yml
+  guidebookPage: null
+  class:
+  - Salvage
+  - Corvette
+  engine:
+  - AME
+
+- type: gameMap
+  id: WFVGSnakeEater
+  mapName: 'VG Snake Eater'
+  mapPath: /SharedMaps/_WF/Community/vg_snake_eater.yml
+  minPlayers: 0
+  stations:
+    WFVGSnakeEater:
+      stationProto: StandardFrontierVessel
+      components:
+      - type: StationNameSetup
+        mapNameTemplate: 'VG Snake Eater {1}'
+        nameGenerator:
+          !type:NanotrasenNameGenerator
+          prefixCreator: '14'
+      - type: StationJobs
+        availableJobs:
+          Contractor: [ 0, 0 ]
