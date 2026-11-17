@@ -15,14 +15,10 @@
   displayWeight: 55 # Second from the top
   canBeAntag: false
   access:
-  - Security
-  - Brig
+  - Caelestinus
   - Maintenance
-  - Service
   - External
   - Mercenary
-  - Captain
-  - Frontier
   guides:
   - Caelestinus
   special:
@@ -47,5 +43,5 @@
     - EncryptionKeyService
     - EncryptionKeySecurity
   # - ShipVoucherFrontierGuard # Mono
-    - WFShipVoucherJudge # WOLFGATE(Judges): free Lightning or Hornet at spawn
-    - WFBookCommonWrit # WOLFGATE(Bench): judges carry the Common Writ
+    - WGShipVoucherJudge # WOLFGATE(Judges): free Lightning or Hornet at spawn
+    - WGBookCommonWrit # WOLFGATE(Bench): judges carry the Common Writ

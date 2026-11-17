@@ -66,7 +66,7 @@ public abstract partial class SharedStunSystem : EntitySystem
         SubscribeLocalEvent<StunOnContactComponent, StartCollideEvent>(OnStunOnContactCollide);
 
         // helping people up if they're knocked down
-        // WOLFGATE(Standing) START: WFHelpUpSystem handles helping up, including through a hug
+        // WOLFGATE(Standing) START: WGHelpUpSystem handles helping up, including through a hug
         // SubscribeLocalEvent<KnockedDownComponent, InteractHandEvent>(OnInteractHand);
         // WOLFGATE END
         SubscribeLocalEvent<SlowedDownComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshMovespeed);
@@ -237,6 +237,13 @@ public abstract partial class SharedStunSystem : EntitySystem
 
         if (!Resolve(uid, ref status, false))
             return false;
+
+        // WOLFGATE(Modsuits) START: rolling MOD spheres shrug off knockdowns
+        var knockdownAttempt = new Content.Shared._WG.Modsuits.Modules.KnockDownAttemptEvent();
+        RaiseLocalEvent(uid, ref knockdownAttempt);
+        if (knockdownAttempt.Cancelled)
+            return false;
+        // WOLFGATE END
 
         if (!_statusEffect.TryAddStatusEffect<KnockedDownComponent>(uid, "KnockedDown", time, refresh))
             return false;

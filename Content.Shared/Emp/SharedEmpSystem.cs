@@ -1,7 +1,9 @@
 using Content.Shared.Examine;
 using Content.Shared.Rejuvenate;
+using Content.Shared._WG.Modsuits.Modules; // WOLFGATE(Modsuits)
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Containers; // WOLFGATE(Modsuits)
 using Robust.Shared.Map;
 using Robust.Shared.Timing;
 using Robust.Shared.Network;
@@ -16,7 +18,8 @@ public abstract partial class SharedEmpSystem : EntitySystem
     [Dependency] private INetManager _net = default!;
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
-    [Dependency] private Content.Shared._WF.ArmorSpecialization.WFCivilianSpecializationSystem _wfSpecs = default!; // WOLFGATE(ArmorSpecialization)
+    [Dependency] private SharedContainerSystem _container = default!; // WOLFGATE(Modsuits)
+    [Dependency] private Content.Shared._WG.ArmorSpecialization.WGCivilianSpecializationSystem _wgSpecs = default!; // WOLFGATE(ArmorSpecialization)
 
     private HashSet<EntityUid> _entSet = new();
 
@@ -89,7 +92,12 @@ public abstract partial class SharedEmpSystem : EntitySystem
     public bool TryEmpEffects(EntityUid uid, float energyConsumption, TimeSpan duration, EntityUid? user = null)
     {
         // WOLFGATE(ArmorSpecialization) START: an EMP-hardened suit shields its wearer and what they carry.
-        if (_wfSpecs.ShieldsFromEmp(uid))
+        if (_wgSpecs.ShieldsFromEmp(uid))
+            return false;
+        // WOLFGATE END
+
+        // WOLFGATE(Modsuits) START: the EMP ward module shields whatever container it sits in.
+        if (IsEmpWardedByContainer(uid))
             return false;
         // WOLFGATE END
 
@@ -147,6 +155,23 @@ public abstract partial class SharedEmpSystem : EntitySystem
     {
         args.PushMarkup(Loc.GetString("emp-disabled-comp-on-examine"));
     }
+
+    // WOLFGATE(Modsuits) START: walks the container chain looking for an EMP ward.
+    private bool IsEmpWardedByContainer(EntityUid uid)
+    {
+        var current = uid;
+        while (_container.TryGetContainingContainer((current, null, null), out var container))
+        {
+            current = container.Owner;
+            var ev = new ContainedEmpAttemptEvent(uid);
+            RaiseLocalEvent(current, ref ev);
+            if (ev.Cancelled)
+                return true;
+        }
+
+        return false;
+    }
+    // WOLFGATE END
 
     private void OnRemove(Entity<EmpDisabledComponent> ent, ref ComponentRemove args)
     {

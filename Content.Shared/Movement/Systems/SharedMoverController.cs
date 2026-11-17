@@ -26,7 +26,7 @@ using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using PullableComponent = Content.Shared.Movement.Pulling.Components.PullableComponent;
 using Content.Shared.StepTrigger.Components; // Delta V-NoShoesSilentFootstepsComponent
-using Content.Shared._WF.Performance; // WOLFGATE(Performance)
+using Content.Shared._WG.Performance; // WOLFGATE(Performance)
 
 namespace Content.Shared.Movement.Systems;
 
@@ -188,6 +188,8 @@ public abstract partial class SharedMoverController : VirtualController
         if (!XformQuery.TryComp(entity.Owner, out var xform))
             return;
 
+        WgTrackGrid(uid, xform); // WOLFGATE(GridMomentum): before the returns below, so a mob pulled off a ship keeps its speed
+
         RelayTargetQuery.TryComp(uid, out var relayTarget);
         var relaySource = relayTarget?.Source;
 
@@ -257,7 +259,7 @@ public abstract partial class SharedMoverController : VirtualController
 
             // If we're not on a grid, and not able to move in space check if we're close enough to a grid to touch.
             if (!touching && MobMoverQuery.TryComp(uid, out var mobMover))
-                touching |= WfIsAroundCollider(_lookup, (uid, physicsComponent, mobMover, xform)); // WOLFGATE(Performance): reuse a still mob's result for a few ticks
+                touching |= WgIsAroundCollider(_lookup, (uid, physicsComponent, mobMover, xform)); // WOLFGATE(Performance): reuse a still mob's result for a few ticks
 
             // If we're touching then use the weightless values
             if (touching)
@@ -309,10 +311,18 @@ public abstract partial class SharedMoverController : VirtualController
             friction = Math.Min(friction, accel);
         friction = Math.Max(friction, _minDamping);
         var minimumFrictionSpeed = moveSpeedComponent?.MinimumFrictionSpeed ?? MovementSpeedModifierComponent.DefaultMinimumFrictionSpeed;
+        // WOLFGATE(GridMomentum) START: off a grid, slow down and push off relative to the grid the mob left, not the map
+        var wgFrame = WgGridFrame(uid, xform);
+        if (!weightless && !inAirHelpless)
+            wgFrame = Vector2.Zero;
+        velocity -= wgFrame;
+        // WOLFGATE END
         Friction(minimumFrictionSpeed, frameTime, friction, ref velocity);
 
         if (!weightless || touching)
             Accelerate(ref velocity, in wishDir, accel, frameTime);
+
+        velocity += wgFrame; // WOLFGATE(GridMomentum)
 
         SetWishDir((uid, mover), wishDir);
 
@@ -631,7 +641,7 @@ public abstract partial class SharedMoverController : VirtualController
         // End Delta V NoShoesSilentFootsteps
 
         // WOLFGATE(GroundCover) START: snow cover crunches underfoot over the floor's own sound
-        var snowStep = new Content.Shared._WF.GroundCover.WFSnowFootstepEvent(uid, xform.GridUid.Value, position);
+        var snowStep = new Content.Shared._WG.GroundCover.WGSnowFootstepEvent(uid, xform.GridUid.Value, position);
         RaiseLocalEvent(ref snowStep);
         if (snowStep.Sound != null)
         {

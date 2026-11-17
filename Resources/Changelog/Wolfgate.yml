@@ -7601,3 +7601,281 @@ Entries:
   id: 100478
   time: '2026-11-15T11:47:28.0000000+00:00'
   url: https://github.com/VanguardControl/Wolfgate/pull/672
+- author: Happyowl93
+  changes:
+    - type: Add
+      message: >-
+        Adamantine slime extracts injected with blood now grow a slime heart, a
+        living ship fitting that slowly repairs its hull while fed adamantine
+        extracts.
+  id: 100479
+  time: '2026-11-15T13:54:20.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/677
+- author: Gandalf2k15
+  changes:
+    - type: Fix
+      message: The ASF headset talks on the ASF channel by default. [950]
+    - type: Fix
+      message: Coil slugs no longer show an error sprite. [955]
+    - type: Fix
+      message: The IRE shielding crate no longer has the antimatter reactor name. [988]
+    - type: Fix
+      message: >-
+        The janitor voucher offers the Bucket and the mail voucher the Hermes.
+        [978]
+    - type: Fix
+      message: >-
+        Asking the ship seller for a second ship list no longer eats your ID
+        card. [976]
+    - type: Fix
+      message: Borgs see their crew's contracts in their PDA. [987]
+    - type: Fix
+      message: Using an encounter ship's deed registers the ship to you. [994]
+    - type: Add
+      message: Overseers can pick a chest rig or belt in their loadout. [960]
+  id: 100480
+  time: '2026-11-15T13:54:31.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/676
+- author: Happyowl93
+  changes:
+    - type: Fix
+      message: TSF and PDV cyborgs can buy ships from their faction's shipyard again.
+  id: 100481
+  time: '2026-11-15T18:52:05.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/680
+- author: Happyowl93
+  changes:
+    - type: Fix
+      message: >-
+        Ship-gun rounds no longer occasionally pass through the hull of a ship
+        flying toward them.
+  id: 100482
+  time: '2026-11-15T19:11:14.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/679
+- author: Happyowl93
+  changes:
+    - type: Tweak
+      message: >-
+        Mobile drydock cranes can be printed again after Shuttlecraft research,
+        so ships that come with a mobile drydock can add cranes. The console is
+        still only available on ships sold with one.
+  id: 100483
+  time: '2026-11-15T19:12:41.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/683
+- author: Gandalf2k15
+  changes:
+    - type: Tweak
+      message: >-
+        The cockpit hides its shield controls on ships without a shield
+        generator, and chat uses the freed space.
+    - type: Tweak
+      message: Space drag now only affects you once you're 4m away from a grid.
+    - type: Tweak
+      message: Radar blips now stack elegantly like encounter blips.
+  id: 100484
+  time: '2026-11-15T19:37:46.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/678
+- author: Erol509
+  changes:
+    - type: Add
+      message: Added a modular modsuit system.
+    - type: Add
+      message: Added modsuit parts, cores, themes, and modules.
+    - type: Add
+      message: Added numerous new modsuit modules and their functionality.
+    - type: Add
+      message: Added modsuit management UI.
+  id: 100485
+  time: '2026-11-15T22:23:42.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/521
+- author: Gandalf2k15
+  changes:
+    - type: Fix
+      message: >-
+        Floating near a moving ship no longer drags you along or flings you off;
+        you keep the speed you left it with.
+    - type: Fix
+      message: >-
+        Encounter names on the mass scanner no longer jump between ships, and
+        stacked tags stay steady.
+    - type: Fix
+      message: >-
+        TSFMC Fireteam Leaders can use the FOB's bank console to pay marines
+        again.
+    - type: Fix
+      message: >-
+        Autocannon shells bursting on a hull wall no longer hurt the room behind
+        it.
+  id: 100486
+  time: '2026-11-16T09:00:56.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/685
+- author: Gandalf2k15
+  changes:
+    - type: Add
+      message: >-
+        Caelestinus has its own R&D server, with a spare in the Overseer's
+        locker.
+    - type: Tweak
+      message: >-
+        The Firestarter and Jackdaw are reworked. The Jackdaw locks its magazine
+        and can't be stowed mid-burst, and drops if you let go during one.
+    - type: Tweak
+      message: Caelestinus suits are renamed and buffed, and come with HUDs.
+    - type: Tweak
+      message: Caelestinus loadouts are updated.
+  id: 100487
+  time: '2026-11-16T09:55:26.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/675
+- author: ImogenOC
+  changes:
+    - type: Add
+      message: >-
+        Staff have Shipmaster, a panel to change a ship's owner and access,
+        repair it, move it and upgrade it.
+    - type: Tweak
+      message: >-
+        A ship's owner by registration can lock and unlock its helm without
+        holding a deed card.
+  id: 100488
+  time: '2026-11-16T09:55:53.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/670
+- author: Happyowl93
+  changes:
+    - type: Fix
+      message: >-
+        Classic ships that were locked behind Mercenary access (Tanuki,
+        Valkyrie, Archer, Balor, Claymore, Praetorian, Fortunate, Siebel,
+        Twilight MkII, Scallywag, Serkesh, Skelraak, Vrikaash, Bow-Man, Rac-Man)
+        can be bought by anyone again.
+  id: 100489
+  time: '2026-11-16T10:33:18.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/691
+- author: Erol509
+  changes:
+    - type: Add
+      message: >-
+        Added BSO clothing sprites, and loadout options for the drip. Resprited
+        departamental head cloaks/mantles
+  id: 100490
+  time: '2026-11-16T12:34:16.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/658
+- author: Happyowl93
+  changes:
+    - type: Fix
+      message: >-
+        Fixed the air alarm UI crashing when linked to vox atmos devices or
+        storage sensors.
+  id: 100491
+  time: '2026-11-16T12:34:42.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/693
+- author: Happyowl93
+  changes:
+    - type: Add
+      message: >-
+        NPC crew now cover the approaches when you break line of sight, and fire
+        sooner when you reappear.
+    - type: Add
+      message: >-
+        Reaver riflemen carry grenades and throw them round corners, shouting a
+        warning first.
+    - type: Add
+      message: >-
+        Veteran and better crew sidestep while shooting, fall back to patch up
+        when badly hurt, and hunt in pairs.
+    - type: Tweak
+      message: >-
+        Reaver crewmen vary in skill: deckhands are weaker and officers sharper
+        than the rest of their crew.
+    - type: Fix
+      message: >-
+        NPC riflemen no longer drop and re-grab their spare magazine forever
+        instead of reloading.
+  id: 100492
+  time: '2026-11-16T13:20:25.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/686
+- author: Gandalf2k15
+  changes:
+    - type: Remove
+      message: Caelestinus Expansion I is rolled back for now.
+  id: 100493
+  time: '2026-11-16T13:30:03.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/695
+- author: Happyowl93
+  changes:
+    - type: Fix
+      message: >-
+        The SRD and drydocks now rebuild a destroyed mobile drydock crane bolted
+        down and bonded to its ship.
+  id: 100494
+  time: '2026-11-16T14:22:59.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/697
+- author: Happyowl93
+  changes:
+    - type: Tweak
+      message: >-
+        Ships from a faction voucher can no longer be broken at a drydock or
+        chop shop by their own faction.
+  id: 100495
+  time: '2026-11-16T14:24:11.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/687
+- author: Gandalf2k15
+  changes:
+    - type: Tweak
+      message: >-
+        The ghost warp menu can be sorted by faction or by place, with players
+        and ships listed under the faction they fly for or the world they're on.
+    - type: Tweak
+      message: >-
+        The nuke and its disk only show in the ghost warp menu while something
+        is happening with them.
+    - type: Remove
+      message: Encounter ships are no longer listed in the ghost warp menu.
+  id: 100496
+  time: '2026-11-16T20:38:14.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/707
+- author: Gandalf2k15
+  changes:
+    - type: Tweak
+      message: >-
+        Shields, drives and other fittings taken off NPC ships can now be bolted
+        down on your own ship.
+  id: 100497
+  time: '2026-11-16T20:40:00.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/703
+- author: Gandalf2k15
+  changes:
+    - type: Add
+      message: >-
+        Radar option to show only contact icons, with names hidden until you
+        hover over a contact.
+    - type: Add
+      message: Radar option to turn off revealing names by hovering.
+  id: 100498
+  time: '2026-11-16T20:40:13.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/708
+- author: Balls2zawall
+  changes:
+    - type: Add
+      message: >-
+        Added the Despot, Ketch, Huolian, Jackal, Molly, Pibb, and Renegade to
+        the reavers ship roster.
+  id: 100499
+  time: '2026-11-16T20:42:03.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/709
+- author: Gandalf2k15
+  changes:
+    - type: Fix
+      message: >-
+        Ship gun rounds and shells no longer pass through standing walls and
+        windows to hit people or explode inside.
+    - type: Fix
+      message: Flak shrapnel no longer cuts people behind a hull.
+    - type: Fix
+      message: A deflector shield no longer lets shells land inside the ship.
+    - type: Fix
+      message: >-
+        NPC ship guns no longer shoot people through the walls of a ship they
+        treat as friendly.
+  id: 100500
+  time: '2026-11-17T07:42:55.0000000+00:00'
+  url: https://github.com/VanguardControl/Wolfgate/pull/710

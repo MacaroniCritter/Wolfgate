@@ -9,23 +9,33 @@
   - !type:RoleTimeRequirement
     role: JobFugitive
     time: 18000 # 5 hours
+  - !type:TraitsRequirement # already a heretic by default
+    inverted: true
+    traits:
+    - Heretic
   alternateRequirementSets:
     longerPlaytimeLessFugitive:
     - !type:OverallPlaytimeRequirement
       time: 216000 # 60 hours
+    - !type:TraitsRequirement # already a heretic by default
+      inverted: true
+      traits:
+      - Heretic
   whitelisted: true # I am NOT trusting regular players to not just use this role to frag out.
   startingGear: GodfatherGear
   icon: JobIconGodfather
   alwaysUseSpawner: true
   supervisors: job-supervisors-nobody
-  # WOLFGATE(ReaverCampaign): Underground crew fly the neutral WFUnderground company, so the Reavers leave them alone
-  assignedCompany: WFUnderground
+  # WOLFGATE(ReaverCampaign): Underground crew fly the neutral WGUnderground company, so the Reavers leave them alone
+  assignedCompany: WGUnderground
   displayWeight: 150
   accessGroups:
   - GeneralAccess
   access: 
   - Underground
   - Godfather
+  guides:
+  - Underground
   special:
   - !type:GiveItemOnHolidaySpecial
     holiday: FrontierBirthday
@@ -36,7 +46,7 @@
     - type: NpcFactionMember
       factions:
       - NanoTrasen
-      - WFUnderground
+      - WGUnderground
     # WOLFGATE END
     - type: Contraband
       hideValues: true
@@ -44,6 +54,14 @@
         FederationMilitaryCredit: 400 # bounty on your head
     - type: RadioOnCryosleep
       radioChannel: Syndicate # Syndicate = Underground
+    - type: AddComponentsAfterTime # heresy
+      addComponentsOnSelection:
+      - type: Contraband
+        hideValues: true
+        turnInValues:
+          FederationMilitaryCredit: 400
+          Doubloon: 250
+      - type: Heretic
   - !type:AddImplantSpecial
     implants: [ DeathRattleImplant, RadioImplant ]
   - !type:AddLanguageSpecial

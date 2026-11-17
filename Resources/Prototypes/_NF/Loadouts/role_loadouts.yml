@@ -222,6 +222,7 @@
 #  - ContractorFace
 #  - ContractorGlasses
 #  - ContractorBelt
+  - WGOverseerBelt # WOLFGATE(Judges): optional chest rig, none by default
   - MonoSecurityGuardHud
   - StationRepEars
   - MonoSecurityGuardShoes

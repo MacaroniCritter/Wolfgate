@@ -23,7 +23,7 @@
       - type: DeleteNearbyDrones
         distance: 4000
       # WOLFGATE(TradeGoods): names the station for its role in the sector economy
-      - type: WFTradeStation
+      - type: WGTradeStation
         id: Frontier
       components:
         - type: StationNameSetup
@@ -57,8 +57,7 @@
             DirectorOfCare: [ 1, 1 ]
             MdMedic: [ -1, -1 ]
           tags:
-          - HeadOfPersonnel
-          - HeadOfSecurity
+          - CaelestinusCommand
         - type: Announcer
         - type: StationCargoBountyDatabase
           maxBounties: 20
