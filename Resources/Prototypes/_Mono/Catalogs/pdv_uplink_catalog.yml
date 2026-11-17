@@ -675,7 +675,7 @@
 
 # WOLFGATE: the uplink sells the Vympel but had no 5.56 for it; priced like the 6.35 magazine and big 7.62 box
 - type: listing
-  id: WFUplinkPirate556Mag
+  id: WGUplinkPirate556Mag
   name: uplink-pirate-5-56x45mm-magazine-name
   description: uplink-pirate-5-56x45mm-magazine-desc
   productEntity: Magazine556x45mmFMJ
@@ -691,7 +691,7 @@
 
 # WOLFGATE: the uplink sells the Vympel but had no 5.56 for it; priced like the 6.35 magazine and big 7.62 box
 - type: listing
-  id: WFUplinkPirate556AmmoBoxBig
+  id: WGUplinkPirate556AmmoBoxBig
   name: uplink-pirate-5-56x45mm-box-big-name
   description: uplink-pirate-5-56x45mm-box-big-desc
   productEntity: AmmoBox556x45mmBigFMJ

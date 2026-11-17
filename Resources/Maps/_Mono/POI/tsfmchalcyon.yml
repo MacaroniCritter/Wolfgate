@@ -70999,7 +70999,7 @@ entities:
     - type: Transform
       parent: 1
       pos: -11.5,-31.5
-- proto: WFContractBoardTSF
+- proto: WGContractBoardTSF
   entities:
   - uid: 3085
     components:
@@ -71030,7 +71030,7 @@ entities:
       parent: 1
       rot: -1.5707963267948966 rad
       pos: 12.5,3.5
-- proto: WFContractCargoPad
+- proto: WGContractCargoPad
   entities:
   - uid: 877
     components:
@@ -71058,7 +71058,7 @@ entities:
     - type: Transform
       parent: 1
       pos: 53.5,0.5
-- proto: WFVendingMachineTraderHalcyon
+- proto: WGVendingMachineTraderHalcyon
   entities:
   - uid: 5675
     components:
