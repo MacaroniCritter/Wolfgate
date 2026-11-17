@@ -335,9 +335,9 @@
   id: WFClothingUnderSocksMime
   components:
   - type: Sprite
-    sprite: _WF/ClownCosmetics/Clothing/Under/mime_socks.rsi
+    sprite: Mobs/Customization/undergarment_socks.rsi
   - type: Clothing
-    sprite: _WF/ClownCosmetics/Clothing/Under/mime_socks.rsi
+    sprite: Mobs/Customization/undergarment_socks.rsi
 
 - type: entity
   parent: ClothingMaskMime

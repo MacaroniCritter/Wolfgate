@@ -16,3 +16,5 @@ marking-UndergarmentTopSportsbra = Sports Bra
 marking-UndergarmentTopSportsbraVox = Sports Bra
 marking-UndergarmentTopTanktop = Tanktop
 marking-UndergarmentTopTanktopVox = Tanktop
+# WOLFGATE(Genitals): Localize the Wolfgate socks marking.
+marking-WFClothingUnderSocksMime = Mime Socks

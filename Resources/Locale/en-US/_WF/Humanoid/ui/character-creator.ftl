@@ -42,6 +42,7 @@ wf-bodypart-FacialHair = Facial Hair
 # Body parts added by the HardLight port.
 wf-bodypart-UndergarmentTop = Underwear (Top)
 wf-bodypart-UndergarmentBottom = Underwear (Bottom)
+wf-bodypart-UndergarmentSocks = Underwear (Socks)
 wf-bodypart-TailBehind = Tail (Behind)
 wf-bodypart-TailOversuit = Tail (Over Suit)
 

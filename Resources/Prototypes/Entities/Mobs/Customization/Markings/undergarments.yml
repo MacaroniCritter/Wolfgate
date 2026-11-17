@@ -221,3 +221,17 @@
   sprites:
   - sprite: Mobs/Customization/undergarments.rsi
     state: satin_reptilian
+
+# WOLFGATE(Genitals): Add the socks marking alongside the other undergarments.
+- type: marking
+  id: WFClothingUnderSocksMime
+  bodyPart: UndergarmentSocks
+  markingCategory: UndergarmentSocks
+  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Monkey, Kobold, Cyborg, Goblin, Protogen, Asakim]
+  coloring:
+    default:
+      type: null
+      fallbackColor: '#FFFFFF'
+  sprites:
+  - sprite: Mobs/Customization/undergarment_socks.rsi
+    state: equipped-FEET

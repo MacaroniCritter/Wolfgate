@@ -92,6 +92,10 @@ Entry points: `WolfgateSpeciesPicker` (species cards with previews and guidebook
 - [`Content.Server/Database/ServerDbBase.cs`](../../../Content.Server/Database/ServerDbBase.cs)
 - [`Content.Shared/Humanoid/HumanoidAppearanceComponent.cs`](../../../Content.Shared/Humanoid/HumanoidAppearanceComponent.cs): player-supplied name shown instead of the species name
 - [`Content.Shared/Humanoid/HumanoidCharacterAppearance.cs`](../../../Content.Shared/Humanoid/HumanoidCharacterAppearance.cs): species-aware hair validation
+- [`Content.Shared/Humanoid/HumanoidVisualLayers.cs`](../../../Content.Shared/Humanoid/HumanoidVisualLayers.cs): add a character-creator layer for socks
+- [`Content.Shared/Humanoid/Markings/MarkingCategories.cs`](../../../Content.Shared/Humanoid/Markings/MarkingCategories.cs)
+  - give socks their own marking category
+  - map the socks layer to its category
 - [`Content.Shared/Humanoid/SharedHumanoidAppearanceSystem.cs`](../../../Content.Shared/Humanoid/SharedHumanoidAppearanceSystem.cs)
   - applies the profile's custom species name
   - as below, but a non-empty custom name replaces the species name outright
@@ -101,5 +105,33 @@ Entry points: `WolfgateSpeciesPicker` (species cards with previews and guidebook
   - custom species display name setter
   - flavor text strips stray tags instead of throwing
   - the custom species name is sanitized like the character name
+- [`Resources/Prototypes/_DV/Species/avali.yml`](../../../Resources/Prototypes/_DV/Species/avali.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_DV/Species/chitinid.yml`](../../../Resources/Prototypes/_DV/Species/chitinid.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_DV/Species/feroxi.yml`](../../../Resources/Prototypes/_DV/Species/feroxi.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_DV/Species/rodentia.yml`](../../../Resources/Prototypes/_DV/Species/rodentia.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_DV/Species/shadekin.yml`](../../../Resources/Prototypes/_DV/Species/shadekin.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_DV/Species/skrell.yml`](../../../Resources/Prototypes/_DV/Species/skrell.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_EinsteinEngines/Species/ipc.yml`](../../../Resources/Prototypes/_EinsteinEngines/Species/ipc.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_Goobstation/Species/tajaran.yml`](../../../Resources/Prototypes/_Goobstation/Species/tajaran.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_Goobstation/Species/yowie.yml`](../../../Resources/Prototypes/_Goobstation/Species/yowie.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_Impstation/Species/thaven.yml`](../../../Resources/Prototypes/_Impstation/Species/thaven.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_Mono/Species/asakim.yml`](../../../Resources/Prototypes/_Mono/Species/asakim.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_Mono/Species/protogen.yml`](../../../Resources/Prototypes/_Mono/Species/protogen.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_NF/Species/goblin_species.yml`](../../../Resources/Prototypes/_NF/Species/goblin_species.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_Obelisk/Species/hydrakin.yml`](../../../Resources/Prototypes/_Obelisk/Species/hydrakin.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_Shitmed/Species/cyborg.yml`](../../../Resources/Prototypes/_Shitmed/Species/cyborg.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_Shitmed/Species/kobold.yml`](../../../Resources/Prototypes/_Shitmed/Species/kobold.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_Shitmed/Species/monkey.yml`](../../../Resources/Prototypes/_Shitmed/Species/monkey.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/Entities/Mobs/Species/arachnid.yml`](../../../Resources/Prototypes/Entities/Mobs/Species/arachnid.yml): draw socks over feet and under uniforms
+- [`Resources/Prototypes/Entities/Mobs/Species/base.yml`](../../../Resources/Prototypes/Entities/Mobs/Species/base.yml): draw socks over feet and under uniforms
+- [`Resources/Prototypes/Entities/Mobs/Species/moth.yml`](../../../Resources/Prototypes/Entities/Mobs/Species/moth.yml): draw socks over feet and under uniforms
+- [`Resources/Prototypes/Entities/Mobs/Species/vox.yml`](../../../Resources/Prototypes/Entities/Mobs/Species/vox.yml): draw socks over feet and under uniforms
+- [`Resources/Prototypes/Species/arachnid.yml`](../../../Resources/Prototypes/Species/arachnid.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/Species/diona.yml`](../../../Resources/Prototypes/Species/diona.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/Species/gingerbread.yml`](../../../Resources/Prototypes/Species/gingerbread.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/Species/human.yml`](../../../Resources/Prototypes/Species/human.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/Species/moth.yml`](../../../Resources/Prototypes/Species/moth.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/Species/skeleton.yml`](../../../Resources/Prototypes/Species/skeleton.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/Species/slime.yml`](../../../Resources/Prototypes/Species/slime.yml): allow socks markings for this species sprite set
 
 <!-- WOLFGATE-GENERATED END -->
