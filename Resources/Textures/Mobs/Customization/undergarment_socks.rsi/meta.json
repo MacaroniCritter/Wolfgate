@@ -8,10 +8,35 @@
     },
     "states": [
         {
-            "name": "icon"
+            "name": "Striped_Stockings",
+            "directions": 4
         },
         {
-            "name": "equipped-FEET",
+            "name": "Fishnet_Stockings",
+            "directions": 4
+        },
+        {
+            "name": "Stockings",
+            "directions": 4
+        },
+        {
+            "name": "Thigh_Highs",
+            "directions": 4
+        },
+        {
+            "name": "Knee_Highs",
+            "directions": 4
+        },
+        {
+            "name": "Socks",
+            "directions": 4
+        },
+        {
+            "name": "Short_Socks",
+            "directions": 4
+        },
+        {
+            "name": "Pantyhose",
             "directions": 4
         }
     ]

@@ -331,15 +331,6 @@
     sprite: _WG/ClownCosmetics/Clothing/Mask/mime_sus.rsi
 
 - type: entity
-  parent: ClothingShoesBase
-  id: WGClothingUnderSocksMime
-  components:
-  - type: Sprite
-    sprite: Mobs/Customization/undergarment_socks.rsi
-  - type: Clothing
-    sprite: Mobs/Customization/undergarment_socks.rsi
-
-- type: entity
   parent: ClothingMaskMime
   id: WGClothingMaskMimeSecurity
   components:

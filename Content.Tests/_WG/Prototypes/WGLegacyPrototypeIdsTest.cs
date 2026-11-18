@@ -4,6 +4,7 @@ using Content.Server._Common.Consent;
 using Content.Server._WG.Genitals;
 using Content.Server.Database;
 using Content.Shared._WG.Prototypes;
+using Content.Shared.Humanoid.Markings;
 using Content.Shared.Preferences;
 using Content.Shared.Preferences.Loadouts;
 using Moq;
@@ -27,6 +28,10 @@ public sealed class WGLegacyPrototypeIdsTest
             Assert.That(WGLegacyPrototypeIds.Resolve(table, "WGUndergarmentStrip"), Is.EqualTo("WGUndergarmentStrip"));
             Assert.That(WGLegacyPrototypeIds.Resolve(table, "GenitalMarkings"), Is.EqualTo("GenitalMarkings"));
             Assert.That(WGLegacyPrototypeIds.Resolve(table, null), Is.Null);
+            Assert.That(WGLegacyPrototypeIds.Resolve(WGLegacyPrototypeIds.Markings, "WGClothingUnderSocksMime"),
+                Is.EqualTo("WGCUndergarmentStripedStockings"));
+            Assert.That(WGLegacyPrototypeIds.Resolve(WGLegacyPrototypeIds.Markings, "W" + "FClothingUnderSocksMime"),
+                Is.EqualTo("WGCUndergarmentStripedStockings"));
         });
     }
 
@@ -91,6 +96,7 @@ public sealed class WGLegacyPrototypeIdsTest
     public void ProfileTest()
     {
         var profile = HumanoidCharacterProfile.DefaultWithSpecies("Canine");
+        profile.Appearance.Markings.Add(new Marking("WGClothingUnderSocksMime", 0));
         var role = new RoleLoadout("JobContractor");
         role.SelectedLoadouts["ContractorFirearm"] = new List<Loadout>
         {
@@ -106,6 +112,7 @@ public sealed class WGLegacyPrototypeIdsTest
         {
             Assert.That(profile.Species.Id, Is.EqualTo("WGCanine"));
             Assert.That(loadouts, Is.EqualTo(new[] { "WGContractorMosinLoadout", "ContractorMk32Loadout" }));
+            Assert.That(profile.Appearance.Markings.Single().MarkingId, Is.EqualTo("WGCUndergarmentStripedStockings"));
         });
     }
 }

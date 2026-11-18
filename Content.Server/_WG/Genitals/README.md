@@ -692,7 +692,7 @@ examiners `CanExamine` allows. `MarkingSet` caps top, bottom and socks markings 
   - ported from HardLight
   - added Protogen and afterwards, so every anatomy-eligible body except Resomi has undergarments
   - Vox restored, these are the Vox-shaped states
-  - Add the socks marking alongside the other undergarments.
+  - Add character-creator socks markings.
 - [`Resources/Prototypes/Entities/Mobs/Customization/Markings/Vulpkanin/vulpkanin_tail.yml`](../../../Resources/Prototypes/Entities/Mobs/Customization/Markings/Vulpkanin/vulpkanin_tail.yml)
   - the south frame draws behind the body, so the tail never covers anatomy
   - both halves of a tail share one colour

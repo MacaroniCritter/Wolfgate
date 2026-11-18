@@ -60,6 +60,13 @@ public static class WGLegacyPrototypeIds
         ["ContractorMosinLoadout"] = "WGContractorMosinLoadout",
     };
 
+    /// <summary>marking ids stored in character profiles and exports.</summary>
+    public static readonly IReadOnlyDictionary<string, string> Markings = new Dictionary<string, string>
+    {
+        ["WGClothingUnderSocksMime"] = "WGCUndergarmentStripedStockings",
+        [OldPrefix + "ClothingUnderSocksMime"] = "WGCUndergarmentStripedStockings",
+    };
+
     /// <summary>shipAlertCode ids stored in ShipAlertComponent.Code on saved grids.</summary>
     public static readonly IReadOnlyDictionary<string, string> ShipAlertCodes = new Dictionary<string, string>
     {
@@ -112,7 +119,7 @@ public static class WGLegacyPrototypeIds
         for (var i = 0; i < appearance.Markings.Count; i++)
         {
             var marking = appearance.Markings[i];
-            var id = Prefix(marking.MarkingId);
+            var id = Resolve(Markings, marking.MarkingId);
             if (id == marking.MarkingId)
                 continue;
 
