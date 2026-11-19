@@ -1809,6 +1809,37 @@ namespace Content.Server.Database.Migrations.Postgres
                     b.ToTable("whitelist", (string)null);
                 });
 
+            modelBuilder.Entity("Content.Server.Database.WolfgateAdminObserver", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("wolfgate_admin_observer_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("data");
+
+                    b.Property<Guid>("PlayerUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("player_user_id");
+
+                    b.Property<DateTime>("Saved")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("saved");
+
+                    b.HasKey("Id")
+                        .HasName("PK_wolfgate_admin_observer");
+
+                    b.HasIndex("PlayerUserId")
+                        .IsUnique();
+
+                    b.ToTable("wolfgate_admin_observer", (string)null);
+                });
+
             modelBuilder.Entity("Content.Server.Database.WolfgateCensus", b =>
                 {
                     b.Property<int>("Id")

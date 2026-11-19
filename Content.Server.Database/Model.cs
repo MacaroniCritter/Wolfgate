@@ -77,6 +77,7 @@ namespace Content.Server.Database
         // WOLFGATE END
         public DbSet<WolfgateShipCommandPreset> WolfgateShipCommandPreset { get; set; } = null!; // WOLFGATE(ShipCommand): players' ship presets
         public DbSet<WolfgateNanoChatNumber> WolfgateNanoChatNumber { get; set; } = null!; // WOLFGATE(NanoChat): each character's number
+        public DbSet<WolfgateAdminObserver> WolfgateAdminObserver { get; set; } = null!; // WOLFGATE(AdminObserver): admins' observer settings
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -625,6 +626,12 @@ namespace Content.Server.Database
 
             modelBuilder.Entity<WolfgateNanoChatNumber>()
                 .HasIndex(n => n.Number)
+                .IsUnique();
+            // WOLFGATE END
+
+            // WOLFGATE(AdminObserver) START: one observer document per admin
+            modelBuilder.Entity<WolfgateAdminObserver>()
+                .HasIndex(o => o.PlayerUserId)
                 .IsUnique();
             // WOLFGATE END
         }
@@ -2371,6 +2378,23 @@ namespace Content.Server.Database
         public Profile Profile { get; set; } = null!;
 
         public int Number { get; set; }
+    }
+    // WOLFGATE END
+
+    // WOLFGATE(AdminObserver) START: an admin's saved observer presets, staff marker and kit
+    /// <summary>An admin's observer settings.</summary>
+    public class WolfgateAdminObserver
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public Guid PlayerUserId { get; set; }
+
+        /// <summary>The settings as JSON (WGAdminObserverData).</summary>
+        [Required]
+        public string Data { get; set; } = "";
+
+        public DateTime Saved { get; set; }
     }
     // WOLFGATE END
 }

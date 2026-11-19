@@ -1,12 +1,10 @@
-<!-- Names must avoid DefaultWindow's own: CloseButton, ContentsContainer, TitleLabel, WindowHeader. -->
-<DefaultWindow xmlns="https://spacestation14.io"
-               xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
-               xmlns:preview="clr-namespace:Content.Client._WG.ShipPreview"
-               Title="{Loc 'wg-vessel-spawn-title'}"
-               Resizable="True"
-               MinSize="800 450"
-               SetSize="1100 680">
-    <BoxContainer Orientation="Horizontal" Margin="4">
+<BoxContainer xmlns="https://spacestation14.io"
+              xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+              xmlns:preview="clr-namespace:Content.Client._WG.ShipPreview"
+              Orientation="Vertical"
+              HorizontalExpand="True"
+              VerticalExpand="True">
+    <BoxContainer Orientation="Horizontal" Margin="4" VerticalExpand="True">
 
         <!-- Vessel list -->
         <BoxContainer Orientation="Vertical" MinWidth="380" Margin="0 0 6 0">
@@ -104,4 +102,4 @@
             </BoxContainer>
         </BoxContainer>
     </BoxContainer>
-</DefaultWindow>
+</BoxContainer>

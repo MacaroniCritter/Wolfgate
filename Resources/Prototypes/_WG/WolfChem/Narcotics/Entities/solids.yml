@@ -122,11 +122,13 @@
     maxFillLevels: 2
     fillBaseName: fill-
   # Solids go in with a click and come out one at a time on use (WGBaggieSystem); the window stays on the verb.
+  # No click insert, so a beaker's click falls through to the pour.
   - type: Storage
     grid:
     - 0,0,1,1
     maxItemSize: Small
     openOnActivate: false
+    clickInsert: false
     whitelist:
       tags:
       - WGBaggable

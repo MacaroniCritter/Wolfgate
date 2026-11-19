@@ -1719,6 +1719,35 @@ namespace Content.Server.Database.Migrations.Sqlite
                     b.ToTable("whitelist", (string)null);
                 });
 
+            modelBuilder.Entity("Content.Server.Database.WolfgateAdminObserver", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("wolfgate_admin_observer_id");
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("data");
+
+                    b.Property<Guid>("PlayerUserId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("player_user_id");
+
+                    b.Property<DateTime>("Saved")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("saved");
+
+                    b.HasKey("Id")
+                        .HasName("PK_wolfgate_admin_observer");
+
+                    b.HasIndex("PlayerUserId")
+                        .IsUnique();
+
+                    b.ToTable("wolfgate_admin_observer", (string)null);
+                });
+
             modelBuilder.Entity("Content.Server.Database.WolfgateCensus", b =>
                 {
                     b.Property<int>("Id")

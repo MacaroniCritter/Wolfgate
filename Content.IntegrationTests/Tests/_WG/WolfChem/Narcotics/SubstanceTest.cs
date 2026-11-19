@@ -1,7 +1,7 @@
 using Content.Shared.Chemistry.Reaction;
 using System.Collections.Generic;
 using System.Linq;
-using Content.Server._Mono.Cargo;
+using Content.Server._WG.WolfChem.Narcotics;
 using Content.Server.Botany;
 using Content.Server.Cargo.Systems;
 using Content.Server.Nutrition.Components;
@@ -195,7 +195,7 @@ public sealed class SubstanceTest
                 {
                     var uid = entMan.SpawnEntity(id, map.GridCoords);
                     Assert.That(entMan.GetComponent<ContrabandComponent>(uid).Severity.Id, Is.EqualTo("Class3Chem"), id);
-                    Assert.That(entMan.HasComponent<SoldAlertComponent>(uid), Is.True, id);
+                    Assert.That(entMan.HasComponent<WGNarcoticStockComponent>(uid), Is.True, id);
                     Assert.That(entMan.HasComponent<ItemTaxComponent>(uid), Is.True, id);
                 }
 
@@ -203,7 +203,7 @@ public sealed class SubstanceTest
                 {
                     var uid = entMan.SpawnEntity(id, map.GridCoords);
                     Assert.That(entMan.GetComponent<ContrabandComponent>(uid).Severity.Id, Is.EqualTo("Class3Chem"), id);
-                    Assert.That(entMan.HasComponent<SoldAlertComponent>(uid), Is.True, id);
+                    Assert.That(entMan.HasComponent<WGNarcoticStockComponent>(uid), Is.True, id);
                     Assert.That(entMan.HasComponent<ItemTaxComponent>(uid), Is.True, id);
                 }
 
@@ -211,7 +211,7 @@ public sealed class SubstanceTest
                 {
                     var uid = entMan.SpawnEntity(id, map.GridCoords);
                     Assert.That(entMan.HasComponent<ContrabandComponent>(uid), Is.False, $"{id} is legal.");
-                    Assert.That(entMan.HasComponent<SoldAlertComponent>(uid), Is.False, $"Selling {id} tips nobody off.");
+                    Assert.That(entMan.HasComponent<WGNarcoticStockComponent>(uid), Is.False, $"{id} is no part of a stockpile.");
                 }
 
                 var blank = entMan.SpawnEntity("WGNeurowareStick", map.GridCoords);

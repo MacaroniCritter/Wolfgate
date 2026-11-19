@@ -110,6 +110,7 @@
   - type: MovementIgnoreGravity
   - type: ProtectedFromStepTriggers
   - type: ZombieImmune
+  - type: WGRemadeNoDevices
   - type: Speech
     enabled: false
 

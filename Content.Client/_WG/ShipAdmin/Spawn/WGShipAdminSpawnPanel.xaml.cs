@@ -1,5 +1,6 @@
 using System.Linq;
 using Content.Client.Administration.Managers;
+using Content.Client._WG.Administration.UI.VesselSpawn;
 using Content.Client._WG.OldVessels;
 using Content.Shared._NF.Bank;
 using Content.Shared._NF.Shipyard.Components;
@@ -16,15 +17,15 @@ using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
-namespace Content.Client._WG.Administration.UI.VesselSpawn;
+namespace Content.Client._WG.ShipAdmin.Spawn;
 
 /// <summary>
-/// Lists every spawnable vessel prototype grouped by category, previews the selected one and spawns it via the
-/// spawnvessel command.
+/// Shipmaster's spawn page, once the standalone Spawn Vessel window: lists every spawnable vessel prototype grouped
+/// by category, previews the selected one and spawns it via the spawnvessel command.
 /// </summary>
 [GenerateTypedNameReferences]
 [UsedImplicitly]
-public sealed partial class VesselSpawnWindow : DefaultWindow
+public sealed partial class WGShipAdminSpawnPanel : BoxContainer
 {
     [Dependency] private IPrototypeManager _prototypeManager = default!;
     [Dependency] private IClientConsoleHost _consoleHost = default!;
@@ -48,7 +49,7 @@ public sealed partial class VesselSpawnWindow : DefaultWindow
     private VesselSpawnCategory? _categoryFilter;
     private VesselPrototype? _selected;
 
-    public VesselSpawnWindow()
+    public WGShipAdminSpawnPanel()
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
@@ -69,15 +70,17 @@ public sealed partial class VesselSpawnWindow : DefaultWindow
 
         // Keep the owner picker in step with players joining and leaving.
         _playerManager.PlayerListUpdated += PopulateOwners;
-        OnClose += () =>
-        {
-            _playerManager.PlayerListUpdated -= PopulateOwners;
-            Preview.PreviewUpdated -= UpdateGridInfo;
-            Preview.Release();
-        };
 
         PopulateVessels();
         UpdateSelection();
+    }
+
+    /// <summary>Lets go of the preview grid and the player list; called when Shipmaster closes.</summary>
+    public void Release()
+    {
+        _playerManager.PlayerListUpdated -= PopulateOwners;
+        Preview.PreviewUpdated -= UpdateGridInfo;
+        Preview.Release();
     }
 
     /// <summary>
