@@ -404,6 +404,9 @@
   - type: IconSmooth
     key: walls
     base: plastitanium
+  # WOLFGATE(WallPaint): persist wall paint on shuttle map entities and render it on a separate surface layer
+  - type: WGPaintableWall
+    paintType: Plastitanium
   - type: Fixtures
     fixtures:
       fix1:
@@ -490,6 +493,9 @@
     mode: Diagonal
     key: walls
     base: state
+  # WOLFGATE(WallPaint): persist diagonal wall paint and render it on a separate surface layer
+  - type: WGPaintableWall
+    paintType: PlastitaniumDiagonal
   - type: Icon
     sprite: Structures/Walls/plastitanium_diagonal.rsi
     state: state0
@@ -534,6 +540,9 @@
   - type: IconSmooth
     key: walls
     base: reinf_over
+  # WOLFGATE(WallPaint): persist wall paint on shuttle map entities and render it on a separate surface layer
+  - type: WGPaintableWall
+    paintType: Reinforced
   - type: Appearance
   - type: GenericVisualizer
     visuals:
@@ -611,6 +620,9 @@
     mode: Diagonal
     key: walls
     base: state
+  # WOLFGATE(WallPaint): persist diagonal wall paint and render it on a separate surface layer
+  - type: WGPaintableWall
+    paintType: ReinforcedDiagonal
   - type: Icon
     sprite: Structures/Walls/reinforced_diagonal.rsi
     state: state0

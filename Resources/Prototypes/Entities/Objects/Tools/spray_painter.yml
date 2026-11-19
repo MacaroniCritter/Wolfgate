@@ -2,7 +2,7 @@
   parent: [BaseItem, RecyclableItemDeviceSmall] # Frontier: added RecyclableItemDeviceSmall
   id: SprayPainter
   name: spray painter
-  description: A spray painter for painting airlocks and pipes.
+  description: A spray painter for painting airlocks, pipes, and reinforced or plastitanium walls. # WOLFGATE(WallPaint): include the supported wall types
   components:
   - type: Sprite
     sprite: Objects/Tools/spray_painter.rsi

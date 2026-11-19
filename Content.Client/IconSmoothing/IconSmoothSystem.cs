@@ -98,6 +98,7 @@ namespace Content.Client.IconSmoothing
             else
                 sprite.LayerMapSet(corner, sprite.AddLayerState(state));
             sprite.LayerSetDirOffset(corner, offset);
+            SetWallPaintCornerState(sprite, corner, offset, state); // WOLFGATE(WallPaint): keep the surface coat aligned with wall smoothing
         }
         // End Frontier: set layer function to remove redundancy
 
@@ -314,6 +315,7 @@ namespace Content.Client.IconSmoothing
             if (gridEntity == null)
             {
                 sprite.Comp.LayerSetState(0, $"{smooth.StateBase}0");
+                SetWallPaintDiagonalState(sprite, $"{smooth.StateBase}0"); // WOLFGATE(WallPaint): mirror the smoothed state on the paint layer
                 return;
             }
 
@@ -340,10 +342,12 @@ namespace Content.Client.IconSmoothing
             if (matching)
             {
                 sprite.Comp.LayerSetState(0, $"{smooth.StateBase}1");
+                SetWallPaintDiagonalState(sprite, $"{smooth.StateBase}1"); // WOLFGATE(WallPaint): mirror the smoothed state on the paint layer
             }
             else
             {
                 sprite.Comp.LayerSetState(0, $"{smooth.StateBase}0");
+                SetWallPaintDiagonalState(sprite, $"{smooth.StateBase}0"); // WOLFGATE(WallPaint): mirror the smoothed state on the paint layer
             }
         }
 
