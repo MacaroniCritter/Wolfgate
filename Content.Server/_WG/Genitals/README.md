@@ -361,9 +361,7 @@ examiners `CanExamine` allows. `MarkingSet` caps top, bottom and socks markings 
   - GenitalMarkings is the adult content master switch.
 - [`Resources/Locale/en-US/_RMC14/markings/undershirt.ftl`](../../../Resources/Locale/en-US/_RMC14/markings/undershirt.ftl): ported from HardLight
 - [`Resources/Locale/en-US/_RMC14/markings/underwear.ftl`](../../../Resources/Locale/en-US/_RMC14/markings/underwear.ftl): ported from HardLight
-- [`Resources/Locale/en-US/markings/undergarment.ftl`](../../../Resources/Locale/en-US/markings/undergarment.ftl)
-  - ported from HardLight
-  - Localize the Wolfgate socks marking.
+- [`Resources/Locale/en-US/markings/undergarment.ftl`](../../../Resources/Locale/en-US/markings/undergarment.ftl): ported from HardLight
 - [`Resources/Prototypes/_CD/Entities/Mobs/Customization/Markings/reptilian.yml`](../../../Resources/Prototypes/_CD/Entities/Mobs/Customization/Markings/reptilian.yml)
   - the south frame draws behind the body, so the tail never covers anatomy
   - both halves of a tail share one colour
@@ -692,7 +690,6 @@ examiners `CanExamine` allows. `MarkingSet` caps top, bottom and socks markings 
   - ported from HardLight
   - added Protogen and afterwards, so every anatomy-eligible body except Resomi has undergarments
   - Vox restored, these are the Vox-shaped states
-  - Add character-creator socks markings.
 - [`Resources/Prototypes/Entities/Mobs/Customization/Markings/Vulpkanin/vulpkanin_tail.yml`](../../../Resources/Prototypes/Entities/Mobs/Customization/Markings/Vulpkanin/vulpkanin_tail.yml)
   - the south frame draws behind the body, so the tail never covers anatomy
   - both halves of a tail share one colour
@@ -768,7 +765,6 @@ examiners `CanExamine` allows. `MarkingSet` caps top, bottom and socks markings 
 - [`Resources/Textures/_RMC14/Mobs/Customization/undershirt.rsi/`](../../../Resources/Textures/_RMC14/Mobs/Customization/undershirt.rsi/): Undergarment marking sprites, ported from HardLight.
 - [`Resources/Textures/_RMC14/Mobs/Customization/underwear.rsi/`](../../../Resources/Textures/_RMC14/Mobs/Customization/underwear.rsi/): Undergarment marking sprites, ported from HardLight.
 - [`Resources/Textures/Mobs/Customization/Markings/Genital/`](../../../Resources/Textures/Mobs/Customization/Markings/Genital/): Genital shape and pregnant belly sprites; Wolfgate-only RSIs at an upstream path.
-- [`Resources/Textures/Mobs/Customization/undergarment_socks.rsi/`](../../../Resources/Textures/Mobs/Customization/undergarment_socks.rsi/): Sock marking sprites stored separately from the top and bottom undergarment sprites.
 - [`Resources/Textures/Mobs/Customization/undergarments.rsi/`](../../../Resources/Textures/Mobs/Customization/undergarments.rsi/): Undergarment marking sprites; Wolfgate-only RSI at an upstream path.
 
 <!-- WOLFGATE-GENERATED END -->

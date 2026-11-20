@@ -172,9 +172,6 @@ unmarked:
   - path: Resources/Textures/Mobs/Customization/undergarments.rsi/
     module: Genitals
     reason: Undergarment marking sprites; Wolfgate-only RSI at an upstream path.
-  - path: Resources/Textures/Mobs/Customization/undergarment_socks.rsi/
-    module: Genitals
-    reason: Sock marking sprites stored separately from the top and bottom undergarment sprites.
   - path: Resources/Textures/_RMC14/Mobs/Customization/undershirt.rsi/
     module: Genitals
     reason: Undergarment marking sprites, ported from HardLight.

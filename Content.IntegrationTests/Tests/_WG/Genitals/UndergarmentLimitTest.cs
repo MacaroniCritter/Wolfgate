@@ -164,8 +164,8 @@ public sealed class UndergarmentLimitTest
             var pointsId = protoMan.Index<SpeciesPrototype>(Species).MarkingPoints;
             var prototype = protoMan.Index<MarkingPointsPrototype>(pointsId);
             var set = new MarkingSet(pointsId, markings, protoMan);
-            var socks = Mark(markings, "WGCUndergarmentStripedStockings");
-            var socksPrototype = markings.Markings["WGCUndergarmentStripedStockings"];
+            var socks = Mark(markings, "WGUndergarmentStripedStockings");
+            var socksPrototype = markings.Markings["WGUndergarmentStripedStockings"];
             var includedSpecies = new[]
             {
                 "Oni", "Felinid", "Human", "Diona", "Gingerbread", "Arachnid", "Dwarf", "Skeleton", "Moth",
@@ -182,7 +182,7 @@ public sealed class UndergarmentLimitTest
                 foreach (var species in includedSpecies)
                 {
                     var available = markings.MarkingsByCategoryAndSpecies(MarkingCategories.UndergarmentSocks, species);
-                    Assert.That(available.ContainsKey("WGCUndergarmentStripedStockings"), Is.True, species);
+                    Assert.That(available.ContainsKey("WGUndergarmentStripedStockings"), Is.True, species);
 
                     var speciesPrototype = protoMan.Index<SpeciesPrototype>(species);
                     var baseSprites = protoMan.Index<HumanoidSpeciesBaseSpritesPrototype>(speciesPrototype.SpriteSet);
@@ -193,7 +193,7 @@ public sealed class UndergarmentLimitTest
                 foreach (var species in excludedSpecies)
                 {
                     var available = markings.MarkingsByCategoryAndSpecies(MarkingCategories.UndergarmentSocks, species);
-                    Assert.That(available.ContainsKey("WGCUndergarmentStripedStockings"), Is.False, species);
+                    Assert.That(available.ContainsKey("WGUndergarmentStripedStockings"), Is.False, species);
                 }
 
                 Assert.That(socksPrototype.BodyPart, Is.EqualTo(HumanoidVisualLayers.UndergarmentSocks));
@@ -206,7 +206,7 @@ public sealed class UndergarmentLimitTest
                 set.AddBack(MarkingCategories.UndergarmentSocks, socks);
                 set.AddBack(MarkingCategories.UndergarmentSocks, socks);
 
-                Assert.That(Ids(set, MarkingCategories.UndergarmentSocks), Is.EqualTo(new[] { "WGCUndergarmentStripedStockings" }));
+                Assert.That(Ids(set, MarkingCategories.UndergarmentSocks), Is.EqualTo(new[] { "WGUndergarmentStripedStockings" }));
                 Assert.That(set.PointsLeft(MarkingCategories.UndergarmentSocks), Is.EqualTo(0));
                 Assert.That(prototype.Points.ContainsKey(MarkingCategories.UndergarmentSocks), Is.False);
             });

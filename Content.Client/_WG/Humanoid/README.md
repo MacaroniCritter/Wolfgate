@@ -30,17 +30,27 @@ Entry points: `WolfgateSpeciesPicker` (species cards with previews and guidebook
 ### Integration tests
 
 - [`Content.IntegrationTests/Tests/_WG/Humanoid/SizePercentTest.cs`](../../../Content.IntegrationTests/Tests/_WG/Humanoid/SizePercentTest.cs)
+- [`Content.IntegrationTests/Tests/_WG/Humanoid/WGSocksLayerTest.cs`](../../../Content.IntegrationTests/Tests/_WG/Humanoid/WGSocksLayerTest.cs)
 - [`Content.IntegrationTests/Tests/_WG/Humanoid/WolfgateEvenRowTest.cs`](../../../Content.IntegrationTests/Tests/_WG/Humanoid/WolfgateEvenRowTest.cs)
 - [`Content.IntegrationTests/Tests/_WG/Humanoid/WolfgateMarkingIconTest.cs`](../../../Content.IntegrationTests/Tests/_WG/Humanoid/WolfgateMarkingIconTest.cs)
 - [`Content.IntegrationTests/Tests/_WG/Humanoid/WolfgateMarkingPickerChassisTest.cs`](../../../Content.IntegrationTests/Tests/_WG/Humanoid/WolfgateMarkingPickerChassisTest.cs)
 - [`Content.IntegrationTests/Tests/_WG/Humanoid/WolfgateMarkingPickerLayoutTest.cs`](../../../Content.IntegrationTests/Tests/_WG/Humanoid/WolfgateMarkingPickerLayoutTest.cs)
 - [`Content.IntegrationTests/Tests/_WG/Humanoid/WolfgateMarkingTileTest.cs`](../../../Content.IntegrationTests/Tests/_WG/Humanoid/WolfgateMarkingTileTest.cs)
 
+### Prototypes
+
+- [`Resources/Prototypes/_WG/Humanoid/socks.yml`](../../../Resources/Prototypes/_WG/Humanoid/socks.yml)
+
 ### Localization
 
+- [`Resources/Locale/en-US/_WG/Humanoid/markings/socks.ftl`](../../../Resources/Locale/en-US/_WG/Humanoid/markings/socks.ftl)
 - [`Resources/Locale/en-US/_WG/Humanoid/preferences/ui/markings-picker.ftl`](../../../Resources/Locale/en-US/_WG/Humanoid/preferences/ui/markings-picker.ftl)
 - [`Resources/Locale/en-US/_WG/Humanoid/ui/character-creator.ftl`](../../../Resources/Locale/en-US/_WG/Humanoid/ui/character-creator.ftl)
 - [`Resources/Locale/en-US/_WG/Humanoid/ui/species.ftl`](../../../Resources/Locale/en-US/_WG/Humanoid/ui/species.ftl)
+
+### Textures
+
+- [`Resources/Textures/_WG/Humanoid/undergarment_socks.rsi/`](../../../Resources/Textures/_WG/Humanoid/undergarment_socks.rsi/)
 
 ## Non-modular edits
 
@@ -105,12 +115,25 @@ Entry points: `WolfgateSpeciesPicker` (species cards with previews and guidebook
   - custom species display name setter
   - flavor text strips stray tags instead of throwing
   - the custom species name is sanitized like the character name
+- [`Resources/Prototypes/_DV/Entities/Mobs/Species/chitinid.yml`](../../../Resources/Prototypes/_DV/Entities/Mobs/Species/chitinid.yml)
+  - feet under the uniform, with socks between them
+  - feet moved under the uniform above
+- [`Resources/Prototypes/_DV/Entities/Mobs/Species/feroxi.yml`](../../../Resources/Prototypes/_DV/Entities/Mobs/Species/feroxi.yml)
+  - feet under the uniform, with socks between them
+  - feet moved under the uniform above
+- [`Resources/Prototypes/_DV/Entities/Mobs/Species/rodentia.yml`](../../../Resources/Prototypes/_DV/Entities/Mobs/Species/rodentia.yml)
+  - feet under the uniform, with socks between them
+  - feet moved under the uniform above
+- [`Resources/Prototypes/_DV/Entities/Mobs/Species/skrell.yml`](../../../Resources/Prototypes/_DV/Entities/Mobs/Species/skrell.yml)
+  - feet under the uniform, with socks between them
+  - feet moved under the uniform above
 - [`Resources/Prototypes/_DV/Species/avali.yml`](../../../Resources/Prototypes/_DV/Species/avali.yml): allow socks markings for this species sprite set
 - [`Resources/Prototypes/_DV/Species/chitinid.yml`](../../../Resources/Prototypes/_DV/Species/chitinid.yml): allow socks markings for this species sprite set
 - [`Resources/Prototypes/_DV/Species/feroxi.yml`](../../../Resources/Prototypes/_DV/Species/feroxi.yml): allow socks markings for this species sprite set
 - [`Resources/Prototypes/_DV/Species/rodentia.yml`](../../../Resources/Prototypes/_DV/Species/rodentia.yml): allow socks markings for this species sprite set
 - [`Resources/Prototypes/_DV/Species/shadekin.yml`](../../../Resources/Prototypes/_DV/Species/shadekin.yml): allow socks markings for this species sprite set
 - [`Resources/Prototypes/_DV/Species/skrell.yml`](../../../Resources/Prototypes/_DV/Species/skrell.yml): allow socks markings for this species sprite set
+- [`Resources/Prototypes/_EinsteinEngines/Entities/Mobs/Player/silicon_base.yml`](../../../Resources/Prototypes/_EinsteinEngines/Entities/Mobs/Player/silicon_base.yml): socks marking over the feet, under clothes
 - [`Resources/Prototypes/_EinsteinEngines/Species/ipc.yml`](../../../Resources/Prototypes/_EinsteinEngines/Species/ipc.yml): allow socks markings for this species sprite set
 - [`Resources/Prototypes/_Goobstation/Species/tajaran.yml`](../../../Resources/Prototypes/_Goobstation/Species/tajaran.yml): allow socks markings for this species sprite set
 - [`Resources/Prototypes/_Goobstation/Species/yowie.yml`](../../../Resources/Prototypes/_Goobstation/Species/yowie.yml): allow socks markings for this species sprite set
@@ -125,7 +148,6 @@ Entry points: `WolfgateSpeciesPicker` (species cards with previews and guidebook
 - [`Resources/Prototypes/Entities/Mobs/Species/arachnid.yml`](../../../Resources/Prototypes/Entities/Mobs/Species/arachnid.yml): draw socks over feet and under uniforms
 - [`Resources/Prototypes/Entities/Mobs/Species/base.yml`](../../../Resources/Prototypes/Entities/Mobs/Species/base.yml): draw socks over feet and under uniforms
 - [`Resources/Prototypes/Entities/Mobs/Species/moth.yml`](../../../Resources/Prototypes/Entities/Mobs/Species/moth.yml): draw socks over feet and under uniforms
-- [`Resources/Prototypes/Entities/Mobs/Species/vox.yml`](../../../Resources/Prototypes/Entities/Mobs/Species/vox.yml): draw socks over feet and under uniforms
 - [`Resources/Prototypes/Species/arachnid.yml`](../../../Resources/Prototypes/Species/arachnid.yml): allow socks markings for this species sprite set
 - [`Resources/Prototypes/Species/diona.yml`](../../../Resources/Prototypes/Species/diona.yml): allow socks markings for this species sprite set
 - [`Resources/Prototypes/Species/gingerbread.yml`](../../../Resources/Prototypes/Species/gingerbread.yml): allow socks markings for this species sprite set

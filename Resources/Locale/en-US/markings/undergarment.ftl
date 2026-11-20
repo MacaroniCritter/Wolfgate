@@ -16,12 +16,3 @@ marking-UndergarmentTopSportsbra = Sports Bra
 marking-UndergarmentTopSportsbraVox = Sports Bra
 marking-UndergarmentTopTanktop = Tanktop
 marking-UndergarmentTopTanktopVox = Tanktop
-# WOLFGATE(Genitals): Localize the Wolfgate socks marking.
-marking-WGCUndergarmentStripedStockings = Striped Stockings
-marking-WGUndergarmentFishnetStockings = Fishnet Stockings
-marking-WGUndergarmentStockings = Stockings
-marking-WGUndergarmentThighHighs = Thigh Highs
-marking-WGUndergarmentKneeHighs = Knee Highs
-marking-WGUndergarmentSocks = Socks
-marking-WGUndergarmentShortSocks = Short Socks
-marking-WGUndergarmentPantyhose = Pantyhose
