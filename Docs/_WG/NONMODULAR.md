@@ -560,6 +560,7 @@ Standalone edits outside `_WG` that serve no module: files with an untagged `WOL
 - [`Resources/Prototypes/_Mono/Research/shuttlecomps.yml`](../../Resources/Prototypes/_Mono/Research/shuttlecomps.yml): restore the licence header removed by Kill Spdx
 - [`Resources/Prototypes/_Mono/Roles/Jobs/Medical/medic.yml`](../../Resources/Prototypes/_Mono/Roles/Jobs/Medical/medic.yml): responders start with advanced jaws of life
 - [`Resources/Prototypes/_Mono/Roles/Jobs/TSFMC/civilian.yml`](../../Resources/Prototypes/_Mono/Roles/Jobs/TSFMC/civilian.yml): TSF contractors speak and understand Sol Common
+- [`Resources/Prototypes/_Mono/Shipyard/PDV/europa.yml`](../../Resources/Prototypes/_Mono/Shipyard/PDV/europa.yml): Europa refit fills its four empty hardpoints with GS-001 Equinox autocannons.
 - [`Resources/Prototypes/_Mono/Traits/physical.yml`](../../Resources/Prototypes/_Mono/Traits/physical.yml): restore the licence header removed by Kill Spdx
 - [`Resources/Prototypes/_Mono/Turf/plating.yml`](../../Resources/Prototypes/_Mono/Turf/plating.yml): restore the licence header removed by Kill Spdx
 - [`Resources/Prototypes/_NF/bounty_contract_collections.yml`](../../Resources/Prototypes/_NF/bounty_contract_collections.yml)

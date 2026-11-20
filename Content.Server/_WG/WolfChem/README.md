@@ -52,9 +52,9 @@ for it and the Medical guide a player page.
 
 Selling at a cargo pallet is where the risk is (`WGNarcoticHeatSystem`). Each seller has a heat of their own: the street
 value they sold lately, cooling at `wg.narcotics.heat_cooling` a second and capped at `heat_cap`. A buyer pays in full up
-to `heat_free` and then less and less, down to `heat_floor` of the value (`WGNarcoticHeatMath.Payout`), so the most a
-seller earns at full price is the cooling rate and a stockpile sold at once, or held to the end of the round, fetches a
-fraction. The fall is gentle (`heat_scale`), so selling past the line still pays: what it costs is exposure. The line
+to `heat_free` and then less and less, down to `heat_floor` of the value, and only `heat_glut_floor` for what is sold
+past `heat_cap`, where the market is saturated (`WGNarcoticHeatMath.Payout`), so the most a seller earns at full price
+is the cooling rate and a stockpile sold at once, or held to the end of the round, fetches a small fraction. The fall is gentle (`heat_scale`), so selling past the line still pays: what it costs is exposure. The line
 itself is fuzzy: each seller's sits up to `heat_fuzz` of `heat_free` either side of it, holds through a visit and is
 drawn anew once they have kept from selling for `heat_fuzz_time`, so a load can't be sized to it beforehand. Heat follows the player, not the body, and nobody else's price moves. The console shows the cut price, and the
 buyer's manner (a popup only the seller sees, before and after a sale) tells them which tier they are in, and when
@@ -101,6 +101,9 @@ which `Solution`'s add, split, transfer and remove methods keep in step. They co
 - `WGSolutionPurity`: fixed grades at map init, for vendor, dealer and loot stock.
 
 Dispensers give standard grade. Touch reactions, tile reactions and fuel ignore grades for now.
+
+`WGPurityTint` sets an appearance flag while one reagent is at or above a grade (99.1% by default); a crystal shard
+that good turns blue through a `GenericVisualizer`.
 
 ## Neuroware
 
@@ -158,6 +161,8 @@ client partial of `WolfmedSyntheticHudOverlaySystem`. Sticks are in `Resources/P
 - [`Content.Server/_WG/WolfChem/Purity/WGPuritySystem.cs`](Purity/WGPuritySystem.cs)
 - [`Content.Server/_WG/WolfChem/Purity/WGPurityTesterComponent.cs`](Purity/WGPurityTesterComponent.cs)
 - [`Content.Server/_WG/WolfChem/Purity/WGPurityTesterSystem.cs`](Purity/WGPurityTesterSystem.cs)
+- [`Content.Server/_WG/WolfChem/Purity/WGPurityTintComponent.cs`](Purity/WGPurityTintComponent.cs)
+- [`Content.Server/_WG/WolfChem/Purity/WGPurityTintSystem.cs`](Purity/WGPurityTintSystem.cs)
 - [`Content.Server/_WG/WolfChem/Purity/WGSolutionPurityComponent.cs`](Purity/WGSolutionPurityComponent.cs)
 - [`Content.Server/_WG/WolfChem/Purity/WGSolutionPuritySystem.cs`](Purity/WGSolutionPuritySystem.cs)
 
@@ -182,6 +187,7 @@ client partial of `WolfmedSyntheticHudOverlaySystem`. Sticks are in `Resources/P
 - [`Content.Shared/_WG/WolfChem/Purity/Solution.Purity.cs`](../../../Content.Shared/_WG/WolfChem/Purity/Solution.Purity.cs)
 - [`Content.Shared/_WG/WolfChem/Purity/WGPurityCVars.cs`](../../../Content.Shared/_WG/WolfChem/Purity/WGPurityCVars.cs)
 - [`Content.Shared/_WG/WolfChem/Purity/WGPurityText.cs`](../../../Content.Shared/_WG/WolfChem/Purity/WGPurityText.cs)
+- [`Content.Shared/_WG/WolfChem/Purity/WGPurityTintVisuals.cs`](../../../Content.Shared/_WG/WolfChem/Purity/WGPurityTintVisuals.cs)
 - [`Content.Shared/_WG/WolfChem/Purity/WGReactionPurityPrototype.cs`](../../../Content.Shared/_WG/WolfChem/Purity/WGReactionPurityPrototype.cs)
 
 ### Client
@@ -368,6 +374,7 @@ client partial of `WolfmedSyntheticHudOverlaySystem`. Sticks are in `Resources/P
 - [`Resources/Prototypes/Entities/Objects/Specific/Hydroponics/leaves.yml`](../../../Resources/Prototypes/Entities/Objects/Specific/Hydroponics/leaves.yml)
   - fits a baggie
   - fits a baggie and a bong bowl
+- [`Resources/Prototypes/Entities/Structures/Machines/chemistry.yml`](../../../Resources/Prototypes/Entities/Structures/Machines/chemistry.yml): cold enough for crystal shards and opium resin
 - [`Resources/Prototypes/Guidebook/medical.yml`](../../../Resources/Prototypes/Guidebook/medical.yml): drugs, grades and neuroware
 - [`Resources/Prototypes/Hydroponics/seeds.yml`](../../../Resources/Prototypes/Hydroponics/seeds.yml): the opium poppy is a poppy mutation
 - [`Resources/Prototypes/Reagents/cleaning.yml`](../../../Resources/Prototypes/Reagents/cleaning.yml)
