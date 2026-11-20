@@ -26,7 +26,6 @@
     RLeg: MobMonkeyRLeg
     LFoot: MobMonkeyLFoot
     RFoot: MobMonkeyRFoot
-    UndergarmentSocks: MobHumanoidAnyMarking # WOLFGATE(Humanoid): allow socks markings for this species sprite set
 
 - type: humanoidBaseSprite
   id: MobMonkeyAnyMarking

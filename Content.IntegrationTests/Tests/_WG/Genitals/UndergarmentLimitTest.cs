@@ -170,11 +170,11 @@ public sealed class UndergarmentLimitTest
             {
                 "Oni", "Felinid", "Human", "Diona", "Gingerbread", "Arachnid", "Dwarf", "Skeleton", "Moth",
                 "SlimePerson", "IPC", "Skrell", "Shadekin", "Rodentia", "Feroxi", "Chitinid", "Avali", "Thaven",
-                "Yowie", "Tajaran", "Hydrakin", "Monkey", "Kobold", "Cyborg", "Goblin", "Protogen", "Asakim",
+                "Yowie", "Tajaran", "Hydrakin", "Kobold", "Goblin", "Protogen", "Asakim",
             };
             var excludedSpecies = new[]
             {
-                "WGCanine", "Felionoid", "Harpy", "Reptilian", "Resomi", "Synth", "Vox", "Vulpkanin",
+                "WGCanine", "Felionoid", "Harpy", "Reptilian", "Resomi", "Synth", "Vox", "Vulpkanin", "Monkey", "Cyborg",
             };
 
             Assert.Multiple(() =>

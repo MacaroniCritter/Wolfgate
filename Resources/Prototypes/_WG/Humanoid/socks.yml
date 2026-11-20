@@ -3,7 +3,7 @@
   id: WGUndergarmentStripedStockings
   bodyPart: UndergarmentSocks
   markingCategory: UndergarmentSocks
-  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Monkey, Kobold, Cyborg, Goblin, Protogen, Asakim]
+  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Kobold, Goblin, Protogen, Asakim]
   coloring:
     default:
       type: null
@@ -16,7 +16,7 @@
   id: WGUndergarmentFishnetStockings
   bodyPart: UndergarmentSocks
   markingCategory: UndergarmentSocks
-  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Monkey, Kobold, Cyborg, Goblin, Protogen, Asakim]
+  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Kobold, Goblin, Protogen, Asakim]
   coloring:
     default:
       type: null
@@ -29,7 +29,7 @@
   id: WGUndergarmentStockings
   bodyPart: UndergarmentSocks
   markingCategory: UndergarmentSocks
-  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Monkey, Kobold, Cyborg, Goblin, Protogen, Asakim]
+  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Kobold, Goblin, Protogen, Asakim]
   coloring:
     default:
       type: null
@@ -42,7 +42,7 @@
   id: WGUndergarmentThighHighs
   bodyPart: UndergarmentSocks
   markingCategory: UndergarmentSocks
-  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Monkey, Kobold, Cyborg, Goblin, Protogen, Asakim]
+  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Kobold, Goblin, Protogen, Asakim]
   coloring:
     default:
       type: null
@@ -55,7 +55,7 @@
   id: WGUndergarmentKneeHighs
   bodyPart: UndergarmentSocks
   markingCategory: UndergarmentSocks
-  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Monkey, Kobold, Cyborg, Goblin, Protogen, Asakim]
+  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Kobold, Goblin, Protogen, Asakim]
   coloring:
     default:
       type: null
@@ -68,7 +68,7 @@
   id: WGUndergarmentSocks
   bodyPart: UndergarmentSocks
   markingCategory: UndergarmentSocks
-  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Monkey, Kobold, Cyborg, Goblin, Protogen, Asakim]
+  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Kobold, Goblin, Protogen, Asakim]
   coloring:
     default:
       type: null
@@ -81,7 +81,7 @@
   id: WGUndergarmentShortSocks
   bodyPart: UndergarmentSocks
   markingCategory: UndergarmentSocks
-  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Monkey, Kobold, Cyborg, Goblin, Protogen, Asakim]
+  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Kobold, Goblin, Protogen, Asakim]
   coloring:
     default:
       type: null
@@ -94,7 +94,7 @@
   id: WGUndergarmentPantyhose
   bodyPart: UndergarmentSocks
   markingCategory: UndergarmentSocks
-  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Monkey, Kobold, Cyborg, Goblin, Protogen, Asakim]
+  speciesRestriction: [Oni, Felinid, Human, Diona, Gingerbread, Arachnid, Dwarf, Skeleton, Moth, SlimePerson, IPC, Skrell, Shadekin, Rodentia, Feroxi, Chitinid, Avali, Thaven, Yowie, Tajaran, Hydrakin, Kobold, Goblin, Protogen, Asakim]
   coloring:
     default:
       type: null
