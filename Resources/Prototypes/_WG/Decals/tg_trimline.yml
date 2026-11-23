@@ -1,0 +1,476 @@
+- type: decal
+  id: TrimW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimw
+
+- type: decal
+  id: Trime
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trime
+
+- type: decal
+  id: TrimN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimn
+
+- type: decal
+  id: TrimS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trims
+
+- type: decal
+  id: TrimNE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimne
+
+- type: decal
+  id: TrimNW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimnw
+
+- type: decal
+  id: TrimSE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimse
+
+- type: decal
+  id: TrimSW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimsw
+
+- type: decal
+  id: TrimCornerE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimcornere
+
+- type: decal
+  id: TrimCornerN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimcornern
+
+- type: decal
+  id: TrimCornerS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimcorners
+
+- type: decal
+  id: TrimCornerW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimcornerw
+
+- type: decal
+  id: TrimEndE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimende
+
+- type: decal
+  id: TrimEndN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimendn
+
+- type: decal
+  id: TrimEndS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimends
+
+- type: decal
+  id: TrimEndW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimendw
+
+- type: decal
+  id: TrimWoodE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoode
+
+- type: decal
+  id: TrimWoodN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodn
+
+- type: decal
+  id: TrimWoodS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoods
+
+- type: decal
+  id: TrimWoodW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodw
+
+- type: decal
+  id: TrimWoodNE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodne
+
+- type: decal
+  id: TrimWoodNW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodnw
+
+- type: decal
+  id: TrimWoodSE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodse
+
+- type: decal
+  id: TrimWoodSW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodsw
+
+- type: decal
+  id: TrimWoodCornerE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodcornere
+
+- type: decal
+  id: TrimWoodCornerN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodcornern
+
+- type: decal
+  id: TrimWoodCornerS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodcorners
+
+- type: decal
+  id: TrimWoodCornerW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodcornerw
+
+- type: decal
+  id: TrimWoodEndE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodende
+
+- type: decal
+  id: TrimWoodEndN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodendn
+
+- type: decal
+  id: TrimWoodEndS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodends
+
+- type: decal
+  id: TrimWoodEndW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: trimwoodendw
+
+- type: decal
+  id: RoundedTrimE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrime
+
+- type: decal
+  id: RoundedTrimN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimn
+
+- type: decal
+  id: RoundedTrimS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrims
+
+- type: decal
+  id: RoundedTrimW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimw
+
+- type: decal
+  id: RoundedTrimNE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimne
+
+- type: decal
+  id: RoundedTrimNW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimnw
+
+- type: decal
+  id: RoundedTrimSE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimse
+
+- type: decal
+  id: RoundedTrimSW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimsw
+
+- type: decal
+  id: RoundedTrimCornerE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimcornere
+
+- type: decal
+  id: RoundedTrimCornerN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimcornern
+
+- type: decal
+  id: RoundedTrimCornerS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimcorners
+
+- type: decal
+  id: RoundedTrimCornerW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimcornerw
+
+- type: decal
+  id: RoundedTrimEndE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimende
+
+- type: decal
+  id: RoundedTrimEndN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimendn
+
+- type: decal
+  id: RoundedTrimEndS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimends
+
+- type: decal
+  id: RoundedTrimEndW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimendw
+
+- type: decal
+  id: RoundedTrimCurveCcwE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimcurveccwe
+
+- type: decal
+  id: RoundedTrimCurveCcwN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimcurveccwn
+
+- type: decal
+  id: RoundedTrimCurveCcwS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimcurveccws
+
+- type: decal
+  id: RoundedTrimCurveCcwW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimcurveccww
+
+- type: decal
+  id: RoundedTrimCurveCwE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimcurvecwe
+
+- type: decal
+  id: RoundedTrimCurveCwN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimcurvecwn
+
+- type: decal
+  id: RoundedTrimCurveCwS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimcurvecws
+
+- type: decal
+  id: RoundedTrimCurveCwW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: roundedtrimcurvecww
+
+- type: decal
+  id: PlatingTrimE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: platingtrime
+
+- type: decal
+  id: PlatingTrimEndE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: platingtrimende
+
+- type: decal
+  id: PlatingTrimEndN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: platingtrimendn
+
+- type: decal
+  id: PlatingTrimEndS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: platingtrimends
+
+- type: decal
+  id: PlatingTrimEndW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: platingtrimendw
+
+- type: decal
+  id: PlatingTrimN
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: platingtrimn
+
+- type: decal
+  id: PlatingTrimNE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: platingtrimne
+
+- type: decal
+  id: PlatingTrimNW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: platingtrimnw
+
+- type: decal
+  id: PlatingTrimS
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: platingtrims
+
+- type: decal
+  id: PlatingTrimSE
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: platingtrimse
+
+- type: decal
+  id: PlatingTrimSW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: platingtrimsw
+
+- type: decal
+  id: PlatingTrimW
+  tags: ["station", "markings"]
+  sprite:
+    sprite: _WG/Decals/trimline.rsi
+    state: platingtrimw
+
