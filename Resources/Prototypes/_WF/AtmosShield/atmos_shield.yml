@@ -1,0 +1,57 @@
+- type: entity
+  id: WFActionToggleAtmosShield
+  name: wf-atmos-shield-action-name
+  description: wf-atmos-shield-action-description
+  components:
+  - type: InstantAction
+    itemIconStyle: BigItem
+    event: !type:ToggleActionEvent
+
+- type: entity
+  parent: [ClothingOuterBaseLarge, AllowSuitStorageClothing]
+  id: WFClothingOuterHardsuitAtmosShield
+  name: wf-atmos-shield-name
+  description: wf-atmos-shield-description
+  components:
+  - type: WFAtmosShield
+  - type: Sprite
+    sprite: _WF/AtmosShield/atmos_shield.rsi
+  - type: Clothing
+    sprite: null
+  - type: ComponentToggler
+    components:
+    - type: PressureProtection
+      highPressureMultiplier: 0.02
+      lowPressureMultiplier: 1000
+    - type: TemperatureProtection
+      heatingCoefficient: 0.001
+      coolingCoefficient: 0.001
+  - type: ItemToggle
+    onUse: false
+  - type: ToggleClothing
+    action: WFActionToggleAtmosShield
+    disableOnUnequip: true
+    mustEquip: true
+  - type: ClothingSpeedModifier
+    walkModifier: 1
+    sprintModifier: 1
+  - type: Armor
+    modifiers:
+      coefficients:
+        Blunt: 0.9
+        Slash: 0.9
+        Piercing: 0.95
+        Heat: 0.9
+        Radiation: 0.25
+  - type: ProtectedFromStepTriggers
+    slots: WITHOUT_POCKET
+  - type: DamageOnInteractProtection
+    damageProtection:
+      flatReductions:
+        Heat: 10
+    slots: OUTERCLOTHING
+  - type: GroupExamine
+  - type: Tag
+    tags:
+    - Hardsuit
+    - WhitelistChameleon

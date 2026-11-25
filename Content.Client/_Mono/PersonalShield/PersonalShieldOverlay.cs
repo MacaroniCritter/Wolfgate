@@ -1,6 +1,8 @@
 using System.Numerics;
 using Content.Shared._Mono.PersonalShield;
 using Content.Shared.Inventory;
+using Content.Shared.Item.ItemToggle.Components; // WOLFGATE(AtmosShield)
+using Content.Shared._WF.AtmosShield; // WOLFGATE(AtmosShield)
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Shared.Enums;
@@ -29,6 +31,17 @@ public sealed partial class PersonalShieldOverlay : Overlay
     private readonly Dictionary<EntityUid, ShaderInstance> _shaders = new();
     private readonly List<EntityUid> _stale = new();
 
+    // WOLFGATE(AtmosShield) START: render the suit with the Medusa bubble-shield effect.
+    private static readonly PersonalShieldVisuals AtmosShieldVisuals = new()
+    {
+        Color = Color.FromHex("#BCF3FF"),
+        FillLevel = 0.2f,
+        HexDensity = 4f,
+        PixelGrid = 192f,
+        Scale = 1.6f,
+    };
+    // WOLFGATE END
+
     public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
 
     public PersonalShieldOverlay()
@@ -55,6 +68,7 @@ public sealed partial class PersonalShieldOverlay : Overlay
 
     protected override void Draw(in OverlayDrawArgs args)
     {
+        // WOLFGATE(AtmosShield) START: draw the atmospheric suit with the Medusa bubble renderer.
         if (args.MapId == MapId.Nullspace)
             return;
 
@@ -73,57 +87,84 @@ public sealed partial class PersonalShieldOverlay : Overlay
             if (!_inventory.TryGetContainingEntity(uid, out var wearer))
                 continue;
 
-            if (!_entManager.TryGetComponent(wearer, out SpriteComponent? sprite) || !sprite.Visible)
-                continue;
-
-            if (!_entManager.TryGetComponent(wearer, out TransformComponent? xform) || xform.MapID != args.MapId)
-                continue;
-
-            if (!TryGetHitboxSize(wearer.Value, sprite, out var extents))
-                continue;
-
-            var size = extents * shield.Visuals.Scale;
-
-            var shader = GetShader(uid);
             var flare = GetDamageFlare(shield);
             var charge = MathF.Max(shield.Runtime.Charge / MathF.Max(shield.Shield.MaxCharge, 0.001f), 0f);
             var minimum = Math.Clamp(shield.Visuals.MinimumBrightness, 0f, 1f);
             var brightness = charge > 1f ? charge : minimum + (1f - minimum) * charge;
             brightness += MathF.Max(1f - brightness, 0f) * flare;
 
-            shader.SetParameter("progress", GetProgress(shield));
-            shader.SetParameter("skin_color", shield.Visuals.Color);
-            shader.SetParameter("brightness", shield.Visuals.Brightness * brightness);
-            shader.SetParameter("pixel_grid", shield.Visuals.PixelGrid);
-            shader.SetParameter("hex_density", shield.Visuals.HexDensity);
-            shader.SetParameter("form_origin", shield.Visuals.FormOrigin);
-            shader.SetParameter("fill_level", shield.Visuals.FillLevel);
-            shader.SetParameter("line_level", shield.Visuals.LineLevel);
-            shader.SetParameter("rim_level", shield.Visuals.RimLevel);
-            shader.SetParameter("core_fade", shield.Visuals.CoreFade);
-            shader.SetParameter("shard_scale", shield.Visuals.ShardScale);
-            shader.SetParameter("alpha_bands", shield.Visuals.AlphaBands);
-            shader.SetParameter("breath_depth", shield.Visuals.BreathDepth);
-            shader.SetParameter("damage_flare", flare);
+            DrawBubble(uid, wearer.Value, args, counterRot, shield.Visuals, GetProgress(shield),
+                shield.Visuals.Brightness * brightness, flare);
+        }
 
-            handle.UseShader(shader);
+        var atmosQuery = _entManager.EntityQueryEnumerator<WFAtmosShieldComponent, ItemToggleComponent>();
+        while (atmosQuery.MoveNext(out var uid, out _, out var toggle))
+        {
+            if (!toggle.Activated ||
+                !_inventory.InSlotWithFlags(uid, SlotFlags.OUTERCLOTHING) ||
+                !_inventory.TryGetContainingEntity(uid, out var wearer))
+            {
+                continue;
+            }
 
-            var worldPos = _transform.GetWorldPosition(xform);
-            handle.SetTransform(Matrix3x2.Multiply(counterRot, Matrix3Helpers.CreateTranslation(worldPos)));
-            handle.DrawTextureRect(Texture.White, Box2.CenteredAround(Vector2.Zero, size));
+            DrawBubble(uid, wearer.Value, args, counterRot, AtmosShieldVisuals, 1f, 1f, 0f);
         }
 
         handle.SetTransform(Matrix3x2.Identity);
         handle.UseShader(null);
 
         PruneShaders();
+        // WOLFGATE END
     }
+
+    // WOLFGATE(AtmosShield) START: share the existing personal-shield bubble rendering with the atmos suit.
+    private void DrawBubble(
+        EntityUid shieldUid,
+        EntityUid wearer,
+        in OverlayDrawArgs args,
+        Matrix3x2 counterRot,
+        PersonalShieldVisuals visuals,
+        float progress,
+        float brightness,
+        float flare)
+    {
+        if (!_entManager.TryGetComponent(wearer, out SpriteComponent? sprite) || !sprite.Visible ||
+            !_entManager.TryGetComponent(wearer, out TransformComponent? xform) || xform.MapID != args.MapId ||
+            !TryGetHitboxSize(wearer, sprite, out var extents))
+        {
+            return;
+        }
+
+        var shader = GetShader(shieldUid);
+        shader.SetParameter("progress", progress);
+        shader.SetParameter("skin_color", visuals.Color);
+        shader.SetParameter("brightness", brightness);
+        shader.SetParameter("pixel_grid", visuals.PixelGrid);
+        shader.SetParameter("hex_density", visuals.HexDensity);
+        shader.SetParameter("form_origin", visuals.FormOrigin);
+        shader.SetParameter("fill_level", visuals.FillLevel);
+        shader.SetParameter("line_level", visuals.LineLevel);
+        shader.SetParameter("rim_level", visuals.RimLevel);
+        shader.SetParameter("core_fade", visuals.CoreFade);
+        shader.SetParameter("shard_scale", visuals.ShardScale);
+        shader.SetParameter("alpha_bands", visuals.AlphaBands);
+        shader.SetParameter("breath_depth", visuals.BreathDepth);
+        shader.SetParameter("damage_flare", flare);
+
+        args.WorldHandle.UseShader(shader);
+        var worldPos = _transform.GetWorldPosition(xform);
+        args.WorldHandle.SetTransform(Matrix3x2.Multiply(counterRot, Matrix3Helpers.CreateTranslation(worldPos)));
+        args.WorldHandle.DrawTextureRect(Texture.White,
+            Box2.CenteredAround(Vector2.Zero, extents * visuals.Scale));
+    }
+    // WOLFGATE END
 
     private void PruneShaders()
     {
         foreach (var (uid, shader) in _shaders)
         {
-            if (_entManager.HasComponent<PersonalShieldComponent>(uid))
+            if (_entManager.HasComponent<PersonalShieldComponent>(uid) ||
+                _entManager.HasComponent<WFAtmosShieldComponent>(uid)) // WOLFGATE(AtmosShield)
                 continue;
 
             shader.Dispose();
