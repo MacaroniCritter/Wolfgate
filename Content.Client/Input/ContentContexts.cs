@@ -1,4 +1,4 @@
-using Content.Shared._WF.RMCCore.Input; // WOLFGATE(Xenonids)
+using Content.Shared._WG.RMCCore.Input; // WOLFGATE(Xenonids)
 using Content.Shared.Input;
 using Robust.Shared.Input;
 
@@ -61,12 +61,21 @@ namespace Content.Client.Input
             human.AddFunction(EngineKeyFunctions.MoveLeft);
             human.AddFunction(EngineKeyFunctions.MoveRight);
             human.AddFunction(EngineKeyFunctions.Walk);
+            human.AddFunction(Content.Shared._WG.TurnInPlace.WGTurnInPlaceKeys.WGTurnInPlace); // WOLFGATE(TurnInPlace): hold to turn without moving
+            // WOLFGATE(PixelShift) START: hold to shift or tilt your sprite, and reset it
+            human.AddFunction(Content.Shared._WG.PixelShift.WGPixelShiftKeys.WGPixelShift);
+            human.AddFunction(Content.Shared._WG.PixelShift.WGPixelShiftKeys.WGPixelTilt);
+            human.AddFunction(Content.Shared._WG.PixelShift.WGPixelShiftKeys.WGPixelShiftReset);
+            // WOLFGATE END
             human.AddFunction(ContentKeyFunctions.ShuttleAscend); // Mono / PZN
             human.AddFunction(ContentKeyFunctions.ShuttleDescend);
             human.AddFunction(ContentKeyFunctions.SwapHands);
             human.AddFunction(ContentKeyFunctions.SwapHandsPrevious); // Frontier
+            human.AddFunction(Content.Shared._WG.HandSelect.WGHandSelectKeys.WGSelectLeftHand); // WOLFGATE(HandSelect): swap to left hand
+            human.AddFunction(Content.Shared._WG.HandSelect.WGHandSelectKeys.WGSelectRightHand); // WOLFGATE(HandSelect): swap to right hand
+            human.AddFunction(Content.Shared._WG.CancelInteractions.WGCancelInteractionKeys.WGCancelInteractions); // WOLFGATE(CancelInteractions): cancel own do-afters
             human.AddFunction(ContentKeyFunctions.Drop);
-            human.AddFunction(ContentKeyFunctions.WFOfferItem); // WOLFGATE(ExtraInteractions): hold out the active item
+            human.AddFunction(ContentKeyFunctions.WGOfferItem); // WOLFGATE(ExtraInteractions): hold out the active item
             human.AddFunction(ContentKeyFunctions.UseItemInHand);
             human.AddFunction(ContentKeyFunctions.AltUseItemInHand);
             human.AddFunction(ContentKeyFunctions.OpenCharacterMenu);
@@ -156,6 +165,8 @@ namespace Content.Client.Input
             aghost.AddFunction(ContentKeyFunctions.TryPullObject);
             aghost.AddFunction(ContentKeyFunctions.MovePulledObject);
             aghost.AddFunction(ContentKeyFunctions.ReleasePulledObject);
+            aghost.AddFunction(Content.Shared._WG.AdminObserver.WGAdminObserverKeys.WGToggleManifest); // WOLFGATE(AdminObserver): the manifest key works in the admin observer
+            aghost.AddFunction(Content.Shared._WG.AdminObserver.WGAdminObserverKeys.WGOpenObserverPanel); // WOLFGATE(AdminObserver): the observer panel key works in the admin observer
 
             var ghost = contexts.New("ghost", "human");
             ghost.AddFunction(EngineKeyFunctions.MoveUp);
@@ -169,6 +180,7 @@ namespace Content.Client.Input
             common.AddFunction(ContentKeyFunctions.OpenTileSpawnWindow);
             common.AddFunction(ContentKeyFunctions.OpenDecalSpawnWindow);
             common.AddFunction(ContentKeyFunctions.OpenAdminMenu);
+            common.AddFunction(Content.Shared._WG.AdminObserver.WGAdminObserverKeys.WGToggleAghost); // WOLFGATE(AdminObserver): the admin ghost key works from any body
             common.AddFunction(ContentKeyFunctions.OpenGuidebook);
 
             // WOLFGATE(Xenonids) START: RMC's resist key and the xenonid input context xeno mobs use

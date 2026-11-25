@@ -26,6 +26,7 @@
     RLeg: MobKoboldRLeg
     LFoot: MobKoboldLFoot
     RFoot: MobKoboldRFoot
+    UndergarmentSocks: MobHumanoidAnyMarking # WOLFGATE(Humanoid): allow socks markings for this species sprite set
 
 - type: humanoidBaseSprite
   id: MobKoboldAnyMarking
@@ -144,5 +145,5 @@
       points: 1
       required: false
     Chest:
-      points: 4 # WOLFGATE(Species): was 1, more marking slots
+      points: 8 # WOLFGATE(Species): was 1, more marking slots
       required: false

@@ -15,6 +15,7 @@
       - !type:Drunk
         slurSpeech: false
         boozePower: 20
+        perUnitInBlood: 1.9 # WOLFGATE(WolfChem): drunkenness follows the units in the blood
 
 - type: reagent
   id: Dylovene
@@ -28,6 +29,11 @@
     Medicine:
       metabolismRate: 0.2 # Mono
       effects:
+      # WOLFGATE(WolfChem) START: Dylovene flushes combat drugs, Redline and Anvil
+      - !type:WGClearIntoxication
+        family: Combat
+        amount: 2
+      # WOLFGATE END
       - !type:HealthChange
         damage:
           types:
@@ -66,6 +72,8 @@
         conditions:
         - !type:ReagentThreshold
           min: 15
+        perUnitInBlood: 3.33 # WOLFGATE(WolfChem): drunkenness follows the units in the blood
+        inBloodAbove: 15 # WOLFGATE(WolfChem): drunkenness follows the units in the blood
   plantMetabolism:
   - !type:PlantAdjustToxins
     amount: -10
@@ -189,6 +197,13 @@
         - !type:ReagentThreshold
           min: 16 #Mono 15 >> 16
       - !type:Drunk
+        # WOLFGATE(WolfChem) START: only in an overdose, like its jitter
+        conditions:
+        - !type:ReagentThreshold
+          min: 16
+        # WOLFGATE END
+        perUnitInBlood: 3.33 # WOLFGATE(WolfChem): drunkenness follows the units in the blood
+        inBloodAbove: 16 # WOLFGATE(WolfChem): drunkenness follows the units in the blood
 
 - type: reagent
   id: Cryoxadone
@@ -228,7 +243,7 @@
             max: 213.0
           key: ForcedSleep
           component: ForcedSleeping
-          refresh: false
+          refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
           type: Add
 
 - type: reagent
@@ -261,7 +276,7 @@
             max: 213.0
           key: ForcedSleep
           component: ForcedSleeping
-          refresh: false
+          refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
           type: Add
 
 - type: reagent
@@ -1544,7 +1559,7 @@
             max: 217.15
           key: ForcedSleep
           component: ForcedSleeping
-          refresh: false
+          refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
           type: Add
 
 
@@ -1586,7 +1601,7 @@
           max: 213.0
         key: ForcedSleep
         component: ForcedSleeping
-        refresh: false
+        refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
         type: Add
 
 - type: reagent
@@ -1639,7 +1654,15 @@
         component: SeeingRainbows
         type: Add
         time: 8
-        refresh: false
+        refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
+      # WOLFGATE(WolfChem) START: Psicodine calms empathogen and cannabis highs
+      - !type:WGClearIntoxication
+        family: Empathogen
+        amount: 2
+      - !type:WGClearIntoxication
+        family: Cannabinoid
+        amount: 2
+      # WOLFGATE END
       - !type:GenericStatusEffect
         key: Jitter
         time: 2.0
@@ -1696,6 +1719,14 @@
   metabolisms:
     Medicine:
       effects:
+      # WOLFGATE(WolfChem) START: Haloperidol brings down stimulant and psychedelic highs
+      - !type:WGClearIntoxication
+        family: Stimulant
+        amount: 2
+      - !type:WGClearIntoxication
+        family: Psychedelic
+        amount: 2
+      # WOLFGATE END
       - !type:Emote
         emote: Yawn
         showInChat: true
@@ -1705,7 +1736,7 @@
         component: Drowsiness
         time: 4
         type: Add
-        refresh: false
+        refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
       - !type:GenericStatusEffect
         key: Jitter
         time: 4.0

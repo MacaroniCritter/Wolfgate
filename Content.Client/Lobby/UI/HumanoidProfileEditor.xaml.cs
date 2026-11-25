@@ -71,14 +71,14 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using Content.Client.Humanoid;
-using Content.Client._WF.Genitals; // WOLFGATE(Genitals)
-using Content.Client._WF.Genitals.UI; // WOLFGATE(Genitals)
-using Content.Client._WF.Humanoid; // WOLFGATE(Humanoid)
-using Content.Client._WF.Traits; // WOLFGATE(Traits)
-using Content.Shared._WF.Genitals; // WOLFGATE(Genitals)
-using Content.Shared._WF.Genitals.Profile; // WOLFGATE(Genitals)
-using Content.Shared._WF.Biotype; // WOLFGATE(Biotype)
-using Content.Shared._WF.Species; // WOLFGATE(Species)
+using Content.Client._WG.Genitals; // WOLFGATE(Genitals)
+using Content.Client._WG.Genitals.UI; // WOLFGATE(Genitals)
+using Content.Client._WG.Humanoid; // WOLFGATE(Humanoid)
+using Content.Client._WG.Traits; // WOLFGATE(Traits)
+using Content.Shared._WG.Genitals; // WOLFGATE(Genitals)
+using Content.Shared._WG.Genitals.Profile; // WOLFGATE(Genitals)
+using Content.Shared._WG.Biotype; // WOLFGATE(Biotype)
+using Content.Shared._WG.Species; // WOLFGATE(Species)
 using Content.Client.Lobby.UI.Loadouts;
 using Content.Client.Lobby.UI.Roles;
 using Content.Client.Message;
@@ -86,7 +86,7 @@ using Content.Client.Players.PlayTimeTracking;
 using Content.Client.Sprite;
 using Content.Client.UserInterface.Systems.Guidebook;
 using Content.Client.UserInterface.Controls;
-using Content.Client._WF.UserInterface.Controls; // WOLFGATE(UserInterface)
+using Content.Client._WG.UserInterface.Controls; // WOLFGATE(UserInterface)
 using Content.Shared._Mono.Persistence; // Mono
 using Content.Shared._Mono.Company;
 using Content.Shared.CCVar;
@@ -116,7 +116,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using Direction = Robust.Shared.Maths.Direction;
 using Content.Client._Mono.Company;
-using LoadoutWindow = Content.Client._WF.Loadouts.WolfgateLoadoutWindow; // WOLFGATE(Loadouts): the editor opens the Wolfgate loadout window in place of the stock one
+using LoadoutWindow = Content.Client._WG.Loadouts.WolfgateLoadoutWindow; // WOLFGATE(Loadouts): the editor opens the Wolfgate loadout window in place of the stock one
 
 namespace Content.Client.Lobby.UI
 {
@@ -294,7 +294,7 @@ namespace Content.Client.Lobby.UI
 
             #region Appearance
 
-            TabContainer.SetTabTitle(0, Loc.GetString("wf-creator-species-tab")); // WOLFGATE(Humanoid)
+            TabContainer.SetTabTitle(0, Loc.GetString("wg-creator-species-tab")); // WOLFGATE(Humanoid)
             TabContainer.SetTabTitle(1, Loc.GetString("humanoid-profile-editor-appearance-tab")); // WOLFGATE(Humanoid): shifted by the species tab
 
             #region Sex
@@ -331,6 +331,7 @@ namespace Content.Client.Lobby.UI
 
             InitializeEmoteVoices(); // WOLFGATE(EmoteVoices)
             InitializeSpeechVoice(); // WOLFGATE(Voice)
+            InitializeCombatMusic(); // WOLFGATE(CombatMusic)
             InitializeSizePercent(); // WOLFGATE(Humanoid): typed percentages for height and width
             InitializeBloodColour(); // WOLFGATE(BloodColour)
 
@@ -684,7 +685,7 @@ namespace Content.Client.Lobby.UI
             #endregion Markings
 
             // WOLFGATE(Genitals) START: anatomy tab, found by position so a tab added or moved upstream cannot shift it
-            TabContainer.SetTabTitle(GenitalsTab.GetPositionInParent(), Loc.GetString("wf-genitals-tab"));
+            TabContainer.SetTabTitle(GenitalsTab.GetPositionInParent(), Loc.GetString("wg-genitals-tab"));
             GenitalEditor.OnProfileChanged += genitals =>
             {
                 Profile = Profile?.WithGenitals(genitals);
@@ -699,6 +700,7 @@ namespace Content.Client.Lobby.UI
             RefreshFlavorText();
             InitializeHeadshot(); // WOLFGATE(Headshot)
             InitializeCustomMarkings(); // WOLFGATE(CustomMarkings)
+            InitializeMarkingGlow(); // WOLFGATE(MarkingGlow)
             InitializeCompanyCard(); // WOLFGATE(Companies)
             InitializeMismatchedParts(); // WOLFGATE(Species)
             InitializeBiotype(); // WOLFGATE(Biotype)
@@ -719,6 +721,7 @@ namespace Content.Client.Lobby.UI
                 _previewRotation = _previewRotation.TurnCcw();
                 SetPreviewRotation(_previewRotation);
             };
+            InitializePreviewFrame(); // WOLFGATE(CharacterPreview): drag to turn, zoom, floor tile
 
             #endregion Dummy
 
@@ -948,7 +951,7 @@ namespace Content.Client.Lobby.UI
                         // WOLFGATE END
 
                         if (trait.NewbieBlocked) // WOLFGATE(Newbie): say why a newbie's saved pick won't apply
-                            tooltipParts.Add(Loc.GetString("wf-newbie-trait-blocked"));
+                            tooltipParts.Add(Loc.GetString("wg-newbie-trait-blocked"));
 
                         if (tooltipParts.Count > 0)
                             selector.SetTooltip(string.Join("\n", tooltipParts));
@@ -1194,10 +1197,10 @@ namespace Content.Client.Lobby.UI
                 }
 
                 // WOLFGATE(Biotype): a biotype the trait lists hides it like a listed species
-                if (!hide && Profile != null && WFBiotypeGates.TraitBlocked(thisProto, Profile, _prototypeManager))
+                if (!hide && Profile != null && WGBiotypeGates.TraitBlocked(thisProto, Profile, _prototypeManager))
                     hide = true;
 
-                if (!hide && WfNewbieTraitBlocked(thisProto)) // WOLFGATE(Newbie): new players can't take kill-target traits
+                if (!hide && WgNewbieTraitBlocked(thisProto)) // WOLFGATE(Newbie): new players can't take kill-target traits
                     hide = true;
 
                 if (!hide)
@@ -1430,6 +1433,7 @@ namespace Content.Client.Lobby.UI
             UpdateFlavorTextEdit();
             UpdateHeadshot(); // WOLFGATE(Headshot)
             UpdateCustomMarkings(); // WOLFGATE(CustomMarkings)
+            UpdateMarkingGlow(); // WOLFGATE(MarkingGlow)
             UpdateCompanyCard(); // WOLFGATE(Companies)
             UpdateMismatchedParts(); // WOLFGATE(Species)
             UpdateBiotype(); // WOLFGATE(Biotype)
@@ -1447,6 +1451,7 @@ namespace Content.Client.Lobby.UI
             UpdateEyePickers();
             UpdateEmoteVoiceControls(); // WOLFGATE(EmoteVoices)
             UpdateSpeechVoiceControls(); // WOLFGATE(Voice)
+            UpdateCombatMusicControls(); // WOLFGATE(CombatMusic)
             UpdateBloodColour(); // WOLFGATE(BloodColour)
             UpdateSaveButton();
             UpdateMarkings();
@@ -1844,7 +1849,7 @@ namespace Content.Client.Lobby.UI
             // WOLFGATE(Gags) START: colours picked for a recolourable item
             _loadoutWindow.OnLoadoutColorsChanged += (loadoutGroup, loadoutProto, colors) =>
             {
-                roleLoadout.SetWFGagsColors(loadoutGroup, loadoutProto, colors);
+                roleLoadout.SetWGGagsColors(loadoutGroup, loadoutProto, colors);
                 _loadoutWindow.RefreshLoadouts(roleLoadout, session, collection);
                 Profile = Profile?.WithLoadout(roleLoadout);
                 ReloadPreview();
@@ -1907,7 +1912,7 @@ namespace Content.Client.Lobby.UI
         private void UpdateDescriptionStatus(string content)
         {
             var max = HumanoidCharacterProfile.MaxDescLength;
-            DescriptionCounter.Text = Loc.GetString("wf-creator-description-counter",
+            DescriptionCounter.Text = Loc.GetString("wg-creator-description-counter",
                 ("count", content.Length), ("max", max));
             SetDangerClass(DescriptionCounter, content.Length > max);
 
@@ -1918,11 +1923,11 @@ namespace Content.Client.Lobby.UI
                 return;
 
             DescriptionWarning.Text = Loc.GetString(tooLong
-                ? "wf-creator-description-too-long"
-                : "wf-creator-description-brackets");
+                ? "wg-creator-description-too-long"
+                : "wg-creator-description-brackets");
             DescriptionWarning.ToolTip = Loc.GetString(tooLong
-                ? "wf-creator-description-too-long-tooltip"
-                : "wf-creator-description-brackets-tooltip", ("max", max));
+                ? "wg-creator-description-too-long-tooltip"
+                : "wg-creator-description-brackets-tooltip", ("max", max));
         }
 
         /// <summary>Toggles the Danger style class without disturbing the control's other classes.</summary>
@@ -2060,7 +2065,9 @@ namespace Content.Client.Lobby.UI
             _anatomySaveConfirm = null;
             // WOLFGATE END
             CloseHeadshotWindow(); // WOLFGATE(Headshot)
+            DisposeCombatMusic(); // WOLFGATE(CombatMusic): stop any preview
             CloseCustomMarkings(); // WOLFGATE(CustomMarkings)
+            DisposeMarkingGlow(); // WOLFGATE(MarkingGlow): drop the cvar subscription
 
             // Mono start
             foreach (var entity in _savedItemEntities)
@@ -2124,7 +2131,7 @@ namespace Content.Client.Lobby.UI
         private void SetSpecies(string newSpecies)
         {
             Profile = Profile?.WithSpecies(newSpecies);
-            Profile = Profile?.WithBiotype(WFBiotype.Default); // WOLFGATE(Biotype): a new species starts on its own biotype
+            Profile = Profile?.WithBiotype(WGBiotype.Default); // WOLFGATE(Biotype): a new species starts on its own biotype
             UpdateBiotype(); // WOLFGATE(Biotype)
             UpdateLegStyle(); // WOLFGATE(LegStyle): legs the new species lacks fall back to its own
             UpdateAugments(); // WOLFGATE(Augments): augments the new species can't take are dropped
@@ -2202,7 +2209,7 @@ namespace Content.Client.Lobby.UI
                 if (!_prototypeManager.TryIndex(traitId, out TraitPrototype? trait))
                     continue;
 
-                if (trait.SpeciesBlacklist.Contains(species) || WFBiotypeGates.TraitBlocked(trait, Profile, _prototypeManager)) // WOLFGATE(Biotype): a listed biotype drops the trait like a listed species
+                if (trait.SpeciesBlacklist.Contains(species) || WGBiotypeGates.TraitBlocked(trait, Profile, _prototypeManager)) // WOLFGATE(Biotype): a listed biotype drops the trait like a listed species
                     toRemove.Add(traitId);
                 // WOLFGATE(Traits) START: a saved trait the character's conditions no longer allow is dropped
                 else if (!TraitConditionUi.AllMet(trait, species.Id, _prototypeManager))
@@ -2497,7 +2504,7 @@ namespace Content.Client.Lobby.UI
                 return;
 
             GenitalEditor.SetContext(Profile.Species, Profile.Sex, Profile.Age, Profile.Appearance.SkinColor,
-                Profile.Appearance.Markings);
+                Profile.Appearance.Markings, Profile.CustomMarkings);
             Markings.HiddenMarkings = WolfgateGenitalEditor.HiddenMarkingsFor(Profile.Species, Profile.Age, _prototypeManager);
         }
 
@@ -2595,6 +2602,7 @@ namespace Content.Client.Lobby.UI
                 1,
                 HairStyleChoices(MarkingCategories.FacialHair)); // WOLFGATE(Species): the styles the option allows
             HairCard.Visible = HairStylePicker.Visible || FacialHairPicker.Visible; // WOLFGATE(Humanoid): no hair card for species without hair
+            UpdateHairGlow(); // WOLFGATE(MarkingGlow): a switch for each kind of hair the species has
         }
 
         private void UpdateCMarkingsHair()

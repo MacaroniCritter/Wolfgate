@@ -227,7 +227,9 @@ public sealed partial class DockingSystem
                     // Check if there's no intersecting grids (AKA oh god it's docking at cargo).
                     grids.Clear();
                     _mapSystem.FindGridsIntersecting(targetGridXform.MapID, dockedBounds, ref grids, includeMap: false);
-                    if (grids.Any(o => o.Owner != targetGrid && o.Owner != targetGridXform.MapUid))
+                    // WOLFGATE(RadarMenu): the docking ship itself is no obstacle, so one that flew up to a dock can take it
+                    // if (grids.Any(o => o.Owner != targetGrid && o.Owner != targetGridXform.MapUid))
+                    if (grids.Any(o => o.Owner != targetGrid && o.Owner != targetGridXform.MapUid && o.Owner != shuttleUid))
                     {
                         continue;
                     }
@@ -293,7 +295,7 @@ public sealed partial class DockingSystem
                                 continue;
                             }
                             */
-                            if (!WFTryGetDockPlacement(
+                            if (!WGTryGetDockPlacement(
                                     other,
                                     _xformQuery.GetComponent(otherUid),
                                     otherGrid,
@@ -410,7 +412,7 @@ public sealed partial class DockingSystem
             {
                 // WOLFGATE(Performance) START: chunk-first walk, same result; this ran per dock pair for every fixture
                 // if (_mapSystem.GetLocalTilesIntersecting(gridEntity.Owner, gridEntity.Comp, aabb).Any())
-                if (WFAnyTileIntersecting(gridEntity, aabb))
+                if (WGAnyTileIntersecting(gridEntity, aabb))
                     return false;
                 // WOLFGATE END
             }
@@ -427,7 +429,7 @@ public sealed partial class DockingSystem
         //
         // return _dockingSet.ToList();
         var docks = new List<Entity<DockingComponent>>();
-        if (_wfDockIndex.DocksOn(uid) is not { } indexed)
+        if (_wgDockIndex.DocksOn(uid) is not { } indexed)
             return docks;
 
         foreach (var dock in indexed)

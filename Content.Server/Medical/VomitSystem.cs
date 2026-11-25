@@ -42,12 +42,16 @@ namespace Content.Server.Medical
         public void Vomit(EntityUid uid, float thirstAdded = -40f, float hungerAdded = -40f)
         {
             // Main requirement: You have a stomach
+            // WOLFGATE: no body, no stomach; a hairball hitting a bodiless mob logged a resolve error
+            if (!HasComp<Content.Shared.Body.Components.BodyComponent>(uid))
+                return;
+
             var stomachList = _body.GetBodyOrganEntityComps<StomachComponent>(uid);
             if (stomachList.Count == 0)
                 return;
 
             // WOLFGATE(Wolfmed) START: no vomiting while dead or in cardiac arrest.
-            var wolfmedAttempt = new Content.Server._WF.Wolfmed.Life.WolfmedVomitAttemptEvent();
+            var wolfmedAttempt = new Content.Server._WG.Wolfmed.Life.WolfmedVomitAttemptEvent();
             RaiseLocalEvent(uid, ref wolfmedAttempt);
             if (wolfmedAttempt.Cancelled)
                 return;

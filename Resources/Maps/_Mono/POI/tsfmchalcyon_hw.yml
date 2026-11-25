@@ -5,7 +5,7 @@ meta:
   forkId: ""
   forkVersion: ""
   time: 08/25/2026 22:27:38
-  entityCount: 10133
+  entityCount: 10134
 maps: []
 grids:
 - 1
@@ -46378,14 +46378,21 @@ entities:
       rot: 1.5707963267948966 rad
       pos: 13.5,-4.5
       parent: 1
-- proto: WFVendingMachineTraderHalcyon
+- proto: WGSpecialistVendorTSF
+  entities:
+  - uid: 10134
+    components:
+    - type: Transform
+      parent: 1
+      pos: 14.5,5.5
+- proto: WGVendingMachineTraderHalcyon
   entities:
   - uid: 10132
     components:
     - type: Transform
       pos: -10.5,-7.5
       parent: 1
-- proto: WFVendingMachineTsfOutfitter
+- proto: WGVendingMachineTsfOutfitter
   entities:
   - uid: 10133
     components:
@@ -46637,15 +46644,46 @@ entities:
         146:
         - - Pressed
           - DoorBolt
-- proto: LockableButtonBrig
+- proto: LockableButtonTSFMC
   entities:
+  - uid: 6955
+    components:
+    - type: Transform
+      pos: 9.5,17.5
+      parent: 1
+    - type: DeviceLinkSource
+      linkedPorts:
+        1253:
+        - - Pressed
+          - Toggle
+        1254:
+        - - Pressed
+          - Toggle
+        1255:
+        - - Pressed
+          - Toggle
+  - uid: 6956
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 7.5,13.5
+      parent: 1
+    - type: DeviceLinkSource
+      linkedPorts:
+        1255:
+        - - Pressed
+          - Toggle
+        1254:
+        - - Pressed
+          - Toggle
+        1253:
+        - - Pressed
+          - Toggle
   - uid: 6950
     components:
     - type: Transform
       pos: -8.237229,13.5
       parent: 1
-- proto: LockableButtonSecurity
-  entities:
   - uid: 6951
     components:
     - type: Transform
@@ -46710,41 +46748,6 @@ entities:
         - - Pressed
           - Toggle
         1250:
-        - - Pressed
-          - Toggle
-- proto: LockableButtonTSFMC
-  entities:
-  - uid: 6955
-    components:
-    - type: Transform
-      pos: 9.5,17.5
-      parent: 1
-    - type: DeviceLinkSource
-      linkedPorts:
-        1253:
-        - - Pressed
-          - Toggle
-        1254:
-        - - Pressed
-          - Toggle
-        1255:
-        - - Pressed
-          - Toggle
-  - uid: 6956
-    components:
-    - type: Transform
-      rot: 3.141592653589793 rad
-      pos: 7.5,13.5
-      parent: 1
-    - type: DeviceLinkSource
-      linkedPorts:
-        1255:
-        - - Pressed
-          - Toggle
-        1254:
-        - - Pressed
-          - Toggle
-        1253:
         - - Pressed
           - Toggle
 - proto: LockerAtmosphericsFilled

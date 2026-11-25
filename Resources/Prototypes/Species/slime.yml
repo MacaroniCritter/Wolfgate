@@ -27,6 +27,7 @@
     Chest: MobSlimeTorso
     UndergarmentTop: MobHumanoidAnyMarking # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
     UndergarmentBottom: MobHumanoidAnyMarking # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
+    UndergarmentSocks: MobHumanoidAnyMarking # WOLFGATE(Humanoid): allow socks markings for this species sprite set
     Genital: MobHumanoidAnyMarking # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
     Penis: MobHumanoidAnyMarking # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
     Breasts: MobHumanoidAnyMarking # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
@@ -50,13 +51,13 @@
       points: 1
       required: false
     Chest:
-      points: 4 # imp 1<4
+      points: 8 # imp 1<4 # WOLFGATE(Species): was 4, more marking slots
       required: false
     Legs:
-      points: 8 # imp 4<8
+      points: 16 # imp 4<8 # WOLFGATE(Species): was 8, more marking slots
       required: false
     Arms:
-      points: 8 # imp 4<8
+      points: 16 # imp 4<8 # WOLFGATE(Species): was 8, more marking slots
       required: false
 
 - type: humanoidBaseSprite

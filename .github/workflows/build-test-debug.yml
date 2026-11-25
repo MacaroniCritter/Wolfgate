@@ -15,7 +15,7 @@ on:
 jobs:
   build:
     if: github.event.pull_request.draft == false
-    # WOLFGATE(Ci) START: split the integration tests over five runners; each builds and runs one shard
+    # WOLFGATE(Ci) START: split the integration tests over seven runners; each builds and runs one shard
     # strategy:
     #   matrix:
     #     os: [ubuntu-latest]
@@ -25,21 +25,27 @@ jobs:
       matrix:
         # Pinned: on ubuntu-26.04 the cockpit and console label-width tests fail with the same code.
         os: [ubuntu-24.04]
-        shard: [ wf-heavy, wf-npc, wf-planets, wf-rest, core ]
+        shard: [ wg-heavy, wg-npc, wg-planets, wg-rest-a, wg-rest-b, wg-rest-c, core ]
         # Balanced on per-module times from the NUnit XML, about 8 minutes of tests each.
         include:
-        - shard: wf-heavy
-          where: "test =~ 'Tests[.]_WF[.](Wolfmed|Vehicles|Remade|AdsIncursion)[.]'"
-        - shard: wf-npc
-          where: "test =~ 'Tests[.]_WF[.](Encounters|NpcCrew|RoundSetup)[.]'"
+        - shard: wg-heavy
+          where: "test =~ 'Tests[.]_WG[.](Wolfmed|Vehicles|Remade|AdsIncursion)[.]'"
+        - shard: wg-npc
+          where: "test =~ 'Tests[.]_WG[.](Encounters|NpcCrew|RoundSetup)[.]'"
         # Whole worlds built per test: on one runner with the rest they ran it out of memory.
-        - shard: wf-planets
-          where: "test =~ 'Tests[.]_WF[.](Planet[A-Za-z]*|Caverns|LivingWorld|SandMaw|ReaverCampaign|Administration)[.]'"
-        - shard: wf-rest
-          where: "test =~ 'Tests[.]_WF[.]' && test !~ 'Tests[.]_WF[.](Wolfmed|Vehicles|Remade|AdsIncursion|Encounters|NpcCrew|RoundSetup|Planet[A-Za-z]*|Caverns|LivingWorld|SandMaw|ReaverCampaign|Administration)[.]' && test !~ ShipyardTest"
+        - shard: wg-planets
+          where: "test =~ 'Tests[.]_WG[.](Planet[A-Za-z]*|Caverns|LivingWorld|SandMaw|ReaverCampaign|Administration)[.]'"
+        # The rest of _WG, split by module name: as one shard (about 2,300 tests) it ran its runner out of memory.
+        # A to L as one shard still grew past the runner's 16 GB and was lost about 50 minutes in, so it is two.
+        - shard: wg-rest-a
+          where: "test =~ 'Tests[.]_WG[.][A-C]' && test !~ 'Tests[.]_WG[.](Wolfmed|Vehicles|Remade|AdsIncursion|Encounters|NpcCrew|RoundSetup|Planet[A-Za-z]*|Caverns|LivingWorld|SandMaw|ReaverCampaign|Administration)[.]' && test !~ ShipyardTest"
+        - shard: wg-rest-b
+          where: "test =~ 'Tests[.]_WG[.][D-L]' && test !~ 'Tests[.]_WG[.](Wolfmed|Vehicles|Remade|AdsIncursion|Encounters|NpcCrew|RoundSetup|Planet[A-Za-z]*|Caverns|LivingWorld|SandMaw|ReaverCampaign|Administration)[.]' && test !~ ShipyardTest"
+        - shard: wg-rest-c
+          where: "test =~ 'Tests[.]_WG[.]' && test !~ 'Tests[.]_WG[.][A-L]' && test !~ 'Tests[.]_WG[.](Wolfmed|Vehicles|Remade|AdsIncursion|Encounters|NpcCrew|RoundSetup|Planet[A-Za-z]*|Caverns|LivingWorld|SandMaw|ReaverCampaign|Administration)[.]' && test !~ ShipyardTest"
         # Upstream and other forks; Content.Tests runs here too.
         - shard: core
-          where: "test !~ 'Tests[.]_WF[.]' && test !~ ShipyardTest"
+          where: "test !~ 'Tests[.]_WG[.]' && test !~ ShipyardTest"
           unit: true
     # WOLFGATE END
 
@@ -87,7 +93,11 @@ jobs:
         # Each shard's filter comes from the matrix; together they cover every test but the Shipyard ones.
         # dotnet test --no-build --configuration DebugOpt Content.IntegrationTests/Content.IntegrationTests.csproj -- "NUnit.Where=${{ matrix.where }}" NUnit.ConsoleOut=0 NUnit.MapWarningTo=Failed NUnit.TestOutputXml="logs" NUnit.WorkDirectory="$(pwd)/test_results"
         # Above AssemblySelectLimit (default 2000) the adapter runs the whole assembly and only hides the extra results.
-        dotnet test --no-build --configuration DebugOpt Content.IntegrationTests/Content.IntegrationTests.csproj -- "NUnit.Where=${{ matrix.where }}" NUnit.AssemblySelectLimit=100000 NUnit.ConsoleOut=0 NUnit.MapWarningTo=Failed NUnit.TestOutputXml="logs" NUnit.WorkDirectory="$(pwd)/test_results"
+        # dotnet test --no-build --configuration DebugOpt Content.IntegrationTests/Content.IntegrationTests.csproj -- "NUnit.Where=${{ matrix.where }}" NUnit.AssemblySelectLimit=100000 NUnit.ConsoleOut=0 NUnit.MapWarningTo=Failed NUnit.TestOutputXml="logs" NUnit.WorkDirectory="$(pwd)/test_results"
+        # WOLFGATE(Ci): a test running past 25 minutes is killed and named, before a stalled runner is shut down with no name
+        # Without it a stuck shard printed nothing until GitHub shut the runner down, the earliest about 27 minutes into
+        # the stuck test. The slowest test, the same-spot spawn-all, takes about 18 minutes.
+        dotnet test --no-build --configuration DebugOpt Content.IntegrationTests/Content.IntegrationTests.csproj --blame-hang-timeout 25m --blame-hang-dump-type none --results-directory "$(pwd)/test_results/blame" -- "NUnit.Where=${{ matrix.where }}" NUnit.AssemblySelectLimit=100000 NUnit.ConsoleOut=0 NUnit.MapWarningTo=Failed NUnit.TestOutputXml="logs" NUnit.WorkDirectory="$(pwd)/test_results"
         # WOLFGATE END
 
     - name: Archive NUnit3 test results.

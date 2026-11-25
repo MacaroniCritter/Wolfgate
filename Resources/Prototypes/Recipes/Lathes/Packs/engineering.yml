@@ -11,6 +11,7 @@
   - Multitool
   - MaintenanceJack #Mono
   - Shovel # WOLFGATE(Caverns): shovels dig cavern shafts on planets
+  - WGNeurowareStick # WOLFGATE(WolfChem): blank data sticks print at the autolathe
   # - NetworkConfigurator # Frontier: downgrade vs. multitool
   - Signaller
   - SprayPainter
@@ -58,7 +59,7 @@
   id: EngineeringBoardsStatic
   recipes:
   - SpaceHeaterMachineCircuitBoard
-  - WFWeatherForecastComputerCircuitboard # WOLFGATE(Planets): weather forecast console board
+  - WGWeatherForecastComputerCircuitboard # WOLFGATE(Planets): weather forecast console board
 
 ## Dynamic
 

@@ -25,6 +25,7 @@
     Head: MobAvaliHead
     UndergarmentTop: MobHumanoidAnyMarking
     UndergarmentBottom: MobHumanoidAnyMarking
+    UndergarmentSocks: MobHumanoidAnyMarking # WOLFGATE(Humanoid): allow socks markings for this species sprite set
     Genital: MobHumanoidAnyMarking
     Penis: MobHumanoidAnyMarking
     Breasts: MobHumanoidAnyMarking
@@ -80,13 +81,13 @@
       required: true
       defaultMarkings: [ AvaliEarsBase ]
     Chest:
-      points: 6
+      points: 8 # WOLFGATE(Species): was 6, more marking slots
       required: false
     Legs:
-      points: 8 # WOLFGATE(Species): was 6, more marking slots
+      points: 16 # WOLFGATE(Species): was 6, more marking slots
       required: false
     Arms:
-      points: 8 # WOLFGATE(Species): was 6, more marking slots
+      points: 16 # WOLFGATE(Species): was 6, more marking slots
       required: false
 
 - type: humanoidBaseSprite

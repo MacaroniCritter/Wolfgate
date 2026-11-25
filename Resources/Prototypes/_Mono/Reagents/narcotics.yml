@@ -24,6 +24,11 @@
     Narcotic:
       metabolismRate: 1
       effects:
+      # WOLFGATE(WolfChem) START: doses the Heroin profile at one and a half strength
+      - !type:WGDose
+        profile: WGHeroin
+        perUnit: 1.5
+      # WOLFGATE END
       - !type:MovespeedModifier
         walkSpeedModifier: 0.40
         sprintSpeedModifier: 0.40
@@ -40,7 +45,8 @@
         component: SeeingRainbows
         type: Add
         time: 20
-        refresh: false
+        refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
+        perUnitInBlood: 1 # WOLFGATE(WolfChem): held at the units left, as long as it used to pile up to
       - !type:Emote
         emote: Laugh
         showInChat: true
@@ -51,6 +57,7 @@
       - !type:Drunk
         slurSpeech: true
         boozePower: 75
+        perUnitInBlood: 1 # WOLFGATE(WolfChem): drunkenness follows the units in the blood
         # OD effects
       - !type:ChemVomit
         probability: 0.05
@@ -62,6 +69,8 @@
         conditions:
         - !type:ReagentThreshold
           min: 5
+        perUnitInBlood: 1 # WOLFGATE(WolfChem): drunkenness follows the units in the blood
+        inBloodAbove: 5 # WOLFGATE(WolfChem): drunkenness follows the units in the blood
       - !type:HealthChange
         conditions:
         - !type:ReagentThreshold
@@ -133,5 +142,5 @@
           min: 30 # Mono
         key: ForcedSleep
         component: ForcedSleeping
-        refresh: false
+        refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
         type: Add

@@ -529,8 +529,11 @@
         reagents:
           - ReagentId: Nicotine
             Quantity: 10
-          - ReagentId: RobustHarvest
+          # WOLFGATE(WolfChem) START: the THC cigarette held plant fertiliser instead of THC
+          # - ReagentId: RobustHarvest
+          - ReagentId: THC
             Quantity: 10
+          # WOLFGATE END
       food:
         maxVol: 5
         reagents:

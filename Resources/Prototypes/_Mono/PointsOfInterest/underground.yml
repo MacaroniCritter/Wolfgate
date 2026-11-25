@@ -11,12 +11,12 @@
   gridPath: /Maps/_Mono/POI/underground.yml
   addComponents:
   # WOLFGATE(Ordnance) START: the faction's ordnance terminal
-  - type: WFOrdnanceStation
-    terminal: WFOrdnanceTerminalUnderground
+  - type: WGOrdnanceStation
+    terminal: WGOrdnanceTerminalUnderground
   # WOLFGATE END
-  # WOLFGATE(ReaverCampaign): the station flies the neutral WFUnderground company, so the Reavers leave it and its cell alone
+  # WOLFGATE(ReaverCampaign): the station flies the neutral WGUnderground company, so the Reavers leave it and its cell alone
   - type: Company
-    companyName: WFUnderground
+    companyName: WGUnderground
   - type: IFF
     color: "#991111"
     readOnly: true # mono
@@ -49,6 +49,8 @@
       - type: ApplyIFFFlagsToDockedShips
         flags:
         - HideLabelAlways # hide all docked ships
+      - type: VoiceOverride # The UBM is the entity speaking when it says to "stop any further activity". Lilyflower pointed out that's kind of nonsensical, and I do agree with her so.
+        nameOverride: TSF Cargo Monitoring
       components:
         - type: StationNameSetup
           mapNameTemplate: 'Underground Black Market'

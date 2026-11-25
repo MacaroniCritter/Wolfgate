@@ -1,12 +1,13 @@
 ﻿using Content.Client.Gameplay;
-using Content.Client._WF.Feedback; // WOLFGATE(Feedback)
-using Content.Client._WF.Census; // WOLFGATE(Census)
-using Content.Client._WF.RoundSetup; // WOLFGATE(RoundSetup)
-using Content.Client._WF.MappingMode; // WOLFGATE(MappingMode)
+using Content.Client._WG.Feedback; // WOLFGATE(Feedback)
+using Content.Client._WG.Census; // WOLFGATE(Census)
+using Content.Client._WG.RoundSetup; // WOLFGATE(RoundSetup)
+using Content.Client._WG.MappingMode; // WOLFGATE(MappingMode)
 using Content.Client.Lobby; // WOLFGATE(InRoundCreator)
-using Content.Client._WF.Roadmap; // WOLFGATE(Roadmap)
-using Content.Client._WF.SectorControl; // WOLFGATE(SectorControl)
-using Content.Client._WF.LoreBook; // WOLFGATE(LoreBook)
+using Content.Client._WG.Roadmap; // WOLFGATE(Roadmap)
+using Content.Client._WG.SectorControl; // WOLFGATE(SectorControl)
+using Content.Client._WG.LoreBook; // WOLFGATE(LoreBook)
+using Content.Client._WG.Unstuck; // WOLFGATE(Unstuck)
 using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Systems.Guidebook;
 using Content.Client.UserInterface.Systems.Info;
@@ -105,7 +106,7 @@ public sealed partial class EscapeUIController : UIController, IOnStateEntered<G
         _escapeWindow.LoreBookButton.OnPressed += _ =>
         {
             CloseEscapeWindow();
-            UIManager.GetUIController<WFLoreBookUIController>().Open();
+            UIManager.GetUIController<WGLoreBookUIController>().Open();
         };
         // WOLFGATE END
 
@@ -113,7 +114,7 @@ public sealed partial class EscapeUIController : UIController, IOnStateEntered<G
         _escapeWindow.SectorMapButton.OnPressed += _ =>
         {
             CloseEscapeWindow();
-            UIManager.GetUIController<WFSectorMapUIController>().ToggleWindow();
+            UIManager.GetUIController<WGSectorMapUIController>().ToggleWindow();
         };
         // WOLFGATE END
 
@@ -129,7 +130,7 @@ public sealed partial class EscapeUIController : UIController, IOnStateEntered<G
         _escapeWindow.RoundSetupButton.OnPressed += _ =>
         {
             CloseEscapeWindow();
-            UIManager.GetUIController<WFRoundSetupUIController>().OpenWindow();
+            UIManager.GetUIController<WGRoundSetupUIController>().OpenWindow();
         };
         // WOLFGATE END
 
@@ -137,7 +138,7 @@ public sealed partial class EscapeUIController : UIController, IOnStateEntered<G
         _escapeWindow.MappingButton.OnPressed += _ =>
         {
             CloseEscapeWindow();
-            UIManager.GetUIController<WFMappingMenuUIController>().OpenWindow();
+            UIManager.GetUIController<WGMappingMenuUIController>().OpenWindow();
         };
 
         _escapeWindow.OnOpen += () =>
@@ -145,11 +146,19 @@ public sealed partial class EscapeUIController : UIController, IOnStateEntered<G
             if (_escapeWindow is not { } window)
                 return;
 
-            var mapping = UIManager.GetUIController<WFMappingMenuUIController>();
+            var mapping = UIManager.GetUIController<WGMappingMenuUIController>();
             window.MappingButton.Visible = mapping.Available;
             window.CharacterButton.Visible = !mapping.ModeEnabled;
             window.RoundSetupButton.Visible = !mapping.ModeEnabled;
             window.SectorMapButton.Visible = !mapping.ModeEnabled;
+        };
+        // WOLFGATE END
+
+        // WOLFGATE(Unstuck) START: asks the server to free a player stuck inside a wall
+        _escapeWindow.UnstuckButton.OnPressed += _ =>
+        {
+            CloseEscapeWindow();
+            EntityManager.System<WGUnstuckSystem>().RequestUnstuck();
         };
         // WOLFGATE END
 

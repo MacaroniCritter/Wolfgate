@@ -454,6 +454,11 @@ public sealed partial class ChatUIController : UIController
             return;
         }
 
+        // WOLFGATE(SpeechBubbles) START: the player's speech bubble toggles
+        if (!WgShowSpeechBubble(ent, msg, speechType))
+            return;
+        // WOLFGATE END
+
         EnqueueSpeechBubble(ent, msg, speechType);
     }
 
@@ -552,7 +557,7 @@ public sealed partial class ChatUIController : UIController
 
             // Can only send local / radio / emote when attached to a non-ghost entity.
             // TODO: this logic is iffy (checking if controlling something that's NOT a ghost), is there a better way to check this?
-            if (_ghost is not {IsGhost: true})
+            if (_ghost is not {IsGhost: true} || WGManifested) // WOLFGATE(AdminObserver): a manifested admin observer speaks in character
             {
                 CanSendChannels |= ChatSelectChannel.Local;
                 CanSendChannels |= ChatSelectChannel.Whisper;
@@ -710,7 +715,7 @@ public sealed partial class ChatUIController : UIController
 
     public ChatSelectChannel MapLocalIfGhost(ChatSelectChannel channel)
     {
-        if (channel == ChatSelectChannel.Local && _ghost is {IsGhost: true})
+        if (channel == ChatSelectChannel.Local && _ghost is {IsGhost: true} && !WGManifested) // WOLFGATE(AdminObserver): Local stays Local for a manifested admin observer
             return ChatSelectChannel.Dead;
 
         return channel;
@@ -781,7 +786,7 @@ public sealed partial class ChatUIController : UIController
 
         if (chatChannel == ChatSelectChannel.Local)
         {
-            if (_ghost?.IsGhost != true)
+            if (_ghost?.IsGhost != true || WGManifested) // WOLFGATE(AdminObserver): Local stays Local for a manifested admin observer
                 return (chatChannel, text, null, null); // Goobstation - Starlight collective mind port
             else
                 chatChannel = ChatSelectChannel.Dead;
@@ -876,8 +881,10 @@ public sealed partial class ChatUIController : UIController
 
     public void ProcessChatMessage(ChatMessage msg, bool speechBubble = true)
     {
-        if (_ent.EntitySysManager.TryGetEntitySystem<Content.Client._WF.Ghost.GhostOrbitSystem>(out var ghostOrbit)) // WOLFGATE(Ghost)
+        if (_ent.EntitySysManager.TryGetEntitySystem<Content.Client._WG.Ghost.GhostOrbitSystem>(out var ghostOrbit)) // WOLFGATE(Ghost)
             ghostOrbit.AddChatLink(msg); // WOLFGATE(Ghost): orbit link for ghosts
+        if (_ent.EntitySysManager.TryGetEntitySystem<Content.Client._WG.Administration.AdminFollow.AdminFollowLinkSystem>(out var adminFollow)) // WOLFGATE(Administration)
+            adminFollow.AddChatLink(msg); // WOLFGATE(Administration): follow link on admin alerts about an entity
 
         // color the name unless it's something like "the old man"
         if ((msg.Channel == ChatChannel.Local || msg.Channel == ChatChannel.Whisper) && _chatNameColorsEnabled)
@@ -886,6 +893,11 @@ public sealed partial class ChatUIController : UIController
             if (grammar != null && grammar.ProperNoun == true)
                 msg.WrappedMessage = SharedChatSystem.InjectTagInsideTag(msg, "Name", "color", GetNameColor(SharedChatSystem.GetStringInsideTag(msg, "Name")));
         }
+
+        // WOLFGATE(WolfChem) START: chat seen through the local player's high, before tags split the message text
+        if (_ent.EntitySysManager.TryGetEntitySystem<Content.Client._WG.WolfChem.Narcotics.WGDrugChatSystem>(out var drugChat))
+            drugChat.Distort(msg);
+        // WOLFGATE END
 
         // Color any codewords for minds that have roles that use them
         if (_player.LocalUser != null && _mindSystem != null && _roleCodewordSystem != null)
@@ -900,10 +912,12 @@ public sealed partial class ChatUIController : UIController
             }
         }
 
+        var wgBeforeHighlights = msg.WrappedMessage; // WOLFGATE(Notifications): tells whether a highlight matched
         foreach (var highlight in _highlights)
         {
             msg.WrappedMessage = SharedChatSystem.InjectTagAroundString(msg, highlight, "color", _highlightsColor);
         }
+        WgOnHighlights(msg, wgBeforeHighlights); // WOLFGATE(Notifications): sound and window flash on a highlight
 
         // Log all incoming chat to repopulate when filter is un-toggled
         if (!msg.HideChat)

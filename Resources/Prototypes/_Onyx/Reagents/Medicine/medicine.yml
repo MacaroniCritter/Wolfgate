@@ -130,6 +130,12 @@
     Medicine: # WOLFGATE(Wolfmed): Onyx `Bloodstream`
       metabolismRate: 0.1
       effects:
+      # WOLFGATE(WolfChem) START: medical opioids build dependence slowly through the Opium profile
+      - !type:WGDose
+        profile: WGOpium
+        perUnit: 0.5
+        dependenceOnly: true
+      # WOLFGATE END
       - !type:SuppressPain
         amount: 1.25
         decayDuration: 45
@@ -166,6 +172,12 @@
     Medicine: # WOLFGATE(Wolfmed): Onyx `Bloodstream`
       metabolismRate: 0.1
       effects:
+      # WOLFGATE(WolfChem) START: medical opioids build dependence slowly through the Heroin profile
+      - !type:WGDose
+        profile: WGHeroin
+        perUnit: 0.5
+        dependenceOnly: true
+      # WOLFGATE END
       - !type:SuppressPain
         amount: 2
         decayDuration: 60

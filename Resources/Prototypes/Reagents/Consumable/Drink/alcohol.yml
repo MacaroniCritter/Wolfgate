@@ -168,6 +168,7 @@
   meltingPoint: -114.1
   metabolisms:
     Alcohol:
+      metabolismRate: 0.25 # WOLFGATE(WolfChem): drunk lasts while ethanol does, so it clears at half speed to keep the old duration
       effects:
       - !type:HealthChange
         conditions:
@@ -181,7 +182,7 @@
           shouldHave: false
         damage:
           types:
-            Poison: 1
+            Poison: 0.5 # WOLFGATE(WolfChem): halved since ethanol now stays twice as long above the threshold
       # dwarves take less toxin damage and heal a marginal amount of brute
       # - !type:HealthChange
       #   conditions:
@@ -200,7 +201,7 @@
           type: Dwarf
         damage:
           groups:
-            Brute: -1
+            Brute: -0.5 # WOLFGATE(WolfChem): halved since ethanol now stays twice as long above the threshold
       - !type:HealthChange
         conditions:
         - !type:ReagentThreshold
@@ -209,9 +210,9 @@
           type: Yowie
         damage:
           groups:
-            Brute: -1
+            Brute: -0.5 # WOLFGATE(WolfChem): halved since ethanol now stays twice as long above the threshold
       - !type:ChemVomit
-        probability: 0.04
+        probability: 0.02 # WOLFGATE(WolfChem): halved since ethanol now stays twice as long above the threshold
         conditions:
         - !type:ReagentThreshold
           reagent: Ethanol
@@ -225,6 +226,7 @@
           shouldHave: false
       - !type:Drunk
         boozePower: 2
+        perUnitInBlood: 10 # WOLFGATE(WolfChem): drunkenness follows the ethanol left in the blood
 
 - type: reagent
   id: Gin

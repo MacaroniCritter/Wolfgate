@@ -37,6 +37,11 @@
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/tobacco.rsi
     state: dried
+  # WOLFGATE(WolfChem) START: fits a baggie
+  - type: Tag
+    tags:
+    - WGBaggable
+  # WOLFGATE END
 
 - type: entity
   name: ground cannabis
@@ -63,6 +68,7 @@
   - type: Tag
     tags:
       - Smokable
+      - WGBaggable # WOLFGATE(WolfChem): fits a baggie
   - type: Item
     size: Tiny
     
@@ -223,6 +229,11 @@
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/tobacco.rsi
     state: dried
+  # WOLFGATE(WolfChem) START: fits a baggie and a bong bowl
+  - type: Tag
+    tags:
+    - WGBaggable
+  # WOLFGATE END
 
 - type: entity
   name: ground tobacco

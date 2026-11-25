@@ -2,6 +2,8 @@ using Content.Server.Cargo.Systems;
 using Content.Server.NPC.HTN;
 using Content.Server.Shuttles.Components;
 using Content.Shared._Mono.CCVar;
+using Content.Shared._Mono.VendingMachine; // WOLFGATE(Cleanup)
+using Content.Shared._WG.TradeGoods; // WOLFGATE(Cleanup)
 using Content.Shared.Mind.Components;
 using Content.Shared.Physics;
 using Robust.Shared.Configuration;
@@ -77,6 +79,7 @@ public sealed partial class SpaceCleanupSystem : BaseCleanupSystem<PhysicsCompon
                 _testOverlapArgs = Array.ConvertAll(_testOverlap.GetParameters(), p => p.HasDefaultValue ? p.DefaultValue : null);
             // WOLFGATE END
         }
+        WGCompileTestOverlap(); // WOLFGATE(Cleanup): typed delegate for the per-contact wall-stuck overlap test
     }
 
     protected override bool ShouldEntityCleanup(EntityUid uid)
@@ -86,6 +89,11 @@ public sealed partial class SpaceCleanupSystem : BaseCleanupSystem<PhysicsCompon
 
     private bool ShouldEntityCleanup(EntityUid uid, float aggression)
     {
+        // WOLFGATE(Cleanup) START: same decision with cheap rejections before pricing; unusual cvars fall through to the check below
+        if (WGTryShouldEntityCleanup(uid, aggression, out var wgCleanup))
+            return wgCleanup;
+        // WOLFGATE END
+
         var xform = Transform(uid);
 
         var isStuck = false;
@@ -98,6 +106,7 @@ public sealed partial class SpaceCleanupSystem : BaseCleanupSystem<PhysicsCompon
             && !_htnQuery.HasComp(uid) // handled by MobCleanupSystem
             && !_immuneQuery.HasComp(uid) // handled by GridCleanupSystem
             && !_mindQuery.HasComp(uid) // no deleting anything that can have a mind - should be handled by MobCleanupSystem anyway
+            && !(isStuck && WgPaidFor(uid)) // WOLFGATE(Cleanup): a bought item or trade crate caught in a wall is kept, its static price undersells it
             && (price = (float)_pricing.GetPrice(uid)) <= _maxPrice
             // WOLFGATE(Cleanup) START: floor the lookup radius, since a zero-price entity's zero radius asserted the server down.
             && (isStuck
@@ -105,6 +114,13 @@ public sealed partial class SpaceCleanupSystem : BaseCleanupSystem<PhysicsCompon
                     && !_cleanup.HasNearbyPlayers(xform.Coordinates, MathF.Max(0.5f, _maxDistance * aggression * MathF.Sqrt(price / _maxPrice))));
             // WOLFGATE END
     }
+
+    // WOLFGATE(Cleanup) START: vended crates spawn inside their vendor and can pile into walls; their worth is the price paid
+    private bool WgPaidFor(EntityUid uid)
+    {
+        return HasComp<VendingMachinePurchaseComponent>(uid) || HasComp<WGTradeOriginComponent>(uid);
+    }
+    // WOLFGATE END
 
     private bool GetWallStuck(Entity<TransformComponent> ent)
     {
@@ -147,6 +163,15 @@ public sealed partial class SpaceCleanupSystem : BaseCleanupSystem<PhysicsCompon
 
             var xf = _physics.GetLocalPhysicsTransform(anch, xform);
             var shape = fix.Shape;
+
+            // WOLFGATE(Cleanup) START: compiled call instead of a boxing reflection Invoke per contact
+            if (_wgTestOverlap != null)
+            {
+                if (_wgTestOverlap(shape, shapeB, xf, xfB))
+                    return true;
+                continue;
+            }
+            // WOLFGATE END
 
             // WOLFGATE(EngineCompat) START: v291 added an optional seventh parameter, which Invoke won't default
             _testOverlapArgs[0] = shape;

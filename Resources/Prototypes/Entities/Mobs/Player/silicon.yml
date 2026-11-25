@@ -481,7 +481,7 @@
         enum.HolopadUiKey.AiRequestWindow:
           type: HolopadBoundUserInterface
         enum.HolopadUiKey.AiActionWindow:
-          type: HolopadBoundUserInterface   
+          type: HolopadBoundUserInterface
 
 # Xenoborg
 - type: entity

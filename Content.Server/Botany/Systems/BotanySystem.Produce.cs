@@ -36,5 +36,8 @@ public sealed partial class BotanySystem
             solutionContainer.MaxVolume += amount;
             solutionContainer.AddReagent(chem, amount);
         }
+
+        WGGradeProduce(uid, solutionContainer, seed); // WOLFGATE(WolfChem): narcotic produce is graded by potency
+        WGMarkProduce(uid, solutionContainer); // WOLFGATE(WolfChem): produce that grew a street drug is a narcotic
     }
 }

@@ -42,6 +42,13 @@
         - !type:ReagentThreshold
           min: 15
       - !type:Drunk
+        # WOLFGATE(WolfChem) START: only in an overdose, like its jitter
+        conditions:
+        - !type:ReagentThreshold
+          min: 15
+        # WOLFGATE END
+        perUnitInBlood: 6.67 # WOLFGATE(WolfChem): drunkenness follows the units in the blood
+        inBloodAbove: 15 # WOLFGATE(WolfChem): drunkenness follows the units in the blood
 
 # pro!
 

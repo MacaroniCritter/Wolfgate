@@ -113,7 +113,8 @@ namespace Content.Server.Entry
                 IoCManager.Resolve<IServerConsentManager>().Initialize(); // WOLFGATE(Genitals): consent system
                 IoCManager.Resolve<INodeGroupFactory>().Initialize();
                 IoCManager.Resolve<ContentNetworkResourceManager>().Initialize();
-                IoCManager.Resolve<_WF.JoinProgress.JoinProgressManager>().Initialize(); // WOLFGATE(JoinProgress): tells joining clients their download size
+                IoCManager.Resolve<_WG.JoinProgress.JoinProgressManager>().Initialize(); // WOLFGATE(JoinProgress): tells joining clients their download size
+                IoCManager.Resolve<_WG.JoinQueue.JoinQueueManager>().Initialize(); // WOLFGATE(JoinQueue): holds players a full server has no slot for
                 IoCManager.Resolve<GhostKickManager>().Initialize();
                 IoCManager.Resolve<ServerInfoManager>().Initialize();
                 IoCManager.Resolve<ServerApi>().Initialize();
@@ -181,7 +182,7 @@ namespace Content.Server.Entry
                 {
                     _euiManager.SendUpdates();
                     _voteManager.Update();
-                    _sysMan?.GetEntitySystem<_WF.StateRecovery.WFGridDeletionHistorySystem>().Dedupe(); // WOLFGATE(StateRecovery): before game states are built
+                    _sysMan?.GetEntitySystem<_WG.StateRecovery.WGGridDeletionHistorySystem>().Dedupe(); // WOLFGATE(StateRecovery): before game states are built
                     break;
                 }
 

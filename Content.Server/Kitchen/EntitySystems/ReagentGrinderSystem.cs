@@ -197,7 +197,7 @@ namespace Content.Server.Kitchen.EntitySystems
                     _doAfterSystem.TryStartDoAfter(doAfter);
                 }
 
-                else if (!HasComp<FitsInDispenserComponent>(heldEnt)) // Mono end
+                else if (!HasComp<FitsInDispenserComponent>(heldEnt) && !HasComp<Content.Shared.Tools.Components.ToolComponent>(heldEnt)) // Mono end // WOLFGATE: a wrench or drill goes to anchoring, not a "can't put it in" popup
                 {
                     // This is ugly but we can't use whitelistFailPopup because there are 2 containers with different whitelists.
                     _popupSystem.PopupEntity(Loc.GetString("reagent-grinder-component-cannot-put-entity-message"), entity.Owner, args.User);

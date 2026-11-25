@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Made for Wolfgate.",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "icon"
+    },
+    {
+      "name": "lost"
+    },
+    {
+      "name": "won"
+    },
+    {
+      "name": "stack_2"
+    },
+    {
+      "name": "stack_10"
+    },
+    {
+      "name": "stack_20"
+    }
+  ]
+}

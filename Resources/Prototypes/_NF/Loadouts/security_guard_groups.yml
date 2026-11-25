@@ -6,13 +6,13 @@
   - ColorBlackGloves
   - FingerlessGloves
   - SecurityCombatGlovesBlack # Mono
-  # WOLFGATE(MeridianClothing) START: Meridian Rift clothing, written by Tools/_WF/MeridianClothing/port.py
-  - WFMeridianLoadoutClothingGlovesColorBlackSecurity
-  - WFMeridianLoadoutClothingGlovesColorBlackSecurityBlu
-  - WFMeridianLoadoutClothingGlovesColorBlackSecurityDepgagCargo
-  - WFMeridianLoadoutClothingGlovesKazaRukSec
-  - WFMeridianLoadoutClothingGlovesKazaRukSecPeacekeeper
-  - WFMeridianLoadoutClothingGlovesTacklerPeacekeeper
+  # WOLFGATE(MeridianClothing) START: Meridian Rift clothing, written by Tools/_WG/MeridianClothing/port.py
+  - WGMeridianLoadoutClothingGlovesColorBlackSecurity
+  - WGMeridianLoadoutClothingGlovesColorBlackSecurityBlu
+  - WGMeridianLoadoutClothingGlovesColorBlackSecurityDepgagCargo
+  - WGMeridianLoadoutClothingGlovesKazaRukSec
+  - WGMeridianLoadoutClothingGlovesKazaRukSecPeacekeeper
+  - WGMeridianLoadoutClothingGlovesTacklerPeacekeeper
   # WOLFGATE END
   fallbacks:
   - SecurityCombatGlovesBlack # Mono
@@ -24,11 +24,27 @@
   loadouts:
   - SecurityBeret
   - SecurityHelmet
-  # WOLFGATE(MeridianClothing) START: Meridian Rift clothing, written by Tools/_WF/MeridianClothing/port.py
-  - WFMeridianLoadoutClothingHeadBlastwaveOfficer
-  - WFMeridianLoadoutClothingHeadCollectableHos
-  - WFMeridianLoadoutClothingHeadCollectablePolice
-  - WFMeridianLoadoutClothingHeadPlaybunnyearsBrigPhys
+  # WOLFGATE(MeridianClothing) START: Meridian Rift clothing, written by Tools/_WG/MeridianClothing/port.py
+  - WGMeridianLoadoutClothingHeadBlastwaveOfficer
+  - WGMeridianLoadoutClothingHeadCollectableHos
+  - WGMeridianLoadoutClothingHeadCollectablePolice
+  - WGMeridianLoadoutClothingHeadPlaybunnyearsBrigPhys
+  - WGMeridianLoadoutHeadHatsSyndicateInterdyneDeckofficerBlack
+  - WGMeridianLoadoutHeadHatsSyndicateInterdyneDeckofficerWhite
+  - WGMeridianLoadoutHeadHatsWardenDrill
+  - WGMeridianLoadoutHeadHatsWardenPolicePatrol
+  - WGMeridianLoadoutHeadHatsWardenRed
+  - WGMeridianLoadoutHeadHatsWardenSyndicate
+  - WGMeridianLoadoutClothingHeadPlaybunnyearsHos
+  - WGMeridianLoadoutClothingHeadPlaybunnyearsSecurity
+  - WGMeridianLoadoutClothingHeadPlaybunnyearsSecurityAssistant
+  # WOLFGATE END
+  # WOLFGATE(Judges) START: Extra hats for judges
+  - HeadofSecurityHead
+  - HeadofSecurityBeret
+  - WardenBeret
+  - WardenHead
+  - ContractorClothingHeadSanabi
   # WOLFGATE END
 
 - type: loadoutGroup
@@ -100,9 +116,12 @@
 
 - type: loadoutGroup
   id: SecurityGuardFace
-  name: loadout-group-contractor-face
-  hidden: true # No point in showing this, it gets auto-selected.
+  name: loadout-group-contractor-face # WOLFGATE(Judges): Judge mask gear
   loadouts:
   - SecurityClothingMaskGasSecurity
+  - MonoSecurityGuardNeckGaiter # WOLFGATE(Judges): Judge mask gear
+  - MonoSecurityGuardNeckGaiterRed # WOLFGATE(Judges): Judge mask gear
+  - MercenaryClothingMaskDrakeIndustriesWatchdog # WOLFGATE(Judges): Judge mask gear
+  - ContractorClothingMaskDrakeIndustries # WOLFGATE(Judges): Judge mask gear
   fallbacks:
   - SecurityClothingMaskGasSecurity

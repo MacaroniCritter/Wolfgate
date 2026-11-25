@@ -107,7 +107,7 @@ namespace Content.Server.GameTicking
             if (_map.MapExists(DefaultMap))
                 return;
 
-            if (WFMappingBlocksRound(announce: false)) // WOLFGATE(MappingMode): mapping mode loads no game map or preset rule
+            if (WGMappingBlocksRound(announce: false)) // WOLFGATE(MappingMode): mapping mode loads no game map or preset rule
                 return;
 
             AddGamePresetRules();
@@ -375,10 +375,10 @@ namespace Content.Server.GameTicking
             if (DummyTicker || _startingRound)
                 return;
 
-            if (WFMappingBlocksRound(announce: true)) // WOLFGATE(MappingMode): mapping mode never starts a round
+            if (WGMappingBlocksRound(announce: true)) // WOLFGATE(MappingMode): mapping mode never starts a round
                 return;
 
-            if (WFRoundStartHeld(force)) // WOLFGATE(Planets): round-start worlds still forming hold the start
+            if (WGRoundStartHeld(force)) // WOLFGATE(Planets): round-start worlds still forming hold the start
                 return;
 
             _startingRound = true;
@@ -1032,6 +1032,10 @@ namespace Content.Server.GameTicking
             // Move everybody currently in the server to lobby.
             foreach (var player in _playerManager.Sessions)
             {
+                // WOLFGATE(JoinQueue): players waiting in the queue stay out of the lobby until let in
+                if (_joinQueue.IsWaiting(player.UserId))
+                    continue;
+
                 PlayerJoinLobby(player);
             }
 
@@ -1058,6 +1062,10 @@ namespace Content.Server.GameTicking
             _playerGameStatuses.Clear();
             foreach (var session in _playerManager.Sessions)
             {
+                // WOLFGATE(JoinQueue): players waiting in the queue get no lobby status until let in
+                if (_joinQueue.IsWaiting(session.UserId))
+                    continue;
+
                 _playerGameStatuses[session.UserId] = LobbyEnabled ? PlayerGameStatus.NotReadyToPlay : PlayerGameStatus.ReadyToPlay;
             }
         }

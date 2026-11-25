@@ -1,0 +1,88 @@
+using Content.Shared._WG.Xenonids.Egg;
+using Robust.Client.Animations;
+using Robust.Client.GameObjects;
+using Robust.Client.ResourceManagement;
+using Robust.Shared.Serialization.TypeSerializers.Implementations;
+
+namespace Content.Client._WG.Xenonids.Egg;
+
+public sealed partial class XenoEggVisualizerSystem : EntitySystem
+{
+    [Dependency] private AnimationPlayerSystem _animation = default!;
+    [Dependency] private SpriteSystem _sprite = default!;
+    [Dependency] private IResourceCache _resourceCache = default!;
+
+    private const string AnimationKey = "rmc_egg_destroying";
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        SubscribeLocalEvent<XenoEggComponent, ComponentStartup>(SetVisuals);
+        SubscribeLocalEvent<XenoEggComponent, XenoEggStateChangedEvent>(SetVisuals);
+
+        SubscribeLocalEvent<DestroyedXenoEggComponent, ComponentStartup>(OnStartup);
+    }
+
+    private void SetVisuals<T>(Entity<XenoEggComponent> ent, ref T args)
+    {
+        if (!TryComp(ent, out SpriteComponent? sprite))
+            return;
+
+        var expectedSprite = ent.Comp.CurrentSprite;
+
+        if (!_resourceCache.TryGetResource<RSIResource>(SpriteSpecifierSerializer.TextureRoot / expectedSprite, out var res))
+            return;
+
+        if (sprite.BaseRSI != res.RSI)
+        {
+            _sprite.SetBaseRsi((ent, sprite), res.RSI);
+            // SetBaseRsi leaves the bounds of layers drawn from it stale.
+            foreach (var eggLayer in sprite.AllLayers)
+            {
+                if (eggLayer is SpriteComponent.Layer { RSI: null } own && own.State.IsValid)
+                    _sprite.LayerSetRsiState(own, own.State, refresh: true);
+            }
+        }
+
+        var state = ent.Comp.State switch
+        {
+            XenoEggState.Item => ent.Comp.ItemState,
+            XenoEggState.Growing => ent.Comp.GrowingState,
+            XenoEggState.Grown => ent.Comp.GrownState,
+            XenoEggState.Opened => ent.Comp.OpenedState,
+            XenoEggState.Opening => ent.Comp.OpeningState,
+            _ => null
+        };
+
+        if (string.IsNullOrWhiteSpace(state))
+            return;
+
+        if (_sprite.LayerMapTryGet((ent, sprite), XenoEggLayers.Base, out var layer, false))
+            _sprite.LayerSetRsiState((ent, sprite), layer, state);
+    }
+
+    private void OnStartup(Entity<DestroyedXenoEggComponent> ent, ref ComponentStartup args)
+    {
+        if (_animation.HasRunningAnimation(ent, AnimationKey))
+            return;
+
+        _animation.Play(ent,
+           new Animation
+           {
+               Length = ent.Comp.AnimationTime,
+               AnimationTracks =
+               {
+                    new AnimationTrackSpriteFlick
+                    {
+                        LayerKey = ent.Comp.Layer,
+                        KeyFrames =
+                        {
+                            new AnimationTrackSpriteFlick.KeyFrame(ent.Comp.AnimationState, 0f),
+                        },
+                    },
+               },
+           },
+           AnimationKey);
+    }
+}

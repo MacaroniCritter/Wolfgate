@@ -17,6 +17,7 @@ public sealed class ShipyardConsoleInterfaceState : BoundUserInterfaceState
     public readonly string ShipyardName;
     public readonly bool FreeListings;
     public readonly float SellRate;
+    public float PriceMultiplier = 1f; // WOLFGATE(ShipCommand): what a commanded ship's price rules make of a list price
 
     public ShipyardConsoleInterfaceState(
         int balance,

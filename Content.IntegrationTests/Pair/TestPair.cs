@@ -5,7 +5,8 @@ using Content.Client.IoC;
 using Content.Client.Parallax.Managers;
 using Content.IntegrationTests.Tests.Destructible;
 using Content.IntegrationTests.Tests.DeviceNetwork;
-using Content.IntegrationTests.Tests._WF.Vehicles; // WOLFGATE(Vehicles)
+using Content.IntegrationTests.Tests._WG.Vehicles; // WOLFGATE(Vehicles)
+using Content.IntegrationTests.Tests._WG.WolfChem.Narcotics; // WOLFGATE(WolfChem)
 using Content.Server.GameTicking;
 using Content.Shared.CCVar;
 using Content.Shared.Players;
@@ -152,6 +153,7 @@ public sealed partial class TestPair : RobustIntegrationTest.TestPair, IAsyncDis
             entSysMan.LoadExtraSystemType<DeviceNetworkTestSystem>();
             entSysMan.LoadExtraSystemType<TestDestructibleListenerSystem>();
             entSysMan.LoadExtraSystemType<VehicleEventProbeSystem>(); // WOLFGATE(Vehicles): records the events the vehicle mover raises
+            entSysMan.LoadExtraSystemType<RadioProbeSystem>(); // WOLFGATE(WolfChem): records radio sends for the narcotic heat test
         };
         return opts;
     }

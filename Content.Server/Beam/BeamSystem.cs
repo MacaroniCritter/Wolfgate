@@ -11,6 +11,7 @@ using Robust.Shared.Physics;
 using Robust.Shared.Physics.Collision.Shapes;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
+using Robust.Shared.Player; // WOLFGATE(NetTraffic)
 
 namespace Content.Server.Beam;
 
@@ -100,8 +101,12 @@ public sealed partial class BeamSystem : SharedBeamSystem
 
         var distanceLength = distanceCorrection.Length();
 
+        // WOLFGATE(NetTraffic) START: only players near either end of the beam get its segment visuals
+        var wgNearby = Filter.Pvs(beamStartPos).AddPlayersByPvs(beamStartPos.Offset(distanceCorrection));
         var beamVisualizerEvent = new BeamVisualizerEvent(GetNetEntity(ent), distanceLength, userAngle, bodyState, shader);
-        RaiseNetworkEvent(beamVisualizerEvent);
+        // RaiseNetworkEvent(beamVisualizerEvent);
+        RaiseNetworkEvent(beamVisualizerEvent, wgNearby);
+        // WOLFGATE END
 
         if (controller != null)
             beam.VirtualBeamController = controller;
@@ -124,7 +129,10 @@ public sealed partial class BeamSystem : SharedBeamSystem
             var newEnt = Spawn(prototype, beamSpawnPos);
 
             var ev = new BeamVisualizerEvent(GetNetEntity(newEnt), distanceLength, userAngle, bodyState, shader);
-            RaiseNetworkEvent(ev);
+            // WOLFGATE(NetTraffic) START: same nearby players as the first segment
+            // RaiseNetworkEvent(ev);
+            RaiseNetworkEvent(ev, wgNearby);
+            // WOLFGATE END
         }
 
         var beamFiredEvent = new BeamFiredEvent(ent);

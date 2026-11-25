@@ -51,6 +51,7 @@
   cost: 60000
   recipeUnlocks:
   - ShipVoucherTsfT2Recipe
+  - ZephyrVoucherTSF
   technologyPrerequisites:
   - TsfTierOneVouchers
   - UniversalMaterialResearchT2
@@ -64,12 +65,13 @@
   tier: 3
   cost: 150000
   recipeUnlocks:
-# - ShipVoucherLudaRecipe # WOLFGATE(Mining): Luda moves to WFTsfCapitalVouchers
+# - ShipVoucherLudaRecipe # WOLFGATE(Mining): Luda moves to WGTsfCapitalVouchers
   - ShipVoucherPolarisRecipe
+  - WGShipVoucherTsfT3Recipe # WOLFGATE(FactionBalance): generic T3 voucher
   # WOLFGATE(OldVessels) START: classic ship LPCs
   - AltairVoucherTSF
-  - WFAndromedaVoucherTSF
-# - FlyssaVoucherTSF # WOLFGATE(Mining): Flyssa moves to WFTsfCapitalVouchers
+  - WGAndromedaVoucherTSF
+# - FlyssaVoucherTSF # WOLFGATE(Mining): Flyssa moves to WGTsfCapitalVouchers
   # WOLFGATE END
   technologyPrerequisites:
   - TsfTierTwoVouchers

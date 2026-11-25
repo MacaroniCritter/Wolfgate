@@ -787,7 +787,7 @@
     dynamicPacks:
     - MonoTradeCratesPrecisionAssemblerMMC
 
-# WOLFGATE(BrokenMachines) START: replaced by a broken prop in _WF/BrokenMachines
+# WOLFGATE(BrokenMachines) START: replaced by a broken prop in _WG/BrokenMachines
 # - type: entity
 #   id: CentrifugeLathe
 #   parent: [BaseStructureDisableToolUse, BaseLatheLube]
@@ -868,6 +868,7 @@
     - StaticGrenades
     - SecurityWeaponsStatic
     - MonoCaelestinusVouchersStatic
+    - MonoAttachmentsStatic # WOLFGATE(Weapons): give judges attachments
     dynamicPacks:
     - SecurityEquipment
     - SecurityExplosives

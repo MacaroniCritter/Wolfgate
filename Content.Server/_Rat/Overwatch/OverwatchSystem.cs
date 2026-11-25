@@ -24,6 +24,7 @@ using Robust.Shared.Prototypes;
 using Content.Shared.Sticky.Components;
 using Content.Server._Mono.Overwatch.Components;
 using Content.Shared.Sticky;
+using Content.Server._WG.Cyborgs; // WOLFGATE(Cyborgs)
 
 namespace Content.Server._Rat.Overwatch;
 
@@ -60,6 +61,7 @@ public sealed class OverwatchSystem : EntitySystem
     [Dependency] private IChatManager _chatManager = default!;
     [Dependency] private SharedTransformSystem _transformSystem = default!;
     [Dependency] private IPrototypeManager _prototypeManager = default!;
+    [Dependency] private WGAiOverwatchSystem _wgAiOverwatch = default!; // WOLFGATE(Cyborgs)
 
     /// <summary>
     /// Пары наблюдения: watcher -> target.
@@ -511,10 +513,12 @@ public sealed class OverwatchSystem : EntitySystem
         var watchingCompActor = EnsureComp<RatOverwatchWatchingComponent>(actor);
         watchingCompActor.Watching = target;
         watchingCompActor.Console = ent.Owner;
+        Dirty(actor, watchingCompActor); // WOLFGATE(Cyborgs): a reused component must send its new target to the client
 
         _watchingPairs[actor] = target;
 
         _eyeSystem.SetTarget(actor, target);
+        _wgAiOverwatch.LimitZoom(actor); // WOLFGATE(Cyborgs): a feed is seen at the default zoom limit, not an AI's
         _viewSubscriberSystem.AddViewSubscriber(target, actorComp.PlayerSession);
     }
 
@@ -556,10 +560,11 @@ public sealed class OverwatchSystem : EntitySystem
             _viewSubscriberSystem.RemoveViewSubscriber(target, actorComp.PlayerSession);
         }
 
-        _eyeSystem.SetTarget(watcher, null);
+        _eyeSystem.SetTarget(watcher, _wgAiOverwatch.ReleaseTarget(watcher)); // WOLFGATE(Cyborgs): an AI's view returns to its remote eye
         _watchingPairs.Remove(watcher);
         watchingComp.Watching = null;
         watchingComp.Console = null;
+        Dirty(watcher, watchingComp); // WOLFGATE(Cyborgs): the client sees the feed end, so an AI's static returns
     }
 
     /// <summary>
@@ -588,7 +593,7 @@ public sealed class OverwatchSystem : EntitySystem
             _viewSubscriberSystem.RemoveViewSubscriber(target, actorComp.PlayerSession);
         }
 
-        _eyeSystem.SetTarget(ent.Owner, null);
+        _eyeSystem.SetTarget(ent.Owner, _wgAiOverwatch.ReleaseTarget(ent.Owner)); // WOLFGATE(Cyborgs): an AI's view returns to its remote eye
         _watchingPairs.Remove(ent.Owner);
         ent.Comp.Console = null;
     }
@@ -671,6 +676,7 @@ public sealed class OverwatchSystem : EntitySystem
     {
         base.Update(frameTime);
 
+        _cacheInvalidationTimer += frameTime; // WOLFGATE: nothing advanced the timer, so the member cache never expired
         _updateTimer += frameTime;
         if (_updateTimer < UpdateInterval)
             return;
@@ -729,6 +735,8 @@ public sealed class OverwatchSystem : EntitySystem
         {
             if (Transform(uid).GridUid != null && TryComp<JamOverwatchComponent>(Transform(uid).GridUid, out var jamComp) && !jamComp.ExcludedFactions.Contains(faction)) // Mono: grids can jam the overwatch console to prevent coordinates leaks.
                 continue;
+            if (HasComp<Content.Server.NPC.HTN.HTNComponent>(uid) && !HasComp<ActorComponent>(uid) && CompOrNull<Content.Shared.Mind.Components.MindContainerComponent>(uid)?.HasMind != true) // WOLFGATE: NPC crew that no player controls don't crowd the console
+                continue; // WOLFGATE: NPC crew that no player controls don't crowd the console
             if (factionComp.CompanyName == faction && HasComp<MobStateComponent>(uid) && !jammedPlayers.Contains(uid))
                 members.Add(uid);
         }

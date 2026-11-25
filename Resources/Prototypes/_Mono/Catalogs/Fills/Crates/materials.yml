@@ -69,7 +69,8 @@
     contents:
     - id: SheetPlastitanium10
     - id: SheetUraniumDepleted
-    - id: SheetUraniumFissile1 # WOLFGATE(Mining): exotic crate fissile, 3 -> 1
+    - id: SheetUraniumFissile1 # WOLFGATE(Mining): exotic crate fissile, 3 -> 2
+      amount: 2 # WOLFGATE(Mining): exotic crate fissile, 3 -> 2
 
 - type: entity
   parent: [ CrateNfsdSecure1, StorageFillMaterialsBasicTsf ]

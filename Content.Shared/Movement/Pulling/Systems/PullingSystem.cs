@@ -1,5 +1,6 @@
 using Content.Shared.ActionBlocker;
 using Content.Shared.Administration.Logs;
+using Content.Shared._WG.InteractionParticles; // WOLFGATE(InteractionParticles)
 using Content.Shared.Alert;
 using Content.Shared.Buckle.Components;
 using Content.Shared.Cuffs.Components;
@@ -28,7 +29,7 @@ using Robust.Shared.Physics.Events;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
-using Content.Shared._WF.RMCCore.Fireman; // WOLFGATE(RMCCore)
+using Content.Shared._WG.RMCCore.Fireman; // WOLFGATE(RMCCore)
 
 namespace Content.Shared.Movement.Pulling.Systems;
 
@@ -479,7 +480,7 @@ public sealed partial class PullingSystem : EntitySystem
 
         // Pulling confirmed
 
-        _interaction.DoContactInteraction(pullableUid, pullerUid);
+        _interaction.DoContactInteraction(pullerUid, pullableUid, null, true, interactionParticleType: InteractionParticleType.Pull); // WOLFGATE(InteractionParticles)
 
         // Use net entity so it's consistent across client and server.
         pullableComp.PullJointId = $"pull-joint-{GetNetEntity(pullableUid)}";

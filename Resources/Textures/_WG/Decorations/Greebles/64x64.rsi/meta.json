@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-4.0",
+  "copyright": "Made by Kepteyn, radar panel originally by Onezero0.",
+  "size": {
+    "x": 64,
+    "y": 64
+  },
+  "states": [
+	{
+      "name": "tank"
+    },
+    {
+      "name": "tank-ox"
+    },
+    {
+      "name": "tank-nit"
+    },
+    {
+      "name": "widepanel",
+      "directions": 4
+    },
+    {
+      "name": "radarpanel1_flipped"
+    }
+  ]
+}

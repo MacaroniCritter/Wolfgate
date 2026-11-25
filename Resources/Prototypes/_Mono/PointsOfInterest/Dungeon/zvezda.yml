@@ -36,12 +36,6 @@
     Zvezda:
       stationProto: RecordsFrontierOutpostCargo
       gridComponents:
-      - type: StationCargoOrderDatabase
-        capacity: 240
-      # WOLFGATE START: trade crate destinations must be on the station entity, not the grid
-      # - type: TradeCrateDestination
-      #   destinationProto: Trade
-      # WOLFGATE END
       - type: VesselInfo
         description: "A half-abandoned decaying station. Sometimes you can hear the hull bend."
       - type: VesselMusic
@@ -52,10 +46,10 @@
           mapNameTemplate: 'Zvezda Orbital Habitation'
         - type: StationDeadDrop
           maxDeadDrops: 12
-        # WOLFGATE START: moved from gridComponents so crates sold here count as delivered
+        - type: StationCargoOrderDatabase
+          capacity: 240
         - type: TradeCrateDestination
           destinationProto: Trade
-        # WOLFGATE END
         - type: ExtraStationInformation
           icon:
             sprite: _NF/Structures/Storage/Crates/secure_ammo.rsi

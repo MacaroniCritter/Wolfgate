@@ -1,6 +1,6 @@
 using System.Numerics; // WOLFGATE: Vector2 for the space-wind NaN guard
 using Content.Server.Atmos.Components;
-using Content.Shared._WF.Performance; // WOLFGATE(Performance)
+using Content.Shared._WG.Performance; // WOLFGATE(Performance)
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Mobs.Components;
@@ -140,6 +140,9 @@ namespace Content.Server.Atmos.EntitySystems
                 if (curTile != tile)
                     tile.PressureSpecificTarget = curTile;
             }
+
+            if (WGWindTooWeak(tile)) // WOLFGATE(Performance): wind below the throw force moves nothing, so skip the search
+                return;
 
             _entSet.ClearAndTrim(); // WOLFGATE(Performance): a crowded tile left the set huge and slowed every clear
             _lookup.GetLocalEntitiesIntersecting(tile.GridIndex, tile.GridIndices, _entSet, 0f);

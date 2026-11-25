@@ -50,18 +50,19 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Content.Shared._Mono.Company;
 using Content.Shared._NF.Bank;
-using Content.Shared._WF.Biotype; // WOLFGATE(Biotype)
-using Content.Shared._WF.ChatFont; // WOLFGATE(ChatFont)
-using Content.Shared._WF.TypingBubble; // WOLFGATE(TypingBubble)
-using Content.Shared._WF.BloodColour; // WOLFGATE(BloodColour)
-using Content.Shared._WF.EmoteVoices; // WOLFGATE(EmoteVoices)
-using Content.Shared._WF.Voice; // WOLFGATE(Voice)
-using Content.Shared._WF.Genitals; // WOLFGATE(Genitals)
-using Content.Shared._WF.Genitals.Migration; // WOLFGATE(Genitals)
-using Content.Shared._WF.Genitals.Profile; // WOLFGATE(Genitals)
-using Content.Shared._WF.LegStyle; // WOLFGATE(LegStyle)
-using Content.Shared._WF.Traits; // WOLFGATE(Traits)
-using Content.Shared._WF.Traits.Conditions; // WOLFGATE(Traits)
+using Content.Shared._WG.Biotype; // WOLFGATE(Biotype)
+using Content.Shared._WG.ChatFont; // WOLFGATE(ChatFont)
+using Content.Shared._WG.CombatMusic; // WOLFGATE(CombatMusic)
+using Content.Shared._WG.TypingBubble; // WOLFGATE(TypingBubble)
+using Content.Shared._WG.BloodColour; // WOLFGATE(BloodColour)
+using Content.Shared._WG.EmoteVoices; // WOLFGATE(EmoteVoices)
+using Content.Shared._WG.Voice; // WOLFGATE(Voice)
+using Content.Shared._WG.Genitals; // WOLFGATE(Genitals)
+using Content.Shared._WG.Genitals.Migration; // WOLFGATE(Genitals)
+using Content.Shared._WG.Genitals.Profile; // WOLFGATE(Genitals)
+using Content.Shared._WG.LegStyle; // WOLFGATE(LegStyle)
+using Content.Shared._WG.Traits; // WOLFGATE(Traits)
+using Content.Shared._WG.Traits.Conditions; // WOLFGATE(Traits)
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
 using Content.Shared.Humanoid;
@@ -305,15 +306,19 @@ namespace Content.Shared.Preferences
             HeadshotUrl = other.HeadshotUrl; // WOLFGATE(Headshot)
             MismatchedParts = other.MismatchedParts; // WOLFGATE(Species)
             CustomMarkings = new(other.CustomMarkings); // WOLFGATE(CustomMarkings)
+            MarkingGlow = new(other.MarkingGlow); // WOLFGATE(MarkingGlow)
             LegStance = other.LegStance; // WOLFGATE(LegStyle)
             Biotype = other.Biotype; // WOLFGATE(Biotype)
             Augments = new(other.Augments); // WOLFGATE(Augments)
+            AugmentImplants = new(other.AugmentImplants); // WOLFGATE(Augments)
             AugmentUnlocks = new(other.AugmentUnlocks); // WOLFGATE(Augments)
+            AugmentFound = new(other.AugmentFound); // WOLFGATE(Augments)
             ChatFont = other.ChatFont; // WOLFGATE(ChatFont)
             TypingIndicator = other.TypingIndicator; // WOLFGATE(TypingBubble)
             BloodColor = other.BloodColor; // WOLFGATE(BloodColour)
             MessageSound = other.MessageSound; // WOLFGATE(EmoteVoices)
             SpeechVoice = other.SpeechVoice; // WOLFGATE(Voice)
+            CombatMusic = new(other.CombatMusic); // WOLFGATE(CombatMusic)
         }
 
         /// <summary>Copy constructor</summary>
@@ -347,15 +352,19 @@ namespace Content.Shared.Preferences
             HeadshotUrl = other.HeadshotUrl; // WOLFGATE(Headshot)
             MismatchedParts = other.MismatchedParts; // WOLFGATE(Species)
             CustomMarkings = new(other.CustomMarkings); // WOLFGATE(CustomMarkings)
+            MarkingGlow = new(other.MarkingGlow); // WOLFGATE(MarkingGlow)
             LegStance = other.LegStance; // WOLFGATE(LegStyle)
             Biotype = other.Biotype; // WOLFGATE(Biotype)
             Augments = new(other.Augments); // WOLFGATE(Augments)
+            AugmentImplants = new(other.AugmentImplants); // WOLFGATE(Augments)
             AugmentUnlocks = new(other.AugmentUnlocks); // WOLFGATE(Augments)
+            AugmentFound = new(other.AugmentFound); // WOLFGATE(Augments)
             ChatFont = other.ChatFont; // WOLFGATE(ChatFont)
             TypingIndicator = other.TypingIndicator; // WOLFGATE(TypingBubble)
             BloodColor = other.BloodColor; // WOLFGATE(BloodColour)
             MessageSound = other.MessageSound; // WOLFGATE(EmoteVoices)
             SpeechVoice = other.SpeechVoice; // WOLFGATE(Voice)
+            CombatMusic = new(other.CombatMusic); // WOLFGATE(CombatMusic)
         }
 
         /// <summary>
@@ -696,6 +705,7 @@ namespace Content.Shared.Preferences
             if (HeadshotUrl != other.HeadshotUrl) return false; // WOLFGATE(Headshot)
             if (MismatchedParts != other.MismatchedParts) return false; // WOLFGATE(Species)
             if (!CustomMarkingsEqual(other)) return false; // WOLFGATE(CustomMarkings)
+            if (!MarkingGlowEqual(other)) return false; // WOLFGATE(MarkingGlow)
             if (LegStance != other.LegStance) return false; // WOLFGATE(LegStyle)
             if (Biotype != other.Biotype) return false; // WOLFGATE(Biotype)
             if (!AugmentsEqual(other)) return false; // WOLFGATE(Augments)
@@ -705,6 +715,7 @@ namespace Content.Shared.Preferences
             if (ScreamVoice != other.ScreamVoice || LaughVoice != other.LaughVoice) return false; // WOLFGATE(EmoteVoices)
             if (MessageSound != other.MessageSound) return false; // WOLFGATE(EmoteVoices)
             if (!Equals(SpeechVoice, other.SpeechVoice)) return false; // WOLFGATE(Voice)
+            if (!CombatMusicEqual(other)) return false; // WOLFGATE(CombatMusic)
             if (!Flags.SequenceEqual(other.Flags)) return false; // Mono
             if (!Components.SequenceEqual(other.Components)) return false; // Mono
             if (!Items.SequenceEqual(other.Items)) return false; // Mono
@@ -758,12 +769,12 @@ namespace Content.Shared.Preferences
             // WOLFGATE(Genitals) START: converts legacy genital markings and applies the anatomy rules
             // Adult-only markings are dropped below the adult age, then the adult gate and organ rules apply. This
             // runs before marking validation, which would keep or drop the old ids.
-            var wfContext = LegacyGenitalMarkings.ContextFor(Species, Appearance.SkinColor, prototypeManager);
-            var (wfAppearance, wfGenitals) = LegacyGenitalMarkings.Migrate(Appearance,
+            var wgContext = LegacyGenitalMarkings.ContextFor(Species, Appearance.SkinColor, prototypeManager);
+            var (wgAppearance, wgGenitals) = LegacyGenitalMarkings.Migrate(Appearance,
                 Genitals ?? GenitalProfile.Unmigrated, // crafted network data can deliver null
-                wfContext);
-            wfAppearance = GenitalAdultMarkings.StripIfMinor(wfAppearance, age, prototypeManager);
-            wfGenitals = GenitalProfileValidator.EnsureValid(wfGenitals, age, Species, prototypeManager);
+                wgContext);
+            wgAppearance = GenitalAdultMarkings.StripIfMinor(wgAppearance, age, prototypeManager);
+            wgGenitals = GenitalProfileValidator.EnsureValid(wgGenitals, age, Species, prototypeManager);
             // WOLFGATE END
 
             var gender = Gender switch
@@ -843,7 +854,7 @@ namespace Content.Shared.Preferences
             // End Frontier
 
             // WOLFGATE(Species): the option widens the hair check
-            var appearance = HumanoidCharacterAppearance.EnsureValid(wfAppearance, Species, Sex, MismatchedParts); // WOLFGATE(Genitals): validates the appearance after legacy genital markings were migrated
+            var appearance = HumanoidCharacterAppearance.EnsureValid(wgAppearance, Species, Sex, MismatchedParts); // WOLFGATE(Genitals): validates the appearance after legacy genital markings were migrated
 
             var prefsUnavailableMode = PreferenceUnavailable switch
             {
@@ -896,7 +907,7 @@ namespace Content.Shared.Preferences
             Gender = gender;
             BankBalance = bankBalance;
             Appearance = appearance;
-            Genitals = wfGenitals; // WOLFGATE(Genitals)
+            Genitals = wgGenitals; // WOLFGATE(Genitals)
             SpawnPriority = spawnPriority;
 
             // WOLFGATE(Humanoid) START: the custom species name is sanitized like the character name
@@ -911,15 +922,17 @@ namespace Content.Shared.Preferences
 
             EnsureHeadshotValid(); // WOLFGATE(Headshot)
             EnsureCustomMarkingsValid(configManager); // WOLFGATE(CustomMarkings)
+            EnsureMarkingGlowValid(); // WOLFGATE(MarkingGlow)
             EnsureValidEmoteVoices(prototypeManager); // WOLFGATE(EmoteVoices)
             MessageSound = MessageSoundRules.Sanitize(MessageSound, prototypeManager); // WOLFGATE(EmoteVoices): an unknown message sound becomes the species' own
             SpeechVoice = (SpeechVoice ?? new SpeechVoice()).Clamped(); // WOLFGATE(Voice): out-of-range sliders come back inside their range; crafted network data can deliver null
             LegStance = LegStyleRules.Validate(Species, LegStance, prototypeManager); // WOLFGATE(LegStyle): legs the species doesn't have fall back to its own
-            Biotype = WFBiotypeRules.Resolve(Biotype, speciesPrototype); // WOLFGATE(Biotype): Default and unknown values become the species' own
+            Biotype = WGBiotypeRules.Resolve(Biotype, speciesPrototype); // WOLFGATE(Biotype): Default and unknown values become the species' own
             EnsureAugmentsValid(prototypeManager, collection.Resolve<IComponentFactory>()); // WOLFGATE(Augments): augments the species can't take are dropped
-            ChatFont = WFChatFontRules.Validate(ChatFont, prototypeManager); // WOLFGATE(ChatFont): an unknown font becomes the default
-            TypingIndicator = WFTypingBubbleRules.Validate(TypingIndicator, prototypeManager); // WOLFGATE(TypingBubble): an unknown or hidden bubble becomes the species' own
-            BloodColor = WFBloodColourRules.Validate(BloodColor); // WOLFGATE(BloodColour)
+            ChatFont = WGChatFontRules.Validate(ChatFont, prototypeManager); // WOLFGATE(ChatFont): an unknown font becomes the default
+            TypingIndicator = WGTypingBubbleRules.Validate(TypingIndicator, prototypeManager); // WOLFGATE(TypingBubble): an unknown or hidden bubble becomes the species' own
+            BloodColor = WGBloodColourRules.Validate(BloodColor); // WOLFGATE(BloodColour)
+            CombatMusic = WGCombatMusicRules.Validate(CombatMusic, prototypeManager); // WOLFGATE(CombatMusic): unknown and repeated tracks are dropped
 
             // Check if the company exists, if not set to "None"
             if (!string.IsNullOrEmpty(Company) &&
@@ -985,7 +998,7 @@ namespace Content.Shared.Preferences
                 if (!protoManager.TryIndex(trait, out var traitProto))
                     continue;
 
-                if (WFBiotypeGates.TraitBlocked(traitProto, this, protoManager)) // WOLFGATE(Biotype): a trait the effective biotype can't take is dropped
+                if (WGBiotypeGates.TraitBlocked(traitProto, this, protoManager)) // WOLFGATE(Biotype): a trait the effective biotype can't take is dropped
                     continue;
 
                 // WOLFGATE(Traits) START: drop a trait whose known conditions the character does not meet
@@ -1080,6 +1093,7 @@ namespace Content.Shared.Preferences
             hashCode.Add(HeadshotUrl); // WOLFGATE(Headshot)
             hashCode.Add(MismatchedParts); // WOLFGATE(Species)
             hashCode.Add(CustomMarkings.Count); // WOLFGATE(CustomMarkings)
+            hashCode.Add(MarkingGlow.Count); // WOLFGATE(MarkingGlow)
             hashCode.Add((int) LegStance); // WOLFGATE(LegStyle)
             hashCode.Add((int) Biotype); // WOLFGATE(Biotype)
             hashCode.Add(Augments.Count); // WOLFGATE(Augments)
@@ -1090,6 +1104,7 @@ namespace Content.Shared.Preferences
             hashCode.Add(LaughVoice); // WOLFGATE(EmoteVoices)
             hashCode.Add(MessageSound); // WOLFGATE(EmoteVoices)
             hashCode.Add(SpeechVoice); // WOLFGATE(Voice)
+            foreach (var track in CombatMusic) hashCode.Add(track); // WOLFGATE(CombatMusic)
             return hashCode.ToHashCode();
         }
 

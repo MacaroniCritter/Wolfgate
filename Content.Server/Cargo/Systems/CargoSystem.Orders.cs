@@ -148,6 +148,9 @@ namespace Content.Server.Cargo.Systems
             if (args.Actor is not { Valid: true } player)
                 return;
 
+            if (WgShipRefuses(uid, player)) // WOLFGATE(ShipCommand): a commanded ship's order consoles turn the barred away
+                return; // WOLFGATE(ShipCommand)
+
             if (!_accessReaderSystem.IsAllowed(player, uid))
             {
                 ConsolePopup(args.Actor, Loc.GetString("cargo-console-order-not-allowed"));
@@ -242,20 +245,20 @@ namespace Content.Server.Cargo.Systems
             order.Approved = true;
             _audio.PlayPvs(component.ConfirmSound, uid);
 
-            if (!_emag.CheckFlag(uid, EmagType.Interaction))
+            // Mono: replace "is unemagged"? flag with "is on the list of alert orders"?
+            if (component.AlertOnPurchase.Contains(order.ProductId))
             {
                 var tryGetIdentityShortInfoEvent = new TryGetIdentityShortInfoEvent(uid, player);
                 RaiseLocalEvent(tryGetIdentityShortInfoEvent);
                 order.SetApproverData(tryGetIdentityShortInfoEvent.Title);
 
-                // Frontier: silence cargo station
-                // var message = Loc.GetString("cargo-console-unlock-approved-order-broadcast",
-                //     ("productName", Loc.GetString(order.ProductName)),
-                //     ("orderAmount", order.OrderQuantity),
-                //     ("approver", order.Approver ?? string.Empty),
-                //     ("cost", cost));
-                // _radio.SendRadioMessage(uid, message, component.AnnouncementChannel, uid, escapeMarkup: false);
-                // End Frontier: silence cargo station
+                var message = Loc.GetString("cargo-console-unlock-approved-order-broadcast",
+                     ("productName", Loc.GetString(order.ProductName)),
+                     ("orderAmount", order.OrderQuantity),
+                     ("approver", order.Approver ?? string.Empty)//,
+                /*   ("cost", cost)*/); // Mono: remove unnecessary arguments in rewritten locale string
+                var speaker = Transform(uid).GridUid ?? uid; // Mono: make the GRID send the message
+                _radio.SendRadioMessage(speaker, message, component.AnnouncementChannel, speaker, escapeMarkup: false, jammable: false); // Mono: unjammable
             }
 
             ConsolePopup(args.Actor, Loc.GetString("cargo-console-trade-station", ("destination", MetaData(uid).EntityName))); // ev.FulfillmentEntity.Value<uid

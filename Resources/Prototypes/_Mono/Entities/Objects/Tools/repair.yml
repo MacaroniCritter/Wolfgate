@@ -8,12 +8,12 @@
   - type: ShipRepairTool
 # WOLFGATE(Resprites) START: SRD uses the shipyard RCD sprite
   - type: Sprite
-    sprite: _WF/Resprites/_WF/Objects/Tools/rcdshipyard.rsi
+    sprite: _WG/Resprites/_WG/Objects/Tools/rcdshipyard.rsi
     state: icon
   - type: Item
     size: Normal
   - type: Clothing
-    sprite: _WF/Resprites/_WF/Objects/Tools/rcdshipyard.rsi
+    sprite: _WG/Resprites/_WG/Objects/Tools/rcdshipyard.rsi
 # WOLFGATE END
     quickEquip: false
     slots:
@@ -33,11 +33,11 @@
 
 - type: entity
   id: ShipRepairDevice
-  description: A Ship Repair Device that can reconstruct destroyed sections of ships. Holds 300 charges.
+  description: A Ship Repair Device that can reconstruct destroyed sections of ships. Holds 350 charges.
   parent: ShipRepairDeviceBase
   components:
   - type: LimitedCharges
-    maxCharges: 300
+    maxCharges: 350
     charges: 100
 
 - type: entity
@@ -50,13 +50,13 @@
 
 - type: entity
   id: ShipRepairDeviceRecharging
-  description: A Ship Repair Device that can reconstruct destroyed sections of ships. Holds 300 charges and slowly recharges.
+  description: A Ship Repair Device that can reconstruct destroyed sections of ships. Holds 350 charges and slowly recharges.
   parent: ShipRepairDeviceBase
   suffix: Recharging
   components:
   - type: LimitedCharges
-    maxCharges: 300
-    charges: 300 # WOLFGATE(Cyborgs): was 50, a 20 minute wait before a cyborg's first real repair
+    maxCharges: 350
+    charges: 350 # WOLFGATE(Cyborgs): was 50, a 20 minute wait before a cyborg's first real repair
   - type: AutoRecharge
     rechargeDuration: 5
 
@@ -110,7 +110,7 @@
       tags:
       - ShipRepairTool
   - type: Sprite
-    sprite: _WF/Resprites/_WF/Objects/Tools/rcdshipyard.rsi # WOLFGATE(Resprites): SRD uses the shipyard RCD sprite
+    sprite: _WG/Resprites/_WG/Objects/Tools/rcdshipyard.rsi # WOLFGATE(Resprites): SRD uses the shipyard RCD sprite
     state: ammo # WOLFGATE(Resprites): SRD uses the shipyard RCD sprite
   - type: Item
     heldPrefix: ammo # WOLFGATE(Resprites): SRD uses the shipyard RCD sprite
@@ -119,5 +119,5 @@
       Steel: 100
       Plastic: 100
   - type: StaticPrice
-    price: 2000
+    price: 820 # WOLFGATE: was 2000, about three times its print cost
     vendPrice: 8000

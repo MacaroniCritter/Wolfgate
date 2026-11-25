@@ -124,6 +124,7 @@
 - Flags: HOST
   Commands:
   - gc_mode
+  - netstats # WOLFGATE(NetTraffic): Lupine traffic breakdown for server ops
   - gc
   - saveconfig
   - testlog

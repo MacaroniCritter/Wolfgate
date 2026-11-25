@@ -13,7 +13,7 @@ using Robust.Shared.Timing;
 
 namespace Content.Server._Battlefield14.FactionTracking;
 
-public sealed class FactionTrackingSystem : EntitySystem
+public sealed partial class FactionTrackingSystem : EntitySystem // WOLFGATE(NetTraffic): partial for send-on-change
 {
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
@@ -55,7 +55,10 @@ public sealed class FactionTrackingSystem : EntitySystem
         }
 
         var ev = new TickerFactionCountEvent(isRoundStarted, bluforReady, redforReady, totalReady, bluforAlive, redforAlive);
-        RaiseNetworkEvent(ev);
+        // WOLFGATE(NetTraffic) START: only changed counts go to everyone; players who joined since get the last ones
+        // RaiseNetworkEvent(ev);
+        WgSendCounts(ev);
+        // WOLFGATE END
     }
 
     private (int blufor, int redfor, int total) CountReadyByFaction(GameTicker ticker)
@@ -164,7 +167,7 @@ public sealed class FactionTrackingSystem : EntitySystem
     private string? GetPreferredDepartment(ICommonSession session)
     {
         // WOLFGATE(RoundSetup) START: count faction crews by their validated setup job without changing saved preferences
-        if (EntityManager.System<Content.Server._WF.RoundSetup.WFRoundSetupSystem>().TryGetSelectedFactionJob(session.UserId, out var crewJob) &&
+        if (EntityManager.System<Content.Server._WG.RoundSetup.WGRoundSetupSystem>().TryGetSelectedFactionJob(session.UserId, out var crewJob) &&
             _jobs.TryGetDepartment(crewJob, out var crewDepartment))
             return crewDepartment.ID;
         // WOLFGATE END

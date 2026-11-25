@@ -27,9 +27,12 @@
     - map: [ "enum.HumanoidVisualLayers.UndergarmentTop" ] # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
     - map: [ "enum.HumanoidVisualLayers.Penis" ] # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
     - map: [ "enum.HumanoidVisualLayers.UndergarmentBottom" ] # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
-    - map: ["jumpsuit"]
+    # WOLFGATE(Humanoid) START: draw socks over feet and under uniforms
     - map: ["enum.HumanoidVisualLayers.LFoot"]
     - map: ["enum.HumanoidVisualLayers.RFoot"]
+    - map: [ "enum.HumanoidVisualLayers.UndergarmentSocks" ]
+    - map: ["jumpsuit"]
+    # WOLFGATE END
     - map: ["enum.HumanoidVisualLayers.LHand"]
     - map: ["enum.HumanoidVisualLayers.RHand"]
     - map: [ "gloves" ]
@@ -288,7 +291,7 @@
   components:
   # WOLFGATE(Wolfmed) START: D20-D22, P2-D7, P2-D9: organic species get wound hosting, pain and a Blunt gib threshold.
   # Wolfmed phase 1 (D21/D32). Non-organic descendants (protogen) have WoundHost stripped by
-  # Content.Shared/_WF/Wolfmed/Body/WolfmedWoundHostExclusionSystem.cs; see the manifest for the full list.
+  # Content.Shared/_WG/Wolfmed/Body/WolfmedWoundHostExclusionSystem.cs; see the manifest for the full list.
   - type: WoundHost # D20: localizedDamageTypes left at Onyx's default, Caustic included
   # Wolfmed phase 2 (P2-D7). ONYX Resources/Prototypes/Body/species_base.yml:54 (<Onyx-PainShock>);
   # placed here rather than on BaseMobSpecies so only organic profiles carry it. Inert on D32-excluded
@@ -428,10 +431,13 @@
     - map: [ "enum.HumanoidVisualLayers.UndergarmentTop" ] # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
     - map: [ "enum.HumanoidVisualLayers.Penis" ] # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
     - map: [ "enum.HumanoidVisualLayers.UndergarmentBottom" ] # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
-    - map: ["jumpsuit"]
-    - map: [ "balaclava" ]
+    # WOLFGATE(Humanoid) START: draw socks over feet and under uniforms
     - map: ["enum.HumanoidVisualLayers.LFoot"]
     - map: ["enum.HumanoidVisualLayers.RFoot"]
+    - map: [ "enum.HumanoidVisualLayers.UndergarmentSocks" ]
+    - map: ["jumpsuit"]
+    # WOLFGATE END
+    - map: [ "balaclava" ]
     - map: ["enum.HumanoidVisualLayers.LHand"]
     - map: ["enum.HumanoidVisualLayers.RHand"]
     - map: ["enum.HumanoidVisualLayers.Handcuffs"]

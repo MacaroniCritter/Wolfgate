@@ -290,6 +290,8 @@ public partial class RCDSystem : EntitySystem
         if (!IsRCDOperationStillValid(uid, component, mapGridData.Value, args.Target, args.User))
             return;
 
+        if (!WgApcFaceFree(uid, component, mapGridData.Value, args.Direction, args.User)) return; // WOLFGATE(Construction): checks the facing the build was started with
+
         // Finalize the operation
         FinalizeRCDOperation(uid, component, mapGridData.Value, args.Direction, args.Target, args.User);
 
@@ -421,6 +423,8 @@ public partial class RCDSystem : EntitySystem
         }
 
         // Entity specific rules
+
+        if (!WgApcFaceFree(uid, component, mapGridData, component.ConstructionDirection, user, popMsgs)) return false; // WOLFGATE(Construction): one APC per wall face
 
         // Check rule: The tile is unoccupied
         var isWindow = component.CachedPrototype.ConstructionRules.Contains(RcdConstructionRule.IsWindow);
@@ -578,7 +582,7 @@ public partial class RCDSystem : EntitySystem
                 {
                     // Deconstruct tile (either converts the tile to lattice, or removes lattice)
                     var tile = (_turf.GetContentTileDefinition(mapGridData.Tile).ID != "Lattice") ? new Tile(_tileDefMan["Lattice"].TileId) : Tile.Empty;
-                    if (tile.IsEmpty) WfRecordHullTileDeconstruction(mapGridData.GridUid, mapGridData.Position); // WOLFGATE(Shuttles): removing the last lattice leaves the hull survey before any split copies it.
+                    if (tile.IsEmpty) WgRecordHullTileDeconstruction(mapGridData.GridUid, mapGridData.Position); // WOLFGATE(Shuttles): removing the last lattice leaves the hull survey before any split copies it.
                     _mapSystem.SetTile(mapGridData.GridUid, mapGridData.Component, mapGridData.Position, tile);
                     _adminLogger.Add(LogType.RCD, LogImpact.High, $"{ToPrettyString(user):user} used RCD to set grid: {mapGridData.GridUid} tile: {mapGridData.Position} open to space");
                 }
@@ -586,7 +590,7 @@ public partial class RCDSystem : EntitySystem
                 {
                     // Deconstruct object
                     _adminLogger.Add(LogType.RCD, LogImpact.High, $"{ToPrettyString(user):user} used RCD to delete {ToPrettyString(target):target}");
-                    WfRecordHullDeconstruction(target.Value); // WOLFGATE(Shuttles): Successful RCD removal updates the hull design without erasing combat losses.
+                    WgRecordHullDeconstruction(target.Value); // WOLFGATE(Shuttles): Successful RCD removal updates the hull design without erasing combat losses.
                     QueueDel(target);
                 }
 

@@ -1,0 +1,26 @@
+<Document>
+# ASF 'Surveyor'
+
+[color=#a4885c]Ship Size:[/color] Small
+
+[color=#a4885c]Recommended Crew:[/color] 1
+
+[color=#a4885c]Power Gen Type:[/color] Uranium
+
+[color=#a4885c]Base Power Draw:[/color] 70 kW (35kw per generator)
+
+[color=#a4885c]Expeditions:[/color] No
+
+[color=#a4885c]IFF Console:[/color] None
+
+"a ubiquitous ASF mining shuttle, seen all throughout their expanding territories, equipped with two M12 mining lasers and two side-mounted Flutter lasers. The Surveyor embodies ASF design principles: emphasizing crew safety, redundant systems, and defensive design, with wide turret arcs, powerful forward thrusters, and common use of shield generators. 
+
+The generators are split apart on opposite sides of the ship, preventing any one critical hit from completely disabling the ship, and the cockpit is located dead-center with most critical systems, allowing the pilot to survive and escape even severe damage.  
+
+A relatively peaceful faction, the ASF have a severe lack of military shipyards, and so many of their most common hulls are refitted civilian ships. As such, the armor and defensive weaponry on the Surveyor is particularly light, relying more on shields and evasiveness to avoid combat and flee to safe locations."
+
+## Cockpit Signals
+
+Signal 1 on the cockpit will shut the front blast doors, useful for resyncing in case of a jammed door, or to brace for combat.
+
+</Document>

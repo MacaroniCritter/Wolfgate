@@ -28,7 +28,7 @@
         component: SeeingRainbows
         type: Add
         time: 5
-        refresh: false
+        refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
   plantMetabolism:
   - !type:PlantAdjustToxins
     amount: 2

@@ -22,6 +22,7 @@
     Chest: MobFeroxiTorso
     UndergarmentTop: MobHumanoidAnyMarking # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
     UndergarmentBottom: MobHumanoidAnyMarking # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
+    UndergarmentSocks: MobHumanoidAnyMarking # WOLFGATE(Humanoid): allow socks markings for this species sprite set
     Genital: MobHumanoidAnyMarking # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
     Penis: MobHumanoidAnyMarking # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
     Breasts: MobHumanoidAnyMarking # WOLFGATE(Genitals): underwear/genital layers ported from HardLight
@@ -61,13 +62,13 @@
       required: true
       defaultMarkings: [ FeroxiSnout ]
     Chest:
-      points: 4 # WOLFGATE(Species): was 3, more marking slots
+      points: 8 # WOLFGATE(Species): was 3, more marking slots
       required: false
     Legs:
-      points: 8 # imp/mono 2<8
+      points: 16 # imp/mono 2<8 # WOLFGATE(Species): was 8, more marking slots
       required: false
     Arms:
-      points: 8 # imp/mono 2<8
+      points: 16 # imp/mono 2<8 # WOLFGATE(Species): was 8, more marking slots
       required: false
     Tail:
       points: 1

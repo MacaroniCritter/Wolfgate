@@ -155,7 +155,11 @@ public sealed partial class GeneratorSystem : SharedGeneratorSystem
             component.Multiplier,
             availableMaterial);
 
-        _materialStorage.TryChangeMaterialAmount(uid, component.FuelMaterial, -toRemove);
+        // WOLFGATE(NetTraffic) START: most ticks burn less than a whole unit, and a change of 0 still re-sent the storage
+        // _materialStorage.TryChangeMaterialAmount(uid, component.FuelMaterial, -toRemove);
+        if (toRemove != 0)
+            _materialStorage.TryChangeMaterialAmount(uid, component.FuelMaterial, -toRemove);
+        // WOLFGATE END
     }
 
     private int RemoveFractionalFuel(ref float fractional, float fuelUsed, float multiplier, int availableQuantity)

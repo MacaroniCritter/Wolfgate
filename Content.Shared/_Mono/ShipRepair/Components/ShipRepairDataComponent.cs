@@ -22,6 +22,8 @@ public sealed partial class ShipRepairDataComponent : Component
     /// </summary>
     [DataField, AutoNetworkedField]
     public List<EntProtoId> EntityPalette = new();
+
+    public override bool SessionSpecific => true; // WOLFGATE(NetTraffic): WGRepairDataNetSystem sends the snapshot only to repair tool users
 }
 
 [DataDefinition, Serializable, NetSerializable]

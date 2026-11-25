@@ -63,8 +63,7 @@ public sealed partial class GraphicsTab : Control
         Control.AddOptionCheckBox(CCVars.ParallaxLowQuality, ParallaxLowQualityCheckBox);
         Control.AddOptionCheckBox(CCVars.HudFpsCounterVisible, FpsCounterCheckBox);
 
-        Control.AddOptionCheckBox(FHCCVars.RenderStarSystem, RenderStarSystemCheckBox); // Far Horizons
-        WfAddWeatherQuality(); // WOLFGATE(WolfWeather)
+        // Control.AddOptionCheckBox(FHCCVars.RenderStarSystem, RenderStarSystemCheckBox); // Far Horizons // WOLFGATE(Options): moved to the Wolfgate tabs
 
         Control.Initialize();
 

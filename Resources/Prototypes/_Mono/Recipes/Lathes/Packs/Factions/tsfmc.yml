@@ -40,11 +40,13 @@
   - ShipVoucherTsfT0Recipe
   - ShipVoucherTsfT1Recipe
   - ShipVoucherTsfT2Recipe
+  - ZephyrVoucherTSF
   - ShipVoucherPolarisRecipe
+  - WGShipVoucherTsfT3Recipe # WOLFGATE(FactionBalance): generic T3 voucher
   - ShipVoucherLudaRecipe
   # WOLFGATE(OldVessels) START: classic ship LPCs
   - AltairVoucherTSF
-  - WFAndromedaVoucherTSF
+  - WGAndromedaVoucherTSF
   - FlyssaVoucherTSF
   # WOLFGATE END
 

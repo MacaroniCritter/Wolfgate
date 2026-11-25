@@ -117,28 +117,36 @@ public sealed partial class ContentAudioSystem
         if (!_timing.IsFirstTimePredicted) //otherwise this will tick like 5x faster on client. thanks prediction
             return;
 
-        WfUpdatePlanetMusic(); // WOLFGATE(Planets): planet soundscapes replace ordinary ambient music.
+        WgUpdatePlanetMusic(); // WOLFGATE(Planets): planet soundscapes replace ordinary ambient music.
+        WgUpdateCombatPlaylist(); // WOLFGATE(CombatMusic): the next combat track once one ends
 
         if (_initialStationMusicBool)
         {
             _initialStationMusicTimer += frameTime;
-            if (_replayAmbientMusicTimer > InitialStationMusicTimeToDrop)
+            if (_initialStationMusicTimer > InitialStationMusicTimeToDrop) // WOLFGATE(Ambience): read its own timer, not the replay timer
             {
-                ReplayAmbientMusic();
+                // WOLFGATE(Ambience) START: only restart when nothing plays, so the first track isn't cut short
+                if (_ambientMusicStream is not { } initialStream || Deleted(initialStream))
+                    ReplayAmbientMusic();
+                // ReplayAmbientMusic();
+                // WOLFGATE END
                 _initialStationMusicBool = false;
                 _initialStationMusicTimer = 0;
                 _replayAmbientMusicTimer = 0;
             }
         }
-        if (_replayAmbientMusicBool)
-        {
-            _replayAmbientMusicTimer += frameTime;
-            if (_replayAmbientMusicTimer > _timeUntilNextAmbientTrack)
-            {
-                ReplayAmbientMusic();
-                _replayAmbientMusicTimer = 0;
-            }
-        }
+        // WOLFGATE(Ambience) START: next track when the last one ends, not on a timer that cuts tracks short
+        WgUpdateAmbientPlaylist(frameTime);
+        // if (_replayAmbientMusicBool)
+        // {
+        //     _replayAmbientMusicTimer += frameTime;
+        //     if (_replayAmbientMusicTimer > _timeUntilNextAmbientTrack)
+        //     {
+        //         ReplayAmbientMusic();
+        //         _replayAmbientMusicTimer = 0;
+        //     }
+        // }
+        // WOLFGATE END
         if (_combatWindUpBool)
         {
             _combatWindUpTimer += frameTime;
@@ -226,18 +234,20 @@ public sealed partial class ContentAudioSystem
 
         SoundCollectionPrototype soundcol = _proto.Index<SoundCollectionPrototype>(_musicProto.ID);
 
-        string path = _random.Pick(soundcol.PickFiles).ToString(); //picks a random track. if someone really cared we could make it make sure it doesnt play the same track twice
+        string path = WgPickAmbientPath(soundcol); // WOLFGATE(Ambience): shuffled bag, no repeats
 
         PlayMusicTrack(path, _musicProto.Sound.Params.Volume, _ambientMusicFadeInTime, false);
     }
 
     private void OnBiomeChange(ref SpaceBiomeSwapMessage ev)
     {
-        SetMusic(_lastGrid, ev.Id, _lastCombatState);
+        WgQueueBiomeChange(ev.Id); // WOLFGATE(Ambience): wait for the change to hold before switching
+        // SetMusic(_lastGrid, ev.Id, _lastCombatState);
     }
     private void OnPlayerParentChange(ref PlayerParentChangedMessage ev)
     {
-        SetMusic(ev.Grid, _lastBiome, _lastCombatState);
+        WgQueueGridChange(ev.Grid); // WOLFGATE(Ambience): wait for the change to hold before switching
+        // SetMusic(ev.Grid, _lastBiome, _lastCombatState);
     }
     private void SwitchCombatMusic(bool currentCombatState)
     {
@@ -314,9 +324,12 @@ public sealed partial class ContentAudioSystem
 
                 _currentlyPlaying = MusicType.Combat;
 
-                SoundCollectionPrototype soundcol = _proto.Index<SoundCollectionPrototype>(_musicProto.ID);
-                string path = _random.Pick(soundcol.PickFiles).ToString();
-                PlayMusicTrack(path, _musicProto.Sound.Params.Volume, _combatMusicFadeInTime, true);
+                // WOLFGATE(CombatMusic) START: the character's playlist, else the faction's tracks shuffled
+                WgPlayCombatTrack();
+                // SoundCollectionPrototype soundcol = _proto.Index<SoundCollectionPrototype>(_musicProto.ID);
+                // string path = _random.Pick(soundcol.PickFiles).ToString();
+                // PlayMusicTrack(path, _musicProto.Sound.Params.Volume, _combatMusicFadeInTime, true);
+                // WOLFGATE END
                 return;
             }
             else
@@ -349,7 +362,7 @@ public sealed partial class ContentAudioSystem
 
                 _musicProto = _proto.Index<AmbientMusicPrototype>(music.AmbientMusicPrototype);
                 SoundCollectionPrototype soundcol = _proto.Index<SoundCollectionPrototype>(_musicProto.ID);
-                string path = _random.Pick(soundcol.PickFiles).ToString();
+                string path = WgPickAmbientPath(soundcol); // WOLFGATE(Ambience): shuffled bag, no repeats
                 PlayMusicTrack(path, _musicProto.Sound.Params.Volume, _ambientMusicFadeInTime, false);
                 return;
             }
@@ -399,7 +412,7 @@ public sealed partial class ContentAudioSystem
             _currentlyPlaying = MusicType.Biome;
 
             SoundCollectionPrototype soundcol = _proto.Index<SoundCollectionPrototype>(_musicProto.ID);
-            string path = _random.Pick(soundcol.PickFiles).ToString();
+            string path = WgPickAmbientPath(soundcol); // WOLFGATE(Ambience): shuffled bag, no repeats
             PlayMusicTrack(path, _musicProto.Sound.Params.Volume, _ambientMusicFadeInTime, false);
             return;
         }
@@ -423,7 +436,7 @@ public sealed partial class ContentAudioSystem
     private void PlayMusicTrack(string path, float volume, float fadein, bool combatMode)
     {
         // WOLFGATE(Planets) START: no ordinary ambient music on a planet, whether a biome, grid, timer or combat-exit request asked.
-        if (!combatMode && WfOnPlanet())
+        if (!combatMode && WgOnPlanet())
         {
             DisableAmbientMusic();
             _isCombatMusicPlaying = false;
@@ -431,9 +444,15 @@ public sealed partial class ContentAudioSystem
             return;
         }
         // WOLFGATE END
+        if (!combatMode && WgBandHoldsMusic()) // WOLFGATE(Ambience): a Lattice band's own music holds other ambient music off
+            return;
 
         _isCombatMusicPlaying = combatMode;
-        FadeOut(_ambientMusicStream);
+        // WOLFGATE(Ambience) START: slower crossfade between ambient tracks; a track that finished on its own is already gone
+        if (TryComp<AudioComponent>(_ambientMusicStream, out var previousAudio))
+            FadeOut(_ambientMusicStream, previousAudio, combatMode ? DefaultDuration : WgAmbientFadeOut);
+        // FadeOut(_ambientMusicStream);
+        // WOLFGATE END
 
         if (combatMode)
         {
@@ -453,6 +472,7 @@ public sealed partial class ContentAudioSystem
             AudioParams.Default.WithVolume(volume))!;
 
         _ambientMusicStream = strim.Value.Entity; //this plays it immediately, but fadein function later makes it actually fade in.
+        WgTrackAmbientStream(combatMode); // WOLFGATE(Ambience): the playlist follows this track to its end
 
         if (fadein != 0)
             FadeIn(_ambientMusicStream, strim.Value.Component, fadein);

@@ -282,6 +282,9 @@ namespace Content.Server.Construction
                     if (validation)
                         return HandleResult.Validated;
 
+                    if (doAfterState == DoAfterState.None) // WOLFGATE(InteractionParticles): construction runs on the server only
+                        _interactionSystem.SpawnInteractionParticle(interactUsing.User, uid, interactUsing.Used, false); // WOLFGATE(InteractionParticles)
+
                     // If we still haven't completed this step's DoAfter...
                     if (doAfterState == DoAfterState.None && insertStep.DoAfter > 0)
                     {
@@ -318,6 +321,15 @@ namespace Content.Server.Construction
 
                         insert = stack;
                     }
+                    // WOLFGATE START: a tag or component step takes one item off a stack, not the whole stack
+                    else if (TryComp<Content.Shared.Stacks.StackComponent>(insert, out var insertStack) && insertStack.Count > 1)
+                    {
+                        if (_stackSystem.Split(insert, 1, Transform(interactUsing.User).Coordinates, insertStack) is not {} single)
+                            return HandleResult.False;
+
+                        insert = single;
+                    }
+                    // WOLFGATE END
 
                     // Container-storage handling.
                     if (!string.IsNullOrEmpty(insertStep.Store))
@@ -372,6 +384,7 @@ namespace Content.Server.Construction
                         TimeSpan.FromSeconds(toolInsertStep.DoAfter));
                     RaiseLocalEvent(uid, ref durationEvent);
 
+                    _interactionSystem.SpawnInteractionParticle(interactUsing.User, uid, interactUsing.Used, false); // WOLFGATE(InteractionParticles): construction runs on the server only
                     var result  = _toolSystem.UseTool(
                         interactUsing.Used,
                         interactUsing.User,

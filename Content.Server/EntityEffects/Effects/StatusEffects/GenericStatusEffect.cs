@@ -39,11 +39,25 @@ public sealed partial class GenericStatusEffect : EntityEffect
     [DataField]
     public StatusEffectMetabolismType Type = StatusEffectMetabolismType.Add;
 
+    // WOLFGATE(WolfChem) START: status time that follows the reagent in the blood
+    /// <summary>
+    ///     When above zero, the time is this many times <see cref="Time"/> per unit of the reagent left, so a
+    ///     refreshed effect is held at the units left instead of scaled by the amount metabolised.
+    /// </summary>
+    [DataField]
+    public float PerUnitInBlood;
+    // WOLFGATE END
+
     public override void Effect(EntityEffectBaseArgs args)
     {
         var statusSys = args.EntityManager.EntitySysManager.GetEntitySystem<StatusEffectsSystem>();
 
         var time = Time;
+        // WOLFGATE(WolfChem) START: status time that follows the reagent in the blood
+        if (PerUnitInBlood > 0f && args is EntityEffectReagentArgs { Source: { } blood, Reagent: { } reagent })
+            time *= PerUnitInBlood * blood.GetTotalPrototypeQuantity(reagent.ID).Float();
+        else
+        // WOLFGATE END
         if (args is EntityEffectReagentArgs reagentArgs)
             time *= reagentArgs.Scale.Float();
 

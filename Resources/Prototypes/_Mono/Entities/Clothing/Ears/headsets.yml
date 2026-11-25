@@ -38,7 +38,10 @@
   - type: ContainerFill
     containers:
       key_slots:
-      - EncryptionKeyStationMaster
+      - EncryptionKeyCommon
+      - EncryptionKeyNfsd
+      - EncryptionKeyCommand
+      - EncryptionKeyTraffic # WOLFGATE: command staff get shortband
   - type: Sprite
     sprite: _Mono/Clothing/Ears/Headsets/tsf.rsi
   - type: Clothing
@@ -205,8 +208,9 @@
   - type: ContainerFill
     containers:
       key_slots:
-      - EncryptionKeyCommon
+      # WOLFGATE: the company key goes first so it is the default channel, not broadband
       - EncryptionKeyMieyo
+      - EncryptionKeyCommon
 
 - type: entity
   parent: ClothingHeadsetAlt
@@ -221,6 +225,7 @@
   - type: ContainerFill
     containers:
       key_slots:
-      - EncryptionKeyCommon
+      # WOLFGATE: the company key goes first so it is the default channel, not broadband
       - EncryptionKeyMieyo
+      - EncryptionKeyCommon
       - EncryptionKeyMieyoCommand

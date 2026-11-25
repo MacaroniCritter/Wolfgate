@@ -87,7 +87,8 @@ public sealed partial class SignalTimerSystem : EntitySystem
         _audio.PlayPvs(signalTimer.DoneSound, uid);
         _signalSystem.InvokePort(uid, signalTimer.TriggerPort);
 
-        if (_ui.HasUi(uid, SignalTimerUiKey.Key))
+        // WOLFGATE(NetTraffic): closed windows get no state; AfterActivatableUIOpenEvent sets it on opening
+        if (_ui.HasUi(uid, SignalTimerUiKey.Key) && _ui.IsUiOpen(uid, SignalTimerUiKey.Key))
         {
             _ui.SetUiState(uid, SignalTimerUiKey.Key, new SignalTimerBoundUserInterfaceState(signalTimer.Label,
                 TimeSpan.FromSeconds(signalTimer.Delay), // Mono

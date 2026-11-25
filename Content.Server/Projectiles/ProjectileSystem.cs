@@ -33,12 +33,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server.Destructible;
-using Content.Server._WF.ShipShields; // WOLFGATE(ShipShields)
 using Content.Shared.Damage;
 using Content.Shared.FixedPoint;
 using Content.Shared.Projectiles;
-using Content.Shared._Mono.SpaceArtillery; // WOLFGATE(ShipShields)
-using Robust.Shared.Containers; // WOLFGATE(Weapons)
 using Robust.Shared.Map;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
@@ -54,7 +51,6 @@ public sealed partial class ProjectileSystem : SharedProjectileSystem
 
     [Dependency] private SharedPhysicsSystem _physics = default!;
     [Dependency] private SharedTransformSystem _transformSystem = default!;
-    [Dependency] private SharedContainerSystem _container = default!; // WOLFGATE(Weapons): the sweep leaves contained projectiles alone
 
     // <Mono>
     private EntityQuery<PhysicsComponent> _physQuery;
@@ -70,17 +66,19 @@ public sealed partial class ProjectileSystem : SharedProjectileSystem
         _fixQuery = GetEntityQuery<FixturesComponent>();
         // Mono
         UpdatesBefore.Add(typeof(SharedPhysicsSystem));
+        WgInitializeSweep(); // WOLFGATE(Weapons): the sweep subscribes to the physics substep
     }
 
     public override DamageSpecifier? ProjectileCollide(Entity<ProjectileComponent, PhysicsComponent> projectile, EntityUid target, MapCoordinates? collisionCoordinates, bool predicted = false)
     {
         var (uid, component, ourBody) = projectile;
+        RemComp<Content.Server._WG.Weapons.Projectiles.WGSweepHoldComponent>(uid); // WOLFGATE(Weapons): the hit landed, so the sweep need not land it
         // Check if projectile is already spent (server-specific check)
         if (component.ProjectileSpent)
             return null;
 
         // WOLFGATE(ShipShields) START: a deflector field slows a round and lets it fly on unspent
-        if (_wfShipShields.PassWolfgateDeflector(target, uid, component))
+        if (_wgShipShields.PassWolfgateDeflector(target, uid, component))
             return null;
         // WOLFGATE END
 
@@ -172,48 +170,31 @@ public sealed partial class ProjectileSystem : SharedProjectileSystem
     {
         base.Update(frameTime);
 
+        // WOLFGATE(Weapons) START: the sweep is ProjectileSystem.Sweep.cs, run on the first physics substep
+        if (WgSweepReplacesUpstream)
+        {
+            _wgSweepTime = frameTime;
+            return;
+        }
+        // WOLFGATE END
+
         var query = EntityQueryEnumerator<ProjectileComponent, PhysicsComponent>();
         while (query.MoveNext(out var uid, out var projectileComp, out var physicsComp))
         {
-            // WOLFGATE(Weapons) START: an item that is only a projectile once shot is not swept while unfired or inside a container
-            // Its carrier's speed is not its own, and a reusable round must not take an old flight's sweep into its next shot.
-            if (projectileComp.ProjectileSpent || projectileComp is { Weapon: null, OnlyCollideWhenShot: true } ||
-                _container.IsEntityInContainer(uid))
-            {
-                projectileComp.RaycastResetVelocity = null;
-                continue;
-            }
-            // WOLFGATE END
-
             if (projectileComp.ProjectileSpent || TerminatingOrDeleted(uid))
-            {
-                projectileComp.RaycastResetVelocity = null; // Mono
                 continue;
-            }
 
             var xform = Transform(uid);
-            var parentVel = _physics.GetMapLinearVelocity(uid, physicsComp, xform) - physicsComp.LinearVelocity; // Mono
-            var currentVelocity = projectileComp.RaycastResetVelocity - parentVel ?? physicsComp.LinearVelocity;
+            var currentVelocity = projectileComp.RaycastResetVelocity ?? _physics.GetMapLinearVelocity(uid, physicsComp, xform);
             var velLen = currentVelocity.Length();
-            // WOLFGATE(ShipShields) START: sweep ship rounds at every speed so slow pulses cannot miss the shield edge
-            // if (!ShouldRaycastProjectile(velLen) && projectileComp.RaycastResetVelocity == null)
-            if (!ShouldRaycastProjectile(velLen) && projectileComp.RaycastResetVelocity == null &&
-                !HasComp<ShipWeaponProjectileComponent>(uid))
+            if (!ShouldRaycastProjectile(velLen) && projectileComp.RaycastResetVelocity == null)
                 continue;
-            // WOLFGATE END
 
             var lastMap = _transformSystem.GetMapCoordinates(xform);
             var lastPosition = lastMap.Position;
             var rayDirection = currentVelocity / velLen;
             // Ensure rayDistance is not zero to prevent issues with IntersectRay if frametime or velocity is zero.
             var rayDistance = velLen * frameTime;
-            // WOLFGATE(Weapons) START: a held hit velocity is restored even when the projectile has no relative speed
-            if (rayDistance <= 0f && projectileComp.RaycastResetVelocity != null)
-            {
-                _physics.SetLinearVelocity(uid, currentVelocity, body: physicsComp);
-                projectileComp.RaycastResetVelocity = null;
-            }
-            // WOLFGATE END
             if (rayDistance <= 0f)
                 continue;
 
@@ -227,9 +208,11 @@ public sealed partial class ProjectileSystem : SharedProjectileSystem
                 false); // IncludeNonHard = false
 
             // do not process other grid velocity if we are gridded
-            if (!ProcessHits(hits) && projectileComp.RaycastResetVelocity != null)
+            if (!ProcessHits(hits) && projectileComp.RaycastResetVelocity is { } resetVel)
             {
-                _physics.SetLinearVelocity(uid, currentVelocity, body: physicsComp);
+                var parentVel = _physics.GetMapLinearVelocity(xform.ParentUid);
+                var resetTo = resetVel - parentVel;
+                _physics.SetLinearVelocity(uid, resetTo, body: physicsComp);
                 projectileComp.RaycastResetVelocity = null;
             }
 
@@ -276,21 +259,14 @@ public sealed partial class ProjectileSystem : SharedProjectileSystem
                 // teleport us so we hit it
                 var hitXform = Transform(minHit.Uid.Value);
                 var hitMapCoord = lastMap.Offset(rayDirection * minHit.Distance);
-                // WOLFGATE(ShipShields) START: consume confirmed shield ray hits without relying on a later edge contact
-                var shieldHit = new WFShipShieldProjectileRayHitEvent(uid, projectileComp, hitMapCoord);
-                RaiseLocalEvent(minHit.Uid.Value, ref shieldHit);
-                if (shieldHit.Handled)
-                    return true;
-                // WOLFGATE END
                 var hitPos = _transformSystem.ToCoordinates(hitMapCoord);
                 // if we somehow hit something not directly parented to space or a grid
-                // WOLFGATE(Weapons): hold every hit on the struck grid, so an impact blast moves with the ship it hit.
-                // if (hitXform.Coordinates.EntityId != hitXform.GridUid && hitXform.GridUid != null)
-                if (hitXform.GridUid != null)
+                if (hitXform.Coordinates.EntityId != hitXform.GridUid && hitXform.GridUid != null)
                     hitPos = _transformSystem.WithEntityId(hitPos, hitXform.GridUid.Value);
 
                 if (projectileComp.RaycastResetVelocity == null)
                 {
+                    var parentVel = _physics.GetMapLinearVelocity(xform.ParentUid);
                     projectileComp.RaycastResetVelocity = currentVelocity + parentVel; // record specifically world velocity
                     var curVel = physicsComp.LinearVelocity;
                     curVel.Normalize();

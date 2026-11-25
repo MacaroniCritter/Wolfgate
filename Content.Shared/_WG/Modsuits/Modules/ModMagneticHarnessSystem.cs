@@ -1,0 +1,226 @@
+using System.Numerics;
+using Content.Shared._WG.Modsuits.Components;
+using Content.Shared._WG.Modsuits.Systems;
+using Content.Shared.Hands;
+using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Inventory;
+using Content.Shared.Inventory.Events;
+using Content.Shared.Weapons.Ranged.Components;
+using Robust.Shared.Audio.Systems;
+using Robust.Shared.Containers;
+using Robust.Shared.Network;
+using Robust.Shared.Physics;
+using Robust.Shared.Physics.Components;
+using Robust.Shared.Physics.Controllers;
+using Robust.Shared.Timing;
+
+namespace Content.Shared._WG.Modsuits.Modules;
+
+public sealed partial class ModMagneticHarnessSystem : VirtualController
+{
+    [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private INetManager _net = default!;
+    [Dependency] private ModSuitSystem _modSuit = default!;
+    [Dependency] private InventorySystem _inventory = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private SharedContainerSystem _container = default!;
+    [Dependency] private SharedHandsSystem _hands = default!;
+
+    private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(5);
+
+    private readonly List<EntityUid> _forget = new();
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        SubscribeLocalEvent<ModMagneticHarnessComponent, DidEquipEvent>(OnDidEquip);
+        SubscribeLocalEvent<ModMagneticHarnessComponent, DidEquipHandEvent>(OnDidEquipHand);
+    }
+
+    private void OnDidEquip(Entity<ModMagneticHarnessComponent> ent, ref DidEquipEvent args)
+    {
+        if (_timing.ApplyingState || !ent.Comp.Slots.Contains(args.Slot))
+            return;
+
+        Magnetize(args.Equipment, ent, args.Slot);
+    }
+
+    private void OnDidEquipHand(Entity<ModMagneticHarnessComponent> ent, ref DidEquipHandEvent args)
+    {
+        if (_timing.ApplyingState)
+            return;
+
+        // A gun drawn from a slot or picked up from the floor should come back to suit storage.
+        Magnetize(args.Equipped, ent, "suitstorage");
+    }
+
+    private void Magnetize(EntityUid gun, Entity<ModMagneticHarnessComponent> harness, string slot)
+    {
+        if (!HasComp<GunComponent>(gun))
+            return;
+
+        var magnetized = EnsureComp<ModMagnetizedGunComponent>(gun);
+        magnetized.Wearer = harness;
+        magnetized.Slot = slot;
+        magnetized.LooseSince = null;
+        magnetized.Launched = false;
+        Dirty(gun, magnetized);
+        PhysicsSystem.UpdateIsPredicted(gun);
+    }
+
+    public override void UpdateBeforeSolve(bool prediction, float frameTime)
+    {
+        base.UpdateBeforeSolve(prediction, frameTime);
+
+        var now = _timing.CurTime;
+        _forget.Clear();
+
+        var query = EntityQueryEnumerator<ModMagnetizedGunComponent, PhysicsComponent>();
+        while (query.MoveNext(out var gun, out var magnetized, out var body))
+        {
+            if (prediction && !body.Predict)
+                continue;
+
+            var owner = magnetized.Wearer;
+            if (TerminatingOrDeleted(owner))
+            {
+                if (_net.IsServer)
+                    _forget.Add(gun);
+                continue;
+            }
+
+            if (_container.IsEntityInContainer(gun)
+                || Transform(gun).Anchored
+                || !TryComp<ModMagneticHarnessComponent>(owner, out var harness))
+            {
+                Reset((gun, magnetized), body, null);
+                continue;
+            }
+
+            var gunPos = TransformSystem.GetMapCoordinates(gun);
+            var ownerPos = TransformSystem.GetMapCoordinates(owner);
+            var offset = ownerPos.Position - gunPos.Position;
+            var distance = offset.Length();
+            if (gunPos.MapId != ownerPos.MapId || distance > harness.Range)
+            {
+                Reset((gun, magnetized), body, null);
+                continue;
+            }
+
+            if (magnetized.LooseSince is not { } since)
+            {
+                magnetized.LooseSince = now;
+                Dirty(gun, magnetized);
+                PhysicsSystem.UpdateIsPredicted(gun);
+                continue;
+            }
+
+            var elapsed = now - since;
+            if (elapsed < harness.Delay)
+                continue;
+
+            if (distance <= harness.CatchDistance)
+            {
+                PhysicsSystem.SetLinearVelocity(gun, Vector2.Zero, body: body);
+                if (_net.IsClient)
+                    continue;
+
+                if (!TryCatch(gun, magnetized, owner, harness))
+                    Reset((gun, magnetized), body, now + RetryDelay);
+
+                continue;
+            }
+
+            if (elapsed > harness.Delay + harness.PullTime + harness.GiveUpTime)
+            {
+                Reset((gun, magnetized), body, now + RetryDelay);
+                continue;
+            }
+
+            var launching = elapsed >= harness.Delay + harness.PullTime;
+            if (launching && !magnetized.Launched)
+            {
+                magnetized.Launched = true;
+                Dirty(gun, magnetized);
+                _audio.PlayPredicted(harness.LaunchSound, gun, owner);
+            }
+
+            if (body.BodyStatus != BodyStatus.InAir)
+                PhysicsSystem.SetBodyStatus(gun, body, BodyStatus.InAir);
+
+            var speed = launching ? harness.LaunchSpeed : harness.PullSpeed;
+            PhysicsSystem.SetLinearVelocity(gun, offset / distance * speed, body: body);
+            PhysicsSystem.SetAngularVelocity(gun, 0f, body: body);
+        }
+
+        foreach (var gun in _forget)
+        {
+            RemComp<ModMagnetizedGunComponent>(gun);
+        }
+    }
+
+    private bool TryCatch(EntityUid gun, ModMagnetizedGunComponent magnetized, EntityUid owner, ModMagneticHarnessComponent harness)
+    {
+        // TG's magnetic harness spends 1.0 DEFAULT_CHARGE_DRAIN on every successful catch. Check the
+        // balance before touching the gun and pay once it is caught, so a failed catch costs nothing.
+        Entity<ModSuitComponent>? paySuit = null;
+        var cost = 0f;
+        if (harness.Module is { } moduleUid
+            && TryComp<ModModuleComponent>(moduleUid, out var module)
+            && _modSuit.TryGetModuleSuit(moduleUid, out var suit))
+        {
+            cost = module.UsePower * ModSuitSystem.PowerDrainScale;
+            if (cost > 0f && !_modSuit.HasCharge(suit, cost))
+                return false;
+
+            paySuit = suit;
+        }
+
+        if (TryComp<PhysicsComponent>(gun, out var body))
+            PhysicsSystem.SetBodyStatus(gun, body, BodyStatus.OnGround);
+
+        var caught = _inventory.TryEquip(owner, gun, magnetized.Slot, silent: true);
+        if (!caught)
+        {
+            foreach (var slot in harness.Slots)
+            {
+                if (slot != magnetized.Slot && _inventory.TryEquip(owner, gun, slot, silent: true))
+                {
+                    caught = true;
+                    break;
+                }
+            }
+        }
+
+        if (!caught)
+            caught = _hands.TryPickupAnyHand(owner, gun, checkActionBlocker: false);
+
+        if (caught)
+        {
+            if (paySuit is { } payer)
+                _modSuit.TryUseCharge(payer, cost);
+
+            _audio.PlayPvs(harness.CatchSound, owner);
+        }
+
+        return caught;
+    }
+
+    private void Reset(Entity<ModMagnetizedGunComponent> ent, PhysicsComponent body, TimeSpan? looseSince)
+    {
+        if (ent.Comp.LooseSince == looseSince && !ent.Comp.Launched)
+            return;
+
+        if (ent.Comp.LooseSince != null && body.BodyStatus == BodyStatus.InAir && !_container.IsEntityInContainer(ent))
+        {
+            PhysicsSystem.SetLinearVelocity(ent, Vector2.Zero, body: body);
+            PhysicsSystem.SetBodyStatus(ent, body, BodyStatus.OnGround);
+        }
+
+        ent.Comp.LooseSince = looseSince;
+        ent.Comp.Launched = false;
+        Dirty(ent);
+        PhysicsSystem.UpdateIsPredicted(ent);
+    }
+}

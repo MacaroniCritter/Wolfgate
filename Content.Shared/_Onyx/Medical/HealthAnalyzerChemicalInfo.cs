@@ -14,7 +14,7 @@ public enum HealthAnalyzerSolutionType : byte
 }
 
 [Serializable, NetSerializable]
-public readonly record struct HealthAnalyzerReagentInfo(string Prototype, FixedPoint2 Quantity);
+public readonly record struct HealthAnalyzerReagentInfo(string Prototype, FixedPoint2 Quantity, float Purity = 1f); // WOLFGATE(WolfChem): the reagent's grade
 
 [Serializable, NetSerializable]
 public sealed record HealthAnalyzerChemicalInfo(

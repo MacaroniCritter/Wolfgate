@@ -88,7 +88,8 @@
         component: Drowsiness
         time: 4
         type: Add
-        refresh: false
+        refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
+        perUnitInBlood: 2 # WOLFGATE(WolfChem): held at the units left, as long as it used to pile up to
       - !type:HealthChange
         conditions:
         - !type:OrganType # Goobstation - Yowie
@@ -379,13 +380,14 @@
     amount: 10
   metabolisms:
     Poison:
+      metabolismRate: 0.05 # WOLFGATE(WolfChem): clears slower so the high lasts as long as before
       effects:
       - !type:GenericStatusEffect
         key: SeeingRainbows
         component: SeeingRainbows
         type: Add
         time: 10
-        refresh: false
+        refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
   # TODO: PROPER hallucinations
 
 - type: reagent

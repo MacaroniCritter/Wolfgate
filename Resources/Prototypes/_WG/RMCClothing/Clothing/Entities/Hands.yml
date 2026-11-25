@@ -1,0 +1,137 @@
+- type: entity
+  parent: ClothingHandsGlovesTacticalCombatBlack
+  id: WGRMCGlovesBlack
+  components:
+  - type: Sprite
+    sprite: _WG/RMCClothing/Clothing/Hands/gloves/black.rsi
+    state: icon
+    color: "#FFFFFF"
+  - type: Clothing
+    sprite: _WG/RMCClothing/Clothing/Hands/gloves/black.rsi
+    clothingVisuals:
+      gloves:
+      - state: equipped-HAND
+  - type: Item
+    sprite: _Mono/Clothing/Hands/Gloves/tactical_combat_any.rsi # inhands; the RMC sheets have none
+    inhandVisuals:
+      left:
+      - state: inhand-left
+        color: "#2F2F2F"
+      right:
+      - state: inhand-right
+        color: "#2F2F2F"
+
+- type: entity
+  parent: ClothingHandsGlovesTacticalCombatBlack
+  id: WGRMCGlovesBrown
+  components:
+  - type: Sprite
+    sprite: _WG/RMCClothing/Clothing/Hands/gloves/brown.rsi
+    state: icon
+    color: "#FFFFFF"
+  - type: Clothing
+    sprite: _WG/RMCClothing/Clothing/Hands/gloves/brown.rsi
+    clothingVisuals:
+      gloves:
+      - state: equipped-HAND
+  - type: Item
+    sprite: _Mono/Clothing/Hands/Gloves/tactical_combat_any.rsi # inhands; the RMC sheets have none
+    inhandVisuals:
+      left:
+      - state: inhand-left
+        color: "#5C4033"
+      right:
+      - state: inhand-right
+        color: "#5C4033"
+
+- type: entity
+  parent: ClothingHandsGlovesTacticalCombatBlack
+  id: WGRMCGlovesGrey
+  components:
+  - type: Sprite
+    sprite: _WG/RMCClothing/Clothing/Hands/gloves/grey.rsi
+    state: icon
+    color: "#FFFFFF"
+  - type: Clothing
+    sprite: _WG/RMCClothing/Clothing/Hands/gloves/grey.rsi
+    clothingVisuals:
+      gloves:
+      - state: equipped-HAND
+  - type: Item
+    sprite: _Mono/Clothing/Hands/Gloves/tactical_combat_any.rsi # inhands; the RMC sheets have none
+    inhandVisuals:
+      left:
+      - state: inhand-left
+        color: "#7A7A7A"
+      right:
+      - state: inhand-right
+        color: "#7A7A7A"
+
+- type: entity
+  parent: ClothingHandsGlovesTacticalCombatBlack
+  id: WGRMCGlovesLightBrown
+  components:
+  - type: Sprite
+    sprite: _WG/RMCClothing/Clothing/Hands/gloves/light_brown.rsi
+    state: icon
+    color: "#FFFFFF"
+  - type: Clothing
+    sprite: _WG/RMCClothing/Clothing/Hands/gloves/light_brown.rsi
+    clothingVisuals:
+      gloves:
+      - state: equipped-HAND
+  - type: Item
+    sprite: _Mono/Clothing/Hands/Gloves/tactical_combat_any.rsi # inhands; the RMC sheets have none
+    inhandVisuals:
+      left:
+      - state: inhand-left
+        color: "#C19A6B"
+      right:
+      - state: inhand-right
+        color: "#C19A6B"
+
+- type: entity
+  parent: ClothingHandsGlovesTacticalCombatBlack
+  id: WGRMCGlovesLeatherBlack
+  components:
+  - type: Sprite
+    sprite: _WG/RMCClothing/Clothing/Hands/gloves/leather_black.rsi
+    state: icon
+    color: "#FFFFFF"
+  - type: Clothing
+    sprite: _WG/RMCClothing/Clothing/Hands/gloves/leather_black.rsi
+    clothingVisuals:
+      gloves:
+      - state: equipped-HAND
+  - type: Item
+    sprite: _Mono/Clothing/Hands/Gloves/tactical_combat_any.rsi # inhands; the RMC sheets have none
+    inhandVisuals:
+      left:
+      - state: inhand-left
+        color: "#2F2F2F"
+      right:
+      - state: inhand-right
+        color: "#2F2F2F"
+
+- type: entity
+  parent: ClothingHandsGlovesTacticalCombatBlack
+  id: WGRMCGlovesVeteran
+  components:
+  - type: Sprite
+    sprite: _WG/RMCClothing/Clothing/Hands/gloves/veteran.rsi
+    state: icon
+    color: "#FFFFFF"
+  - type: Clothing
+    sprite: _WG/RMCClothing/Clothing/Hands/gloves/veteran.rsi
+    clothingVisuals:
+      gloves:
+      - state: equipped-HAND
+  - type: Item
+    sprite: _Mono/Clothing/Hands/Gloves/tactical_combat_any.rsi # inhands; the RMC sheets have none
+    inhandVisuals:
+      left:
+      - state: inhand-left
+        color: "#4B4F3A"
+      right:
+      - state: inhand-right
+        color: "#4B4F3A"

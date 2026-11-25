@@ -8,6 +8,9 @@
       collection: HydrakinScream
     Laugh:
       collection: HydrakinLaugh
+    # WOLFGATE(EmoteVoices): Meridian weh
+    Weh:
+      path: /Audio/_WG/EmoteVoices/Weh/weh.ogg
     Crying:
       collection: HydrakinCry
     Sigh:

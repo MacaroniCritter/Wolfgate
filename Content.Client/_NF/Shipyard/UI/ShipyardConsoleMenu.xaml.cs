@@ -33,6 +33,7 @@ public sealed partial class ShipyardConsoleMenu : FancyWindow
     private List<string> _lastAvailableProtos = new();
     private List<string> _lastUnavailableProtos = new();
     private bool _freeListings = false;
+    private float _wgPriceMultiplier = 1f; // WOLFGATE(ShipCommand)
     private bool _validId = false;
 
     public ShipyardConsoleMenu(ShipyardConsoleBoundUserInterface owner)
@@ -178,7 +179,7 @@ public sealed partial class ShipyardConsoleMenu : FancyWindow
             else if (prototype != null && !prototype.Purchasable) // Mono
                 priceText = Loc.GetString("shipyard-console-menu-listing-voucher");
             else
-                priceText = BankSystemExtensions.ToSpesoString(prototype!.Price);
+                priceText = BankSystemExtensions.ToSpesoString((int) MathF.Round(prototype!.Price * _wgPriceMultiplier)); // WOLFGATE(ShipCommand): a commanded ship's price rules
 
             var vesselEntry = new VesselRow
             {
@@ -349,6 +350,7 @@ public sealed partial class ShipyardConsoleMenu : FancyWindow
             DeedTitle.Text = $"None";
         }
         _freeListings = state.FreeListings;
+        _wgPriceMultiplier = state.PriceMultiplier; // WOLFGATE(ShipCommand)
         _validId = state.IsTargetIdPresent;
         PopulateProducts(_lastAvailableProtos, _lastUnavailableProtos, _freeListings, _validId);
     }

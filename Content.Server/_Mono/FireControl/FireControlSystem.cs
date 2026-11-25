@@ -32,6 +32,7 @@ using Content.Shared._Mono.ShipGuns;
 using Content.Shared.Examine;
 using Content.Server.Salvage.Expeditions;
 using Content.Shared._Crescent.Hardpoints;
+using Content.Shared._Crescent.ShipShields;
 
 namespace Content.Server._Mono.FireControl;
 
@@ -400,7 +401,7 @@ public sealed partial class FireControlSystem : EntitySystem
     {
         if (TerminatingOrDeleted(grid)
             || HasComp<FTLComponent>(grid)
-            || HasComp<Content.Server._WF.Planets.Hop.WFPlanetHopComponent>(grid) // WOLFGATE(Planets): no firing mid-hop
+            || HasComp<Content.Server._WG.Planets.Hop.WGPlanetHopComponent>(grid) // WOLFGATE(Planets): no firing mid-hop
             || HasComp<SpaceArtilleryDisabledGridComponent>(grid)
         )
             return false;
@@ -518,7 +519,7 @@ public sealed partial class FireControlSystem : EntitySystem
             return false;
 
         // WOLFGATE(ShipCombat): a gun with a turn rate turns toward the target and holds fire until laid on it.
-        if (_fireRotateQuery.HasComp(weapon) && !_wfTraverse.TryLay(weapon, coords, direction))
+        if (_fireRotateQuery.HasComp(weapon) && !_wgTraverse.TryLay(weapon, coords, direction))
             return false;
 
         // Check for obstacles in the firing direction
@@ -591,7 +592,7 @@ public sealed partial class FireControlSystem : EntitySystem
         // Calculate distance to target (capped at maximum distance)
         var targetDistance = Vector2.Distance(weaponPos, targetPos);
         var rayDistance = Math.Min(targetDistance, maxDistance);
-        rayDistance = Math.Min(rayDistance, WfGridReach(weaponTransform)); // WOLFGATE(Performance): only the weapon's own grid can block, so the ray ends where it does
+        rayDistance = Math.Min(rayDistance, WgGridReach(weaponTransform)); // WOLFGATE(Performance): only the weapon's own grid can block, so the ray ends where it does
 
         // Initialize ray collision
         var ray = new CollisionRay(weaponPos, direction, collisionMask: (int)(CollisionGroup.Opaque | CollisionGroup.Impassable));
@@ -601,6 +602,10 @@ public sealed partial class FireControlSystem : EntitySystem
         {
             // Always ignore the source weapon itself
             if (entity == sourceWeapon)
+                return true;
+
+            // Always ignore shields, since shields are now opaque and will be caught by the LOS check
+            if (HasComp<ShipShieldComponent>(entity))
                 return true;
 
             // If the weapon isn't on a grid, we'll check against all entities

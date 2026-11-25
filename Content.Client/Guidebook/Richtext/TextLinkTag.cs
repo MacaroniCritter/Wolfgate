@@ -35,22 +35,24 @@ public sealed class TextLinkTag : IMarkupTag
 
         label.OnMouseEntered += _ => label.FontColorOverride = Color.LightSkyBlue;
         label.OnMouseExited += _ => label.FontColorOverride = Color.CornflowerBlue;
-        label.OnKeyBindDown += args => OnKeybindDown(args, link);
+        label.OnKeyBindDown += args => OnKeybindDown(args, link, label); // WOLFGATE: the tag is shared, so walk up from the clicked label, not the last one built
 
         control = label;
         Control = label;
         return true;
     }
 
-    private void OnKeybindDown(GUIBoundKeyEventArgs args, string link)
+    private void OnKeybindDown(GUIBoundKeyEventArgs args, string link, Control clicked) // WOLFGATE: takes the clicked label
     {
         if (args.Function != EngineKeyFunctions.UIClick)
             return;
 
-        if (Control == null)
-            return;
-
-        var current = Control;
+        // WOLFGATE START: start from the clicked label; Control is the last label any document built
+        // if (Control == null)
+        //     return;
+        // var current = Control;
+        Control? current = clicked;
+        // WOLFGATE END
         while (current != null)
         {
             current = current.Parent;

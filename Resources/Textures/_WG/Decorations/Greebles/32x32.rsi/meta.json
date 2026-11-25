@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-4.0",
+  "copyright": "Dish and tank made by Kepteyn, Poles taken from Bubberstation.",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+	{
+      "name": "bronze-dish"
+    },
+    {
+      "name": "tanksmall"
+    },
+    {
+      "name": "pole"
+    },
+    {
+      "name": "pole-anchor"
+    },
+    {
+      "name": "poleend-right"
+    },
+    {
+      "name": "poleend-left"
+    },
+    {
+      "name": "pole-stripes"
+    }
+  ]
+}

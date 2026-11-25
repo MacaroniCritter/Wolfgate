@@ -52,13 +52,17 @@ public sealed partial class MiscTab : Control
         Control.AddOptionCheckBox(CCVars.OpaqueStorageWindow, OpaqueStorageWindowCheckBox);
         Control.AddOptionCheckBox(CCVars.ChatEnableFancyBubbles, FancySpeechBubblesCheckBox);
         Control.AddOptionCheckBox(CCVars.ChatFancyNameBackground, FancyNameBackgroundsCheckBox);
-        Control.AddOptionCheckBox(CCVars.LogInChat, LogInChatCheckBox);
-        Control.AddOptionCheckBox(CCVars.CoalesceIdenticalMessages, CoalesceIdenticalMessagesCheckBox);
+        // WOLFGATE(Options) START: fork settings moved to the Wolfgate tabs
+        // Control.AddOptionCheckBox(CCVars.LogInChat, LogInChatCheckBox);
+        // Control.AddOptionCheckBox(CCVars.CoalesceIdenticalMessages, CoalesceIdenticalMessagesCheckBox);
+        // WOLFGATE END
         Control.AddOptionCheckBox(CCVars.StaticStorageUI, StaticStorageUI);
-        Control.AddOptionCheckBox(CCVars.DetailedExamine, DetailedExamineCheckBox); // Goobstation Change
-        Control.AddOptionCheckBox(MonoCVars.RadioNoiseEnabled, RadioNoiseCheckBox); // Mono
-        Control.AddOptionCheckBox(MonoCVars.AreaEchoEnabled, AreaEchoCheckBox); // Mono
-        Control.AddOptionCheckBox(MonoCVars.AreaEchoHighResolution, AreaEchoHighResolutionCheckBox); // Mono
+        // WOLFGATE(Options) START: fork settings moved to the Wolfgate tabs
+        // Control.AddOptionCheckBox(CCVars.DetailedExamine, DetailedExamineCheckBox); // Goobstation Change
+        // Control.AddOptionCheckBox(MonoCVars.RadioNoiseEnabled, RadioNoiseCheckBox); // Mono
+        // Control.AddOptionCheckBox(MonoCVars.AreaEchoEnabled, AreaEchoCheckBox); // Mono
+        // Control.AddOptionCheckBox(MonoCVars.AreaEchoHighResolution, AreaEchoHighResolutionCheckBox); // Mono
+        // WOLFGATE END
 
         Control.Initialize();
     }

@@ -83,5 +83,5 @@ uplink-faction-materials-advanced-name = Advanced Materials Crate
 uplink-faction-materials-advanced-desc = A crate containing 50 sheets of plasma, uranium, gold and silver.
 
 uplink-faction-materials-exotic-name = Exotic Materials Crate
-# WOLFGATE(Mining): one fissile plate, matching the crate fill
-uplink-faction-materials-exotic-desc = A crate containing 10 sheets of plastitanium, 5 bars of depleted uranium, and 1 plate of fissile uranium.
+# WOLFGATE(Mining): two fissile plates, 10 plastitanium, matching the crate
+uplink-faction-materials-exotic-desc = A crate containing 10 sheets of plastitanium, 5 bars of depleted uranium, and 2 plates of fissile uranium.

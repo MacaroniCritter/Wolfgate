@@ -143,7 +143,7 @@ public sealed partial class NewsSystem : SharedNewsSystem
 
     private void OnWriteUiPublishMessage(Entity<NewsWriterComponent> ent, ref NewsWriterPublishMessage msg)
     {
-        if (!ent.Comp.PublishEnabled)
+        if (!ent.Comp.PublishEnabled && !EntityManager.System<Content.Server._WG.AdminCooldowns.WGAdminCooldownSystem>().Skips(msg.Actor)) // WOLFGATE(AdminCooldowns): admins skip the publish cooldown
             return;
 
         if (!TryGetArticles(ent, out var articles))
@@ -164,6 +164,10 @@ public sealed partial class NewsSystem : SharedNewsSystem
 
         var title = msg.Title.Trim();
         var content = msg.Content.Trim();
+        // WOLFGATE(Lattice) START: the Coda can't be written down either
+        title = Content.Shared._WG.Lattice.WGWrittenTextEvent.Apply(EntityManager, msg.Actor, title);
+        content = Content.Shared._WG.Lattice.WGWrittenTextEvent.Apply(EntityManager, msg.Actor, content);
+        // WOLFGATE END
 
         var article = new NewsArticle
         {

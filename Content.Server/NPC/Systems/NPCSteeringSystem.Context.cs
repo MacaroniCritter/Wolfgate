@@ -197,6 +197,14 @@ public sealed partial class NPCSteeringSystem
             return false;
         }
 
+        // WOLFGATE(NpcCrew) START: crew out of a fight hold short of a burning tile rather than walk through the fire
+        if (!directMove && IsCrewFireAhead(uid, targetCoordinates))
+        {
+            steering.Status = SteeringStatus.NoPath;
+            return false;
+        }
+        // WOLFGATE END
+
         var direction = targetMap.Position - ourMap.Position;
 
         // Need to be pretty close if it's just a node to make sure LOS for door bashes or the likes.
@@ -323,6 +331,9 @@ public sealed partial class NPCSteeringSystem
                 // and I don't want to spam grafana even harder than it gets spammed rn.
                 Log.Debug($"NPC {ToPrettyString(uid)} found stuck at {ourCoordinates}");
                 needsPath = true;
+                // WOLFGATE(NpcCrew): stuck crew stop short of a held spot or step aside, as a repath runs back into the same body
+                if (TryUnstickCrew(uid, steering, xform, direction, targetDistance))
+                    return true;
 
                 if (stuckTime.TotalSeconds > maxStuckTime * 3)
                 {
@@ -455,6 +466,9 @@ public sealed partial class NPCSteeringSystem
             return;
         }
 
+        if (IsCrewSidestepping(uid, steering)) // WOLFGATE(NpcCrew): a crewman stepping aside reaches that tile before a repath
+            return;
+
         if (!needsPath && steering.CurrentPath.Count > 0)
         {
             needsPath = steering.CurrentPath.Count > 0 && (steering.CurrentPath.Peek().Data.Flags & PathfindingBreadcrumbFlag.Invalid) != 0x0;
@@ -491,6 +505,13 @@ public sealed partial class NPCSteeringSystem
         for (var i = 0; i < nodes.Count; i++)
         {
             var node = nodes[i];
+            // WOLFGATE START: a path over a grid deleted since it was found threw and put the NPC to sleep; repath instead
+            if (TerminatingOrDeleted(node.GraphUid))
+            {
+                nodes.Clear();
+                return;
+            }
+            // WOLFGATE END
             var matrix = _transform.GetWorldMatrix(node.GraphUid);
 
             // Always want to prune the poly itself so we point to the next poly and don't backtrack.

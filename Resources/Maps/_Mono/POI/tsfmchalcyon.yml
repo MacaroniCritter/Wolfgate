@@ -5,7 +5,7 @@ meta:
   forkId: wolfgate-mapping
   forkVersion: 20261106-021336-f99d2cb-tm508-6eaf4386
   time: 11/08/2026 03:02:17
-  entityCount: 10745
+  entityCount: 10747
 maps: []
 grids:
 - 1
@@ -36427,6 +36427,20 @@ entities:
     - type: Transform
       parent: 1
       pos: 5.5,24.5
+- proto: WGSpecialistVendorTSF
+  entities:
+  - uid: 10746
+    components:
+    - type: Transform
+      parent: 1
+      pos: 14.5,5.5
+- proto: WGVendingMachineTsfOutfitter
+  entities:
+  - uid: 10747
+    components:
+    - type: Transform
+      parent: 1
+      pos: 14.5,4.5
 - proto: filingCabinetDrawer
   entities:
   - uid: 5676
@@ -49356,15 +49370,46 @@ entities:
         172:
         - - Pressed
           - DoorBolt
-- proto: LockableButtonBrig
+- proto: LockableButtonTSFMC
   entities:
+  - uid: 7359
+    components:
+    - type: Transform
+      parent: 1
+      pos: 9.5,17.5
+    - type: DeviceLinkSource
+      linkedPorts:
+        1243:
+        - - Pressed
+          - Toggle
+        1244:
+        - - Pressed
+          - Toggle
+        1245:
+        - - Pressed
+          - Toggle
+  - uid: 7360
+    components:
+    - type: Transform
+      parent: 1
+      rot: 3.141592653589793 rad
+      pos: 7.5,13.5
+    - type: DeviceLinkSource
+      linkedPorts:
+        1245:
+        - - Pressed
+          - Toggle
+        1244:
+        - - Pressed
+          - Toggle
+        1243:
+        - - Pressed
+          - Toggle
   - uid: 7354
     components:
     - type: Transform
       parent: 1
       pos: -8.237229,13.5
-- proto: LockableButtonSecurity
-  entities:
   - uid: 7355
     components:
     - type: Transform
@@ -49429,41 +49474,6 @@ entities:
         - - Pressed
           - Toggle
         1240:
-        - - Pressed
-          - Toggle
-- proto: LockableButtonTSFMC
-  entities:
-  - uid: 7359
-    components:
-    - type: Transform
-      parent: 1
-      pos: 9.5,17.5
-    - type: DeviceLinkSource
-      linkedPorts:
-        1243:
-        - - Pressed
-          - Toggle
-        1244:
-        - - Pressed
-          - Toggle
-        1245:
-        - - Pressed
-          - Toggle
-  - uid: 7360
-    components:
-    - type: Transform
-      parent: 1
-      rot: 3.141592653589793 rad
-      pos: 7.5,13.5
-    - type: DeviceLinkSource
-      linkedPorts:
-        1245:
-        - - Pressed
-          - Toggle
-        1244:
-        - - Pressed
-          - Toggle
-        1243:
         - - Pressed
           - Toggle
 - proto: LockerAtmosphericsFilled
@@ -70999,7 +71009,7 @@ entities:
     - type: Transform
       parent: 1
       pos: -11.5,-31.5
-- proto: WFContractBoardTSF
+- proto: WGContractBoardTSF
   entities:
   - uid: 3085
     components:
@@ -71030,7 +71040,7 @@ entities:
       parent: 1
       rot: -1.5707963267948966 rad
       pos: 12.5,3.5
-- proto: WFContractCargoPad
+- proto: WGContractCargoPad
   entities:
   - uid: 877
     components:
@@ -71058,7 +71068,7 @@ entities:
     - type: Transform
       parent: 1
       pos: 53.5,0.5
-- proto: WFVendingMachineTraderHalcyon
+- proto: WGVendingMachineTraderHalcyon
   entities:
   - uid: 5675
     components:
@@ -71226,7 +71236,7 @@ entities:
       pos: 8.5,-45.5
     - type: DeltaPressure
       gridUid: 1
-- proto: WindoorSecureBrigLocked
+- proto: WindoorSecureTsfmcLocked
   entities:
   - uid: 10673
     components:

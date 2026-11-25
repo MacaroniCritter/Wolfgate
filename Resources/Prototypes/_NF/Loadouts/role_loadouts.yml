@@ -222,6 +222,7 @@
 #  - ContractorFace
 #  - ContractorGlasses
 #  - ContractorBelt
+  - WGOverseerBelt # WOLFGATE(Judges): optional chest rig, none by default
   - MonoSecurityGuardHud
   - StationRepEars
   - MonoSecurityGuardShoes
@@ -246,7 +247,7 @@
   # Mono Start
   - MonoSecurityGuardOuterClothing
   - MonoSecurityGuardBelt
-  - MonoSecurityGuardGaiter
+  # - MonoSecurityGuardGaiter # WOLFGATE(Judges): gaiters are picked in SecurityGuardFace now
   - MonoSecurityGuardHud
   - MonoSecurityGuardShoes
   - MonoSecurityGuardJumpsuit
@@ -258,6 +259,7 @@
   - SecurityGuardGloves
   - SecurityGuardHead
   - SecurityGuardEars
+  - SecurityGuardFace # WOLFGATE(Judges): face slot is a visible choice
   - NfsdBoxSurvival
   - SecurityGuardPDA
   - ContractorWallet
@@ -270,6 +272,7 @@
   - ContractorBureaucracy
   - NFSpeciesSpecific
   #- FactionArmorPlates # Mono
+  - HeadofSecurityNeck # WOLFGATE(Judges): Judges pick neckwear from the HoS group
 
 - type: roleLoadout
   id: JobDirectorOfCare

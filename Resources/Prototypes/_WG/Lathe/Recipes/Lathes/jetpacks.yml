@@ -1,0 +1,8 @@
+- type: latheRecipe
+  id: JetpackSecurity
+  result: JetpackSecurity
+  completetime: 10
+  materials:
+    Steel: 8000
+    Plastic: 8000
+    Gold: 50

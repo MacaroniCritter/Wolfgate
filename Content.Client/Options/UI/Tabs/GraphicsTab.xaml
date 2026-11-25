@@ -16,10 +16,10 @@
                 <CheckBox Name="ParallaxLowQualityCheckBox" Text="{Loc 'ui-options-parallax-low-quality'}" />
                 <CheckBox Name="AmbientOcclusionCheckBox" Text="{Loc 'ui-options-ambient-occlusion'}" />
                 <!-- Far Horizons start -->
-                <CheckBox Name="RenderStarSystemCheckBox" Text="{Loc 'ui-options-render-star-system'}" />
+                <!-- WOLFGATE(Options) START: fork setting moved to the Wolfgate tabs -->
+                <!-- <CheckBox Name="RenderStarSystemCheckBox" Text="{Loc 'ui-options-render-star-system'}" /> -->
+                <!-- WOLFGATE END -->
                 <!-- Far Horizons end -->
-                <!-- WOLFGATE(WolfWeather): weather detail option -->
-                <ui:OptionDropDown Name="DropDownWeatherQuality" Title="{Loc 'ui-options-wolf-weather-quality'}" />
 
                 <!-- Interface -->
                 <Label Text="{Loc 'ui-options-interface-label'}" StyleClasses="LabelKeyText"/>

@@ -123,7 +123,7 @@
         component: SeeingRainbows
         type: Add
         time: 5
-        refresh: false
+        refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
     Drink:
       effects:
       - !type:GenericStatusEffect
@@ -131,7 +131,7 @@
         component: Muted
         type: Add
         time: 5
-        refresh: false
+        refresh: true # WOLFGATE(WolfChem): held while it is being digested instead of piling up each tick
   footstepSound:
     collection: FootstepSticky
     params:

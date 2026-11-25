@@ -423,7 +423,10 @@ public sealed partial class InstrumentSystem : SharedInstrumentSystem
 
         if (send || !instrument.RespectMidiLimits)
         {
-            RaiseNetworkEvent(msg);
+            // WOLFGATE(NetTraffic) START: only players near enough to have the instrument get its notes; the performer's client ignores its own
+            // RaiseNetworkEvent(msg);
+            RaiseNetworkEvent(msg, Filter.Pvs(uid, entityManager: EntityManager).RemovePlayerByAttachedEntity(attached));
+            // WOLFGATE END
         }
     }
 

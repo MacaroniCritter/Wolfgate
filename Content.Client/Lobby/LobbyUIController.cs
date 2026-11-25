@@ -1,8 +1,8 @@
 using System.Linq;
-using Content.Client._WF.Gags; // WOLFGATE(Gags)
+using Content.Client._WG.Gags; // WOLFGATE(Gags)
 using Content.Client._Mono.Company; // Mono
 using Content.Client._Mono.MonoCoins;
-using Content.Client._WF.InRoundCreator; // WOLFGATE(InRoundCreator)
+using Content.Client._WG.InRoundCreator; // WOLFGATE(InRoundCreator)
 using Content.Client.Gameplay; // WOLFGATE(InRoundCreator)
 using Content.Client.Guidebook;
 using Content.Client.Humanoid;
@@ -182,6 +182,15 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
     private void PreferencesDataLoaded()
     {
         PreviewPanel?.SetLoaded(true);
+
+        // WOLFGATE(InRoundCreator) START: the creator open over a round shows what the server changed
+        // One holding unsaved edits is left alone; its next save brings the server's copy back.
+        if (_stateManager.CurrentState is GameplayState && _inRoundWindow is { IsOpen: true } && _profileEditor is { IsDirty: false })
+        {
+            ReloadCharacterSetup();
+            return;
+        }
+        // WOLFGATE END
 
         if (_stateManager.CurrentState is not LobbyState)
             return;
@@ -542,6 +551,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         _characterSetup.DeleteCharacter += args =>
         {
             _preferencesManager.DeleteCharacter(args);
+            EntityManager.System<Content.Client._WG.CustomMarkings.CustomMarkingSystem>().ReleaseSlot(args); // WOLFGATE(CustomMarkings): its own markings go to every character
 
             // Reload everything
             if (EditedSlot == args)
@@ -603,7 +613,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
                     continue;
 
                 _spawn.EquipStartingGear(uid, loadoutProto);
-                EntityManager.System<WFGagsSystem>().ApplyLoadout(uid, loadoutProto, loadout); // WOLFGATE(Gags): picked colours on the preview
+                EntityManager.System<WGGagsSystem>().ApplyLoadout(uid, loadoutProto, loadout); // WOLFGATE(Gags): picked colours on the preview
             }
         }
     }

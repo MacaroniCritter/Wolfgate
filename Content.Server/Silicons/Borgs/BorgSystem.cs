@@ -246,13 +246,19 @@ public sealed partial class BorgSystem : SharedBorgSystem
             Toggle.TryActivate(uid);
         }
 
-        UpdateUI(uid, component);
+        // WOLFGATE(Cyborgs) START: the charge changes every tick with the headlight on
+        // UpdateUI(uid, component);
+        WgUpdateChargeUi(uid, component);
+        // WOLFGATE END
     }
 
     private void OnPowerCellSlotEmpty(EntityUid uid, BorgChassisComponent component, ref PowerCellSlotEmptyEvent args)
     {
         Toggle.TryDeactivate(uid);
-        UpdateUI(uid, component);
+        // WOLFGATE(Cyborgs) START: an empty cell raises this on every failed draw
+        // UpdateUI(uid, component);
+        WgUpdateChargeUi(uid, component);
+        // WOLFGATE END
     }
 
     private void OnGetDeadIC(EntityUid uid, BorgChassisComponent component, ref GetCharactedDeadIcEvent args)

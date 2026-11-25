@@ -2,7 +2,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.GameStates;
 using Content.Shared.Access.Components;
 using Content.Shared.Containers.ItemSlots;
-using Content.Shared._WF.EngineCompat;
+using Content.Shared._WG.EngineCompat;
 
 namespace Content.Shared.PDA
 {
@@ -12,6 +12,8 @@ namespace Content.Shared.PDA
         public const string PdaIdSlotId = "PDA-id";
         public const string PdaPenSlotId = "PDA-pen";
         public const string PdaPaiSlotId = "PDA-pai";
+        // WOLFGATE(PdaStorage): dedicated data disk slot
+        public const string PdaDiskSlotId = "PDA-disk";
 
         [DataField("idSlot")]
         public ItemSlot IdSlot = new();
@@ -21,6 +23,10 @@ namespace Content.Shared.PDA
 
         [DataField("paiSlot")]
         public ItemSlot PaiSlot = new();
+
+        // WOLFGATE(PdaStorage): removable data disk
+        [DataField("diskSlot")]
+        public ItemSlot DiskSlot = new();
 
         // Really this should just be using ItemSlot.StartingItem. However, seeing as we have so many different starting
         // PDA's and no nice way to inherit the other fields from the ItemSlot data definition, this makes the yaml much

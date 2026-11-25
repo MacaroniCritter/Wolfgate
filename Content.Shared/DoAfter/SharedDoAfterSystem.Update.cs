@@ -26,12 +26,25 @@ public abstract partial class SharedDoAfterSystem : EntitySystem
         var xformQuery = GetEntityQuery<TransformComponent>();
         var handsQuery = GetEntityQuery<HandsComponent>();
 
+        // WOLFGATE START: a finishing do-after can start one on another entity, which added to the query mid-loop and threw
+        _wgActive.Clear();
         var enumerator = EntityQueryEnumerator<ActiveDoAfterComponent, DoAfterComponent>();
         while (enumerator.MoveNext(out var uid, out var active, out var comp))
         {
+            _wgActive.Add((uid, active, comp));
+        }
+
+        foreach (var (uid, active, comp) in _wgActive)
+        {
+            if (active.LifeStage > ComponentLifeStage.Running || comp.LifeStage > ComponentLifeStage.Running)
+                continue;
+
             Update(uid, active, comp, time, xformQuery, handsQuery);
         }
+        // WOLFGATE END
     }
+
+    private readonly List<(EntityUid, ActiveDoAfterComponent, DoAfterComponent)> _wgActive = new(); // WOLFGATE: the do-afters to update this tick, taken before any runs
 
     protected void Update(
         EntityUid uid,

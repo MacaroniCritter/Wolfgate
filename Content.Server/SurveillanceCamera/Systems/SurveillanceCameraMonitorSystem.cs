@@ -498,6 +498,10 @@ public sealed partial class SurveillanceCameraMonitorSystem : EntitySystem
             return;
         }
 
+        // WOLFGATE(NetTraffic): closed windows get no state; AfterActivatableUIOpenEvent sets it via AddViewer
+        if (!_userInterface.IsUiOpen(uid, SurveillanceCameraMonitorUiKey.Key))
+            return;
+
         var state = new SurveillanceCameraMonitorUiState(GetNetEntity(monitor.ActiveCamera), monitor.KnownSubnets.Keys.ToHashSet(), monitor.ActiveCameraAddress, monitor.ActiveSubnet, monitor.KnownCameras);
         _userInterface.SetUiState(uid, SurveillanceCameraMonitorUiKey.Key, state);
     }

@@ -26,6 +26,7 @@
     Penis: MobHumanoidAnyMarking
     Breasts: MobHumanoidAnyMarking
     # WOLFGATE END
+    UndergarmentSocks: MobHumanoidAnyMarking # WOLFGATE(Humanoid): allow socks markings for this species sprite set
     Tail: MobHumanoidAnyMarking
     # WOLFGATE(Genitals) START: split tail layers ported from HardLight/Floof
     TailBehind: MobHumanoidAnyMarking
@@ -159,11 +160,11 @@
       points: 2 # WWDP-Edit
       required: false
     Chest:
-      points: 4 # WOLFGATE(Species): was 3, more marking slots
+      points: 8 # WOLFGATE(Species): was 3, more marking slots
       required: false
     Legs:
-      points: 8 # WOLFGATE(Species): was 2, more marking slots
+      points: 16 # WOLFGATE(Species): was 2, more marking slots
       required: false
     Arms:
-      points: 8 # WOLFGATE(Species): was 2, more marking slots
+      points: 16 # WOLFGATE(Species): was 2, more marking slots
       required: false

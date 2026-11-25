@@ -14,21 +14,19 @@
   components:
   - type: PrybarProsthetics
 
-- type: trait
-  id: Vigor
-  name: trait-vigor-name
-  description: trait-vigor-desc
-  category: Physical
-  cost: 6
-  mutuallyExclusiveTraits:
-  - Lethargy
-# WOLFGATE(Biotype): synthetic bodies can't take this, whatever the species
-  speciesBlacklist:
-  - Oni
-  biotypeBlacklist:
-  - Synthetic
-  components:
-  - type: Vigor
+#- type: trait
+#  id: Vigor
+#  name: trait-vigor-name
+#  description: trait-vigor-desc
+#  category: Physical
+#  cost: 6
+#  mutuallyExclusiveTraits:
+#  - Lethargy
+#  speciesBlacklist:
+#  - Oni
+#  - IPC
+#  components:
+#  - type: Vigor
 
 - type: trait
   id: Lethargy
@@ -36,8 +34,6 @@
   description: trait-lethargy-desc
   category: Physical
   cost: -4
-  mutuallyExclusiveTraits:
-  - Vigor
   speciesBlacklist:
   - Felinid
   - Tajaran
@@ -53,63 +49,62 @@
   description: trait-glass-jaw-desc
   category: Physical
   cost: -2
-  mutuallyExclusiveTraits:
-  - Tenacity
 # WOLFGATE(Biotype): synthetic bodies can't take this, whatever the species
   biotypeBlacklist:
   - Synthetic
   components:
   - type: GlassJaw
 
-- type: trait
-  id: Tenacity
-  name: trait-tenacity-name
-  description: trait-tenacity-desc
-  category: Physical
-  cost: 1
-  mutuallyExclusiveTraits:
-  - GlassJaw
-  - OsteogenesisImperfecta
-# WOLFGATE(Biotype): synthetic bodies can't take this, whatever the species
-  biotypeBlacklist:
-  - Synthetic
-  components:
-  - type: Tenacity
+#- type: trait
+#  id: Tenacity
+#  name: trait-tenacity-name
+#  description: trait-tenacity-desc
+#  category: Physical
+#  cost: 1
+#  mutuallyExclusiveTraits:
+#  - GlassJaw
+#  - OsteogenesisImperfecta
+#  speciesBlacklist:
+#  - IPC
+#  components:
+#  - type: Tenacity
 
-- type: trait
-  id: WillToLive
-  name: trait-will-to-live-name
-  description: trait-will-to-live-desc
-  category: Physical
-  cost: 1
-  mutuallyExclusiveTraits:
-  - WillToDie
-  - Redshirt
+# WOLFGATE(Traits) START: Wolfmed doesn't use the damage threshold for death, so these did nothing for their points.
+#- type: trait
+#  id: WillToLive
+#  name: trait-will-to-live-name
+#  description: trait-will-to-live-desc
+#  category: Physical
+#  cost: 1
+#  mutuallyExclusiveTraits:
+#  - WillToDie
+#  - Redshirt
 # WOLFGATE(Biotype): synthetic bodies can't take this, whatever the species
-  biotypeBlacklist:
-  - Synthetic
-  blacklist:
-    components:
-    - BorgChassis
-  components:
-  - type: WillToLive
-
-- type: trait
-  id: WillToDie
-  name: trait-will-to-die-name
-  description: trait-will-to-die-desc
-  category: Physical
-  cost: -1
-  mutuallyExclusiveTraits:
-  - WillToLive
+#  biotypeBlacklist:
+#  - Synthetic
+#  blacklist:
+#    components:
+#    - BorgChassis
+#  components:
+#  - type: WillToLive
+#
+#- type: trait
+#  id: WillToDie
+#  name: trait-will-to-die-name
+#  description: trait-will-to-die-desc
+#  category: Physical
+#  cost: -1
+#  mutuallyExclusiveTraits:
+#  - WillToLive
 # WOLFGATE(Biotype): synthetic bodies can't take this, whatever the species
-  biotypeBlacklist:
-  - Synthetic
-  blacklist:
-    components:
-    - BorgChassis
-  components:
-  - type: WillToDie
+#  biotypeBlacklist:
+#  - Synthetic
+#  blacklist:
+#    components:
+#    - BorgChassis
+#  components:
+#  - type: WillToDie
+# WOLFGATE END
 
 - type: trait
   id: Thieving
@@ -125,47 +120,49 @@
     timeMultiplier: 0.5
     identifyHidden: true
 
-- type: trait
-  id: BionicLegs
-  name: trait-bionic-legs-name
-  description: trait-bionic-legs-desc
-  category: Physical
-  cost: 2
-  components:
-  - type: BionicLegs
+# WOLFGATE(Traits) START: removed; no-slip legs and a faster sprint for 2 points, cheaper than the same augment.
+# - type: trait
+#   id: BionicLegs
+#   name: trait-bionic-legs-name
+#   description: trait-bionic-legs-desc
+#   category: Physical
+#   cost: 2
+#   components:
+#   - type: BionicLegs
+# WOLFGATE END
 
-- type: trait
-  id: OsteogenesisImperfecta
-  name: trait-osteogenesis-imperfecta-name
-  description: trait-osteogenesis-imperfecta-desc
-  category: Physical
-  cost: -6
-  mutuallyExclusiveTraits:
-  - Tenacity
+# WOLFGATE(Traits) START: removed; Wolfmed doesn't read the crit threshold or the old bleeding, so these were free points.
+# - type: trait
+#   id: OsteogenesisImperfecta
+#   name: trait-osteogenesis-imperfecta-name
+#   description: trait-osteogenesis-imperfecta-desc
+#   category: Physical
+#   cost: -6
 # WOLFGATE(Biotype): synthetic bodies can't take this, whatever the species
-  biotypeBlacklist:
-  - Synthetic
-  blacklist:
-    components:
-    - BorgChassis
-  components:
-  - type: GlassJaw
-    critDecrease: 50
-
-- type: trait
-  id: Hemophilia
-  name: trait-hemophilia-name
-  description: trait-hemophilia-desc
-  category: Physical
-  cost: -4
+#   biotypeBlacklist:
+#   - Synthetic
+#   blacklist:
+#     components:
+#     - BorgChassis
+#   components:
+#   - type: GlassJaw
+#     critDecrease: 50
+#
+# - type: trait
+#   id: Hemophilia
+#   name: trait-hemophilia-name
+#   description: trait-hemophilia-desc
+#   category: Physical
+#   cost: -4
 # WOLFGATE(Biotype): synthetic bodies can't take this, whatever the species
-  biotypeBlacklist:
-  - Synthetic
-  blacklist:
-    components:
-    - BorgChassis
-  components:
-  - type: Hemophilia
+#   biotypeBlacklist:
+#   - Synthetic
+#   blacklist:
+#     components:
+#     - BorgChassis
+#   components:
+#   - type: Hemophilia
+# WOLFGATE END
 
 - type: trait
   id: Voracious
@@ -204,35 +201,37 @@
       entityProduced: MaterialWebSilk1
       hungerCost: 4
 
-- type: trait
-  id: Feeble
-  name: trait-feeble-name
-  description: trait-feeble-desc
-  category: Physical
-  cost: -4
-  mutuallyExclusiveTraits:
-   - Steadfast
-  speciesBlacklist:
-   - Felinid
-   - Tajaran
-  components:
-    - type: SlowOnDamage
-      speedModifierThresholds:
-        "45": 0.70
-        "65": 0.46
+# WOLFGATE(Traits) START: removed; its slow-on-damage is skipped because every species already has one, so it was free points.
+# - type: trait
+#   id: Feeble
+#   name: trait-feeble-name
+#   description: trait-feeble-desc
+#   category: Physical
+#   cost: -4
+#   mutuallyExclusiveTraits:
+#    - Steadfast
+#   speciesBlacklist:
+#    - Felinid
+#    - Tajaran
+#   components:
+#     - type: SlowOnDamage
+#       speedModifierThresholds:
+#         "45": 0.70
+#         "65": 0.46
+# WOLFGATE END
 
-- type: trait
-  id: TrapAvoider
-  name: trait-trap-avoider-name
-  description: trait-trap-avoider-desc
-  category: Physical
-  cost: 3
-  speciesBlacklist:
-    - Felinid
-    - Tajaran
-    - Harpy
-  components:
-    - type: TrapAvoider
+#- type: trait
+#  id: TrapAvoider
+#  name: trait-trap-avoider-name
+#  description: trait-trap-avoider-desc
+#  category: Physical
+#  cost: 3
+#  speciesBlacklist:
+#    - Felinid
+#    - Tajaran
+#    - Harpy
+#  components:
+#    - type: TrapAvoider
 
 - type: trait
   id: SelfAware
@@ -262,23 +261,25 @@
   components:
   - type: LiquorLifeline
 
-- type: trait
-  id: Redshirt
-  name: trait-redshirt-name
-  description: trait-redshirt-desc
-  category: Physical
-  cost: -8
-  mutuallyExclusiveTraits:
-  - WillToLive
+# WOLFGATE(Traits) START: Wolfmed doesn't use the damage threshold for death, so these did nothing for their points.
+#- type: trait
+#  id: Redshirt
+#  name: trait-redshirt-name
+#  description: trait-redshirt-desc
+#  category: Physical
+#  cost: -3
+#  mutuallyExclusiveTraits:
+#  - WillToLive
 # WOLFGATE(Biotype): synthetic bodies can't take this, whatever the species
-  biotypeBlacklist:
-  - Synthetic
-  blacklist:
-    components:
-    - BorgChassis
-  components:
-  - type: WillToDie
-    deadDecrease: 100
+#  biotypeBlacklist:
+#  - Synthetic
+#  blacklist:
+#    components:
+#    - BorgChassis
+#  components:
+#  - type: WillToDie
+#    deadDecrease: 100
+# WOLFGATE END
 
 - type: trait
   id: StrikingCalluses
@@ -298,8 +299,10 @@
   description: trait-steadfast-desc
   category: Physical
   cost: 3
-  mutuallyExclusiveTraits:
-  - Feeble
+# WOLFGATE(Traits) START: Feeble is removed.
+#  mutuallyExclusiveTraits:
+#  - Feeble
+# WOLFGATE END
   speciesBlacklist:
   - Felinid
   - Tajaran
@@ -312,23 +315,23 @@
       "70": 0.83
       "90": 0.70
 
-- type: trait
-  id: DermalArmor
-  name: trait-dermal-armor-name
-  description: trait-dermal-armor-desc
-  category: Physical
-  cost: 6
-  components:
-  - type: DamageProtectionBuff
-    modifiers:
-      dermal:
-        id: DermalArmorTrait
-        coefficients:
-          Shock: 1.25
-        flatReductions:
-          Blunt: 3.5
-          Slash: 3.5
-          Piercing: 3.5
+#- type: trait
+#  id: DermalArmor
+#  name: trait-dermal-armor-name
+#  description: trait-dermal-armor-desc
+#  category: Physical
+#  cost: 6
+#  components:
+#  - type: DamageProtectionBuff
+#    modifiers:
+#      dermal:
+#        id: DermalArmorTrait
+#        coefficients:
+#          Shock: 1.25
+#        flatReductions:
+#          Blunt: 3.5
+#          Slash: 3.5
+#          Piercing: 3.5
 
 - type: trait
   id: HardenedLymphocytes
@@ -355,7 +358,7 @@
   name: trait-ironman-name
   description: trait-ironman-desc
   category: Physical
-  cost: -5 # This shit was FREE for factions practically
+  cost: -2 # This shit was FREE for factions practically
   components:
   - type: Ironman
   traitGear: ShipVoucherFrontierIronMan
@@ -398,7 +401,11 @@
   category: Physical
   cost: 6
   mutuallyExclusiveTraits:
-  - Hemophilia
+# WOLFGATE(Traits) START: Hemophilia is removed; Hemophagia already regenerates and clots.
+#  - Hemophilia
+  - WGHemophagia
+  - WGHemophagiaMasquerade
+# WOLFGATE END
 # WOLFGATE(Biotype): synthetic bodies can't take this, whatever the species
   biotypeBlacklist:
   - Synthetic
@@ -410,8 +417,12 @@
     intervalSeconds: 1
     damagePerInterval:
       groups:
-        Brute: -1.5
-        Burn: -2
+# WOLFGATE(Traits) START: 0.3 a second, not 3.5; it was an always-on heal and wound mend that outhealed a medic.
+#        Brute: -1.5
+#        Burn: -2
+        Brute: -0.15
+        Burn: -0.15
+# WOLFGATE END
     critMultiplier: .25
 
 - type: trait
@@ -420,27 +431,30 @@
   description: trait-nanite-repair-drones-desc
   category: Physical
   cost: 8
-  speciesBlacklist:
-  - Human
-  - Chitinid
-  - Oni
-  - Vulpkanin
-  - WFCanine # WOLFGATE(Species): Canine is a Vulpkanin copy
-  - Vox
-  - Diona
-  - Moth
-  - Goblin
-  - Arachnid
-  - Resomi
-  - Harpy
-  - Reptilian
-  - Hydrakin
-  - Rodentia
-  - Dwarf
-  - SlimePerson
-  - Felinid
-  - Tajaran
-  - Feroxi
+# WOLFGATE(Biotype) START: any synthetic body can take this and no organic one, whatever the species
+#  speciesBlacklist:
+#  - Human
+#  - Chitinid
+#  - Oni
+#  - Vulpkanin
+#  - Vox
+#  - Diona
+#  - Moth
+#  - Goblin
+#  - Arachnid
+#  - Resomi
+#  - Harpy
+#  - Reptilian
+#  - Hydrakin
+#  - Rodentia
+#  - Dwarf
+#  - SlimePerson
+#  - Felinid
+#  - Tajaran
+#  - Feroxi
+  biotypeBlacklist:
+  - Organic
+# WOLFGATE END
   blacklist:
     components:
     - BorgChassis
@@ -449,8 +463,13 @@
     intervalSeconds: 1
     damagePerInterval:
       groups:
-        Brute: -1.5
-        Burn: -2
+# WOLFGATE(Traits) START: 0.3 a second, not 3.5, and a quarter of it while down rather than double.
+#        Brute: -1.5
+#        Burn: -2
+        Brute: -0.15
+        Burn: -0.15
+    critMultiplier: 0.25
+# WOLFGATE END
     # WOLFGATE(Wolfmed): the drones repair a chassis too; flesh-only mending left every chassis wound open
     mendCapabilities: [ Biological, Mechanical, Electrical ]
 
@@ -473,7 +492,7 @@
   name: trait-heretic-name
   description: trait-heretic-desc
   category: Physical
-  cost: 0 # no points because it's free points for members of the PDV and arguably TSF too.
+  cost: 0 # no points because it's free points during TSFthreat
   newbieBlocked: true # WOLFGATE(Newbie): it makes them a kill target, which the newbie rules forbid
   blacklist:
     components:

@@ -80,11 +80,12 @@
     rewardAccounts:
       Nfsd: 1.0
     # WOLFGATE(LiveFixes): guards always nearby kept the vault from ever leaving
-    wfMaxExtensions: 4
+    wgMaxExtensions: 4
   - type: CurrencyInjectionOnBluespaceError # Mono: reward TSF with FMC for defending solarian vault
-    company: TSF
-    amount:
-      FederationMilitaryCredit: 250
+    injection: 
+      company: TSF
+      amount:
+        FederationMilitaryCredit: 250
     requiredEntities:
     - DataChitStorageServer # no cheesing it
 
@@ -129,11 +130,12 @@
     rewardAccounts:
       Nfsd: 1.0
     # WOLFGATE(LiveFixes): guards always nearby kept the vault from ever leaving
-    wfMaxExtensions: 4
+    wgMaxExtensions: 4
   - type: CurrencyInjectionOnBluespaceError # Mono: reward TSF with FMC for defending solarian vault
-    company: TSF
-    amount:
-      FederationMilitaryCredit: 100
+    injection: 
+      company: TSF
+      amount:
+        FederationMilitaryCredit: 100
 
 - type: entity
   id: BluespaceSyndicateFTLInterception

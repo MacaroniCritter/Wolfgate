@@ -17,13 +17,13 @@
   minimumDistance: 2500 # Mono
   maximumDistance: 3500 # Mono
   # WOLFGATE(ReaverCampaign): the Contested Sector game mode spawns the same sector as Standard
-  spawnGamePreset: [ NFAdventure, NFPirate, MonoStandard, WFContestedSector, MonoRogueTSF, MonoTSFUSSP, MonoADS, MonoChimera, MonoMixed, MonoAllAtOnce, MonoChimeraTsf ]
+  spawnGamePreset: [ NFAdventure, NFPirate, MonoStandard, WGContestedSector, MonoRogueTSF, MonoTSFUSSP, MonoADS, MonoChimera, MonoMixed, MonoAllAtOnce, MonoChimeraTsf ]
   spawnGroup: Required
   gridPath: /Maps/_Mono/POI/tsfmchalcyon.yml
   addComponents:
   # WOLFGATE(Ordnance) START: the faction's ordnance terminal
-  - type: WFOrdnanceStation
-    terminal: WFOrdnanceTerminalTSF
+  - type: WGOrdnanceStation
+    terminal: WGOrdnanceTerminalTSF
   # WOLFGATE END
   - type: IFF
     color: "#047abd"
@@ -65,15 +65,23 @@
           availableJobs:
             #TsfCivilian: [ -1, -1 ]
             Sheriff: [ 1, 1 ]
-            Bailiff: [1, 1 ]
-            SeniorOfficer: [ 3, 3 ] # Mono
-            Brigmedic: [ 2, 2 ] # Mono
+            # WOLFGATE(FactionBalance) START: more leader and specialist slots for a 130-player population
+            # Bailiff: [1, 1 ]
+            # SeniorOfficer: [ 3, 3 ] # Mono
+            # Brigmedic: [ 2, 2 ] # Mono
+            Bailiff: [ 2, 2 ]
+            SeniorOfficer: [ 6, 6 ]
+            Brigmedic: [ 5, 5 ]
+            # WOLFGATE END
             Deputy: [ -1, -1 ] # Mono
-            TsfEngineer: [ 2, 2 ]
-            TsfBorg: [ 2, 2 ]
+            # WOLFGATE(FactionBalance) START: more leader and specialist slots for a 130-player population
+            # TsfEngineer: [ 2, 2 ]
+            # TsfBorg: [ 2, 2 ]
+            TsfEngineer: [ 4, 4 ]
+            TsfBorg: [ 3, 3 ]
+            # WOLFGATE END
           tags:
-          - HeadOfPersonnel
-          - HeadOfSecurity
+          - TsfmcColonel
         - type: StationDeadDropReporting
           messageSet: Nfsd
         - type: StationDeadDropHintExempt
@@ -91,8 +99,8 @@
   gridPath: /Maps/_Mono/POI/tsfmchalcyon_hw.yml
   addComponents:
   # WOLFGATE(Ordnance) START: the faction's ordnance terminal
-  - type: WFOrdnanceStation
-    terminal: WFOrdnanceTerminalTSF
+  - type: WGOrdnanceStation
+    terminal: WGOrdnanceTerminalTSF
   # WOLFGATE END
   - type: IFF
     color: "#047abd"

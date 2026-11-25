@@ -148,7 +148,7 @@ namespace Content.Server.Atmos.EntitySystems
                 for (var i = 0; i < Atmospherics.Directions; i++)
                 {
                     var indices = tile.GridIndices.Offset((AtmosDirection) (1 << i));
-                    if (_map.TryGetTile(ent.Comp3, indices, out var gridTile) && !gridTile.IsEmpty && !WfIsBareGround(ent, gridTile)) // WOLFGATE(Planets): bare planet ground keeps no map tile alive
+                    if (_map.TryGetTile(ent.Comp3, indices, out var gridTile) && !gridTile.IsEmpty && !WgIsBareGround(ent, gridTile)) // WOLFGATE(Planets): bare planet ground keeps no map tile alive
                     {
                         connected = true;
                         break;
@@ -158,7 +158,7 @@ namespace Content.Server.Atmos.EntitySystems
                 if (!connected)
                 {
                     RemoveActiveTile(atmos, tile);
-                    WfUnlinkTile(tile); // WOLFGATE(ShipRepair): a trimmed tile must not stay linked to its neighbours
+                    WgUnlinkTile(tile); // WOLFGATE(ShipRepair): a trimmed tile must not stay linked to its neighbours
                     atmos.Tiles.Remove(tile.GridIndices);
                 }
             }
@@ -177,7 +177,7 @@ namespace Content.Server.Atmos.EntitySystems
         {
             var idx = tile.GridIndices;
             bool mapAtmosphere;
-            if (_map.TryGetTile(ent.Comp3, idx, out var gTile) && !gTile.IsEmpty && !WfIsBareGround(ent, gTile)) // WOLFGATE(Planets): bare planet ground shares the map's air, like a tile off the grid
+            if (_map.TryGetTile(ent.Comp3, idx, out var gTile) && !gTile.IsEmpty && !WgIsBareGround(ent, gTile)) // WOLFGATE(Planets): bare planet ground shares the map's air, like a tile off the grid
             {
                 var contentDef = (ContentTileDefinition) _tileDefinitionManager[gTile.TypeId];
                 mapAtmosphere = contentDef.MapAtmosphere;
@@ -277,7 +277,7 @@ namespace Content.Server.Atmos.EntitySystems
             if (data.FixVacuum)
                 GridFixTileVacuum(tile);
 
-            WfFillTerrainTile(ent, tile, data); // WOLFGATE(Planets): a tile built on a planet starts with the air around it, not a vacuum
+            WgFillTerrainTile(ent, tile, data); // WOLFGATE(Planets): a tile built on a planet starts with the air around it, not a vacuum
         }
 
         private void QueueRunTiles(
@@ -626,11 +626,14 @@ namespace Content.Server.Atmos.EntitySystems
                 _currentRunAtmosphereIndex = 0;
                 _currentRunAtmosphere.Clear();
 
-                var query = EntityQueryEnumerator<GridAtmosphereComponent, GasTileOverlayComponent, MapGridComponent, TransformComponent>();
-                while (query.MoveNext(out var uid, out var atmos, out var overlay, out var grid, out var xform ))
-                {
-                    _currentRunAtmosphere.Add((uid, atmos, overlay, grid, xform));
-                }
+                // WOLFGATE(Performance) START: reuse the grid atmosphere list instead of walking every grid each tick
+                // var query = EntityQueryEnumerator<GridAtmosphereComponent, GasTileOverlayComponent, MapGridComponent, TransformComponent>();
+                // while (query.MoveNext(out var uid, out var atmos, out var overlay, out var grid, out var xform ))
+                // {
+                //     _currentRunAtmosphere.Add((uid, atmos, overlay, grid, xform));
+                // }
+                WGQueueRunAtmospheres();
+                // WOLFGATE END
             }
 
             // We set this to true just in case we have to stop processing due to time constraints.

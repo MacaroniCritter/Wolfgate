@@ -34,7 +34,6 @@
     - state: blue
     - state: voucherservice
   - type: ShipyardVoucher
-    consoleType: Shipyard
     vessels:
     - Spessbite
 
@@ -53,9 +52,11 @@
     heldPrefix: blue
   - type: ShipyardVoucher
     destroyOnEmpty: true
-    consoleType: Sr
     access:
     - Janitor
+    # WOLFGATE(Shipyard): Mono vouchers only list their vessels, access alone offers nothing
+    vessels:
+    - Bucket
 
 - type: entity
   parent: ShipVoucherFrontierJanitor
@@ -70,6 +71,9 @@
   - type: ShipyardVoucher
     access:
     - Mail
+    # WOLFGATE(Shipyard): the mail ship, not the janitor's
+    vessels:
+    - Hermes
 
 - type: entity
   parent: ShipVoucherFrontierJanitor
@@ -86,5 +90,5 @@
     - Brig # odd, but potentially restricts cadets in lieu of a security guard-only access level
     # WOLFGATE(Shipyard) START: Judges can redeem Roswell with the standard station guard voucher
     vessels:
-    - WFRoswell
+    - WGRoswell
     # WOLFGATE END

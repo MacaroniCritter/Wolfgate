@@ -90,6 +90,13 @@
   - type: Icon
     sprite: _RMC14/Structures/Furniture/Tables/tables_64x64.rsi
     state: table_pool2
+  # WOLFGATE(Pool): playable 8-ball
+  - type: WGPoolTable
+    range: 2.5
+  - type: UserInterface
+    interfaces:
+      enum.WGPoolUiKey.Key:
+        type: PoolBoundUserInterface
 
 - type: entity
   parent: BaseStructure

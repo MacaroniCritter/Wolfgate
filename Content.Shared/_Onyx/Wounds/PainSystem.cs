@@ -10,7 +10,7 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Rejuvenate;
 using Content.Shared.StatusEffectNew;
 using Content.Shared.Stunnable;
-using Content.Shared._WF.Wolfmed.Compat; // WOLFGATE(Wolfmed): Onyx's TryUpdateParalyzeDuration is a compat extension here.
+using Content.Shared._WG.Wolfmed.Compat; // WOLFGATE(Wolfmed): Onyx's TryUpdateParalyzeDuration is a compat extension here.
 using Content.Shared.Traits.Assorted;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
@@ -28,7 +28,7 @@ public sealed partial class PainSystem : EntitySystem
     [Dependency] private IGameTiming _timing = default!;
     [Dependency] private WoundSystem _wounds = default!;
     [Dependency] private IPrototypeManager _prototypes = default!;
-    [Dependency] private Content.Shared._WF.Wolfmed.Consciousness.WolfmedBodyPainSystem _wolfmedPain = default!; // WOLFGATE(Wolfmed): M1a
+    [Dependency] private Content.Shared._WG.Wolfmed.Consciousness.WolfmedBodyPainSystem _wolfmedPain = default!; // WOLFGATE(Wolfmed): M1a
 
     // WOLFGATE(Wolfmed): M1a: the shock's threshold, re-arm and adrenaline length are CVars now
     // (WolfmedBodyPainSystem), and adrenaline no longer multiplies pain by 0.7 (OD5).
@@ -171,10 +171,14 @@ public sealed partial class PainSystem : EntitySystem
         return GetPainBeforeAdrenaline((entity.Owner, entity.Comp));
     }
 
-    private FixedPoint2 GetPainBeforeAdrenaline(Entity<PainComponent> entity)
+    // WOLFGATE(Wolfmed) START: a reading that counts pain through numbness, for the Numb trait's consciousness.
+    // private FixedPoint2 GetPainBeforeAdrenaline(Entity<PainComponent> entity)
+    private FixedPoint2 GetPainBeforeAdrenaline(Entity<PainComponent> entity, bool wgThroughNumbness = false)
     {
-        if (IsPainNumb(entity.Owner))
+        // if (IsPainNumb(entity.Owner))
+        if (!wgThroughNumbness && IsPainNumb(entity.Owner))
             return FixedPoint2.Zero;
+    // WOLFGATE END
 
         var suppression = entity.Comp.Suppression;
         if (TryComp(entity, out BodyPartComponent? part) && part.Body is { } body &&
@@ -307,13 +311,13 @@ public sealed partial class PainSystem : EntitySystem
         shockTarget.Armed = false;
         Dirty(entity.Owner, shockTarget);
 
-        if (mobState.CurrentState == MobState.Alive && WfMayCryOut(entity)) // WOLFGATE(Wolfmed): an unconscious body does not scream, nor one whose gear silences it.
+        if (mobState.CurrentState == MobState.Alive && WgMayCryOut(entity)) // WOLFGATE(Wolfmed): an unconscious body does not scream, nor one whose gear silences it.
         _chat.TryEmoteWithChat(entity, "Scream", ChatTransmitRange.HideChat,
             ignoreActionBlocker: true, forceEmote: true);
         _jitter.DoJitter(entity, PainShockStunTime, true, 20f, 7f);
         ApplyPainShockAdrenaline(entity);
         // WOLFGATE(Wolfmed): BRAIN: a shock on a body that has already bled out stops the heart.
-        var shocked = new Content.Shared._WF.Wolfmed.Life.WolfmedPainShockEvent(entity.Owner);
+        var shocked = new Content.Shared._WG.Wolfmed.Life.WolfmedPainShockEvent(entity.Owner);
         RaiseLocalEvent(ref shocked);
     }
 
@@ -417,7 +421,7 @@ public sealed partial class PainSystem : EntitySystem
     public bool CanFeelPain(EntityUid part)
     {
         // WOLFGATE(Synthetics): a chassis part isolated from the panel has its damage sensors off.
-        if (HasComp<Content.Shared._WF.Synthetics.WFIsolatedPartComponent>(part))
+        if (HasComp<Content.Shared._WG.Synthetics.WGIsolatedPartComponent>(part))
             return false;
 
         return !TryComp(part, out WoundableComponent? woundable) ||
@@ -454,8 +458,15 @@ public sealed partial class PainSystem : EntitySystem
     private void RaisePainChanged(EntityUid uid, PainComponent component, FixedPoint2 oldPain)
     {
         var pain = GetPain((uid, component));
+        // WOLFGATE(Wolfmed) START: a Numb trait body feels no change, but its consciousness still reads the pain.
+        // if (pain == oldPain)
+        //     return;
         if (pain == oldPain)
+        {
+            WgRaiseNumbPainChanged(uid);
             return;
+        }
+        // WOLFGATE END
 
         var changed = new PainChangedEvent(uid, oldPain, pain);
         RaiseLocalEvent(uid, ref changed);
@@ -489,9 +500,9 @@ public sealed partial class PainSystem : EntitySystem
     }
 
     // WOLFGATE(ArmorSpecialization) START: worn gear may silence the pain-shock scream (the mime's vow).
-    private bool WfMayCryOut(EntityUid body)
+    private bool WgMayCryOut(EntityUid body)
     {
-        var ev = new Content.Shared._WF.Wolfmed.Wounds.WolfmedPainNoiseAttemptEvent();
+        var ev = new Content.Shared._WG.Wolfmed.Wounds.WolfmedPainNoiseAttemptEvent();
         RaiseLocalEvent(body, ref ev);
         return !ev.Cancelled;
     }

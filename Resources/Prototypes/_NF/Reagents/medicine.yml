@@ -39,7 +39,7 @@
           max: 213.0
         key: ForcedSleep
         component: ForcedSleeping
-        refresh: false
+        refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
         type: Add
 
 - type: reagent
@@ -81,6 +81,6 @@
           max: 213.0
         key: ForcedSleep
         component: ForcedSleeping
-        refresh: false
+        refresh: true # WOLFGATE(WolfChem): held while it is in the blood instead of piling up each tick
         type: Add
 

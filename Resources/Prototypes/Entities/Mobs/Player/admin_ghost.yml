@@ -41,7 +41,7 @@
     - SyndicateAgent
     - CentralCommand
     - Pirate # Frontier
-    - WFShipLocked # WOLFGATE(ShipAccess): admin ghosts open locked ship doors, as they open every other airlock
+    - WGShipLocked # WOLFGATE(ShipAccess): admin ghosts open locked ship doors, as they open every other airlock
   - type: UserInterface
     interfaces:
       enum.SolarControlConsoleUiKey.Key:
@@ -108,15 +108,26 @@
   - type: ShowAntagIcons
   - type: Inventory
     templateId: aghost
-  - type: Loadout
-    prototypes: [ NFMobAghostGear ] # Frontier MobAghostGear<NFMobAghostGear
+  # WOLFGATE(AdminObserver) START: the kit comes from the admin's saved layout, or WGAdminObserverGear
+  # - type: Loadout
+  #   prototypes: [ NFMobAghostGear ] # Frontier MobAghostGear<NFMobAghostGear
+  - type: WGAdminObserver
+  # WOLFGATE END
+  # WOLFGATE(AdminObserver) START: a manifested observer says, whispers and emotes as the living do
+  - type: Speech
+  - type: Emoting
+  - type: TypingIndicator
+  # WOLFGATE END
+  # WOLFGATE(AdminObserver) START: the staff marker's sigil is drawn as a status icon
+  - type: StatusIcon
+  # WOLFGATE END
   - type: BypassInteractionChecks
   - type: BankAccount # Frontier
   - type: ShowHealthBars # Monolith
     damageContainers:
     - Biological
     - Inorganic
-    - WFSiliconWolfmed # WOLFGATE(Wolfmed): playtest 3: the IPC's container, so its bar shows
+    - WGSiliconWolfmed # WOLFGATE(Wolfmed): playtest 3: the IPC's container, so its bar shows
     - Synth # WOLFGATE(Wolfmed): the HardLight Synth's container, so its bar shows
   - type: ShowSyndicateIcons # Monolith
 

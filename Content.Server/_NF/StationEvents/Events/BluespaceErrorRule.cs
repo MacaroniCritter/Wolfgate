@@ -136,7 +136,7 @@ public sealed partial class BluespaceErrorRule : StationEventSystem<BluespaceErr
                 if (component.ExtendIfPopulated)
                     _autoExtend.AutoExtend(uid, spawned);
 
-                if (component.ExtendIfPopulated && component.WfMaxExtensions is { } cap && TryComp<AutoExtendRuleComponent>(uid, out var extend)) // WOLFGATE(LiveFixes): capped events
+                if (component.ExtendIfPopulated && component.WgMaxExtensions is { } cap && TryComp<AutoExtendRuleComponent>(uid, out var extend)) // WOLFGATE(LiveFixes): capped events
                     extend.MaxExtensions = cap;
             }
         }
@@ -302,7 +302,7 @@ public sealed partial class BluespaceErrorRule : StationEventSystem<BluespaceErr
                             break;
                     }
                     if (gridValue / component.StartingValue > comp.IntegrityRequirement && requiredEntitiesFound) // good job!
-                        _currencyInjection.InjectCurrency(comp.Company, comp.Amount);
+                        _currencyInjection.InjectCurrency(comp.Injection);
                 }
                 // Mono end
 

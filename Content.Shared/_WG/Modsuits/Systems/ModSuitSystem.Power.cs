@@ -1,0 +1,301 @@
+using Content.Shared._WG.Modsuits.Components;
+using Content.Shared.Power;
+using Content.Shared.Power.Components;
+using Content.Shared.PowerCell.Components;
+using Content.Shared.Popups;
+using Content.Shared.Rounding;
+using Robust.Shared.Containers;
+using Robust.Shared.Network;
+
+namespace Content.Shared._WG.Modsuits.Systems;
+
+public sealed partial class ModSuitSystem
+{
+    private static readonly TimeSpan PowerAlertInterval = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    /// Converts the port's TG-derived drain numbers to TG watts: the 0.8 theme drain becomes 50 W, so a
+    /// TG-sized MOD cell lasts as long as it does on TG station.
+    /// Module costs are authored as the TG value times <see cref="TgCostUnit"/>.
+    /// </summary>
+    public const float PowerDrainScale = 62.5f;
+
+    /// <summary>
+    /// TG expresses module costs as multiples of DEFAULT_CHARGE_DRAIN; the port's theme baseline is 0.8,
+    /// so a TG cost of X is written as 0.8X and drains 50X joules per second.
+    /// </summary>
+    public const float TgCostUnit = 0.8f;
+
+    private TimeSpan _nextPowerAlertUpdate;
+
+    public EntityUid? GetCore(Entity<ModSuitComponent> ent)
+    {
+        return _itemSlots.GetItemOrNull(ent, ent.Comp.CoreSlotId);
+    }
+
+    /// <summary>Returns the battery the suit draws from, either in the core itself or in its cell slot.</summary>
+    public Entity<BatteryComponent>? GetBattery(Entity<ModSuitComponent> ent)
+    {
+        if (GetCore(ent) is not { } core)
+            return null;
+
+        return TryGetBattery(core);
+    }
+
+    /// <summary>Finds a battery on the entity or in the power cell slot it owns.</summary>
+    public Entity<BatteryComponent>? TryGetBattery(EntityUid uid)
+    {
+        if (TryComp<BatteryComponent>(uid, out var battery))
+            return (uid, battery);
+
+        if (!TryComp<PowerCellSlotComponent>(uid, out var cellSlot)
+            || _itemSlots.GetItemOrNull(uid, cellSlot.CellSlotId) is not { } cell
+            || !TryComp<BatteryComponent>(cell, out var cellBattery))
+            return null;
+
+        return (cell, cellBattery);
+    }
+
+    /// <summary>Reads a battery's charge through the shared power event, which the server implements.</summary>
+    public float GetCharge(Entity<BatteryComponent> battery)
+    {
+        var ev = new GetChargeEvent();
+        RaiseLocalEvent(battery.Owner, ref ev);
+        return ev.CurrentCharge;
+    }
+
+    public bool HasCharge(Entity<ModSuitComponent> ent, float amount)
+    {
+        if (_net.IsClient)
+            return ent.Comp.Charge >= amount;
+
+        return GetBattery(ent) is { } battery && GetCharge(battery) >= amount;
+    }
+
+    public bool TryUseCharge(Entity<ModSuitComponent> ent, float amount)
+    {
+        if (amount <= 0f)
+            return true;
+
+        if (_net.IsClient)
+            return ent.Comp.Charge >= amount;
+
+        return GetBattery(ent) is { } battery && _battery.TryUseCharge(battery.AsNullable(), amount);
+    }
+
+    /// <summary>Copies the battery's charge into networked fields so the client can display it.</summary>
+    private void SyncCharge(Entity<ModSuitComponent> ent)
+    {
+        if (_net.IsClient)
+            return;
+
+        var charge = 0f;
+        var max = 1f;
+        var hasBattery = false;
+        if (GetBattery(ent) is { } battery)
+        {
+            charge = GetCharge(battery);
+            max = MathF.Max(1f, battery.Comp.MaxCharge);
+            hasBattery = true;
+        }
+
+        if (MathF.Abs(ent.Comp.Charge - charge) < 0.01f
+            && MathF.Abs(ent.Comp.MaxCharge - max) < 0.01f
+            && ent.Comp.HasBattery == hasBattery)
+            return;
+
+        ent.Comp.Charge = charge;
+        ent.Comp.MaxCharge = max;
+        ent.Comp.HasBattery = hasBattery;
+        Dirty(ent);
+    }
+
+    /// <summary>Sets a module's idle drain and replicates it, for costs that change with the module's state.</summary>
+    public void SetModuleIdlePower(EntityUid moduleUid, float power)
+    {
+        if (TerminatingOrDeleted(moduleUid)
+            || !TryComp<ModModuleComponent>(moduleUid, out var module)
+            || module.IdlePower == power)
+            return;
+
+        module.IdlePower = power;
+        Dirty(moduleUid, module);
+    }
+
+    public float GetThemeDrain(Entity<ModSuitComponent> ent)
+    {
+        return _proto.Index(ent.Comp.Theme).ChargeDrain;
+    }
+
+    public float GetTotalDrain(Entity<ModSuitComponent> ent)
+    {
+        if (ent.Comp.State == ModSuitState.Inactive)
+            return 0f;
+
+        var drain = GetThemeDrain(ent);
+        if (ent.Comp.State != ModSuitState.Active)
+            return drain * PowerDrainScale;
+
+        foreach (var module in ent.Comp.ModulesContainer.ContainedEntities)
+        {
+            if (!TryComp<ModModuleComponent>(module, out var moduleComp))
+                continue;
+
+            drain += moduleComp.IdlePower;
+            if (moduleComp.Active)
+                drain += moduleComp.ActivePower;
+        }
+
+        return drain * PowerDrainScale;
+    }
+
+    /// <summary>Wolfgate's batteries have no charge-rate hook, so the drain is applied in <see cref="UpdatePowerDrain"/>.</summary>
+    public void RefreshDrain(Entity<ModSuitComponent> ent)
+    {
+        SyncCharge(ent);
+    }
+
+    private void OnPowerCellChanged(Entity<ModSuitComponent> ent, ref PowerCellChangedEvent args)
+    {
+        if (_timing.ApplyingState || ent.Comp.LifeStage > ComponentLifeStage.Running)
+            return;
+
+        RaiseUpdated(ent);
+        SyncCharge(ent);
+        SetPowered(ent, !args.Ejected && HasCharge(ent, 0.01f));
+        UpdatePowerAlert(ent);
+    }
+
+    private void OnSuitEntInserted(Entity<ModSuitComponent> ent, ref EntInsertedIntoContainerMessage args)
+    {
+        if (ent.Comp.LifeStage < ComponentLifeStage.Running)
+            return;
+
+        RaiseUpdated(ent);
+        SyncCharge(ent);
+
+        if (args.Container.ID != ent.Comp.CoreSlotId || _timing.ApplyingState)
+            return;
+
+        RefreshDrain(ent);
+        SetPowered(ent, HasCharge(ent, 0.01f));
+    }
+
+    private void OnSuitEntRemoved(Entity<ModSuitComponent> ent, ref EntRemovedFromContainerMessage args)
+    {
+        if (ent.Comp.LifeStage < ComponentLifeStage.Running)
+            return;
+
+        RaiseUpdated(ent);
+        SyncCharge(ent);
+
+        if (args.Container.ID != ent.Comp.CoreSlotId || _timing.ApplyingState)
+            return;
+
+        SetPowered(ent, false);
+    }
+
+    private void RaiseUpdated(EntityUid suit)
+    {
+        var ev = new ModSuitUpdatedEvent();
+        RaiseLocalEvent(suit, ref ev);
+    }
+
+    private void SetPowered(Entity<ModSuitComponent> ent, bool powered)
+    {
+        if (ent.Comp.Powered == powered)
+            return;
+
+        ent.Comp.Powered = powered;
+        Dirty(ent);
+
+        if (ent.Comp.State == ModSuitState.Active)
+        {
+            if (powered)
+            {
+                ActivatePassiveModules(ent);
+            }
+            else
+            {
+                DeactivateAllModules(ent, true);
+                if (ent.Comp.Wearer is { } wearer)
+                    _popup.PopupClient(Loc.GetString("modsuit-out-of-power"), wearer, wearer, PopupType.MediumCaution);
+            }
+        }
+
+        RefreshDrain(ent);
+        RefreshSpeed(ent);
+        UpdatePowerAlert(ent);
+    }
+
+    private void UpdatePowerAlerts()
+    {
+        if (_timing.CurTime < _nextPowerAlertUpdate)
+            return;
+
+        _nextPowerAlertUpdate = _timing.CurTime + PowerAlertInterval;
+
+        var query = EntityQueryEnumerator<ModSuitComponent>();
+        while (query.MoveNext(out var uid, out var comp))
+        {
+            if (!ShouldStep(comp))
+                continue;
+
+            var ent = (uid, comp);
+            if (comp.Wearer != null && comp.State != ModSuitState.Inactive)
+            {
+                UpdatePowerDrain(ent);
+                UpdatePowerAlert(ent);
+            }
+
+            SyncCharge(ent);
+        }
+    }
+
+    /// <summary>Spends the suit's per-second drain on the server and cuts power when the core empties.</summary>
+    private void UpdatePowerDrain(Entity<ModSuitComponent> ent)
+    {
+        if (_net.IsClient || GetBattery(ent) is not { } battery)
+            return;
+
+        var charge = GetCharge(battery);
+        if (charge <= 0f)
+        {
+            DepletePower(ent);
+            return;
+        }
+
+        var drain = GetTotalDrain(ent);
+        if (drain <= 0f)
+            return;
+
+        if (!_battery.TryUseCharge(battery.AsNullable(), drain) || GetCharge(battery) <= 0f)
+            DepletePower(ent);
+    }
+
+    /// <summary>Cuts the modules and unseals the suit once its core is empty.</summary>
+    private void DepletePower(Entity<ModSuitComponent> ent)
+    {
+        SetPowered(ent, false);
+
+        if (ent.Comp.State == ModSuitState.Active)
+            StartDeactivation(ent);
+        else if (ent.Comp.State == ModSuitState.Activating)
+            ForceDeactivate(ent, false);
+    }
+
+    private void UpdatePowerAlert(Entity<ModSuitComponent> ent)
+    {
+        if (_timing.ApplyingState || ent.Comp.Wearer is not { } wearer)
+            return;
+
+        if (ent.Comp.State == ModSuitState.Inactive || GetCore(ent) == null)
+        {
+            _alerts.ClearAlert(wearer, ent.Comp.PowerAlert);
+            return;
+        }
+
+        var severity = ContentHelpers.RoundToLevels(MathF.Max(0f, ent.Comp.Charge), MathF.Max(1f, ent.Comp.MaxCharge), 6);
+        _alerts.ShowAlert(wearer, ent.Comp.PowerAlert, (short) severity);
+    }
+}

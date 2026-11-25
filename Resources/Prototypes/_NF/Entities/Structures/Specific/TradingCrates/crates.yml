@@ -11,7 +11,7 @@
     expressOnTimeBonus: 1500
     expressLatePenalty: 1000 # 2000/3250
   # WOLFGATE(TradeGoods): the pallet price follows the selling station's demand
-  - type: WFTradeCrateMarket
+  - type: WGTradeCrateMarket
   - type: Icon
     sprite: _NF/Structures/Storage/Crates/tradedark.rsi
   - type: Sprite
@@ -57,7 +57,7 @@
     expressOnTimeBonus: 1500
     expressLatePenalty: 5500 # 0/2000
   # WOLFGATE(TradeGoods): the pallet price follows the selling station's demand
-  - type: WFTradeCrateMarket
+  - type: WGTradeCrateMarket
   - type: Icon
     sprite: _NF/Structures/Storage/Crates/tradelight.rsi
   - type: Sprite
@@ -92,7 +92,7 @@
 
 # region Contraband Crates
 - type: entity
-  parent: [ CrateTradeBaseSecureContraband, BaseFactionGearTaxedT2 ]
+  parent: [ CrateTradeBaseSecurePDV, BaseFactionGearTaxedT2 ]
   id: CrateTradeContrabandSecure1
   #categories: [ HideSpawnMenu ]
   components:
@@ -121,7 +121,7 @@
     valueElsewhere: 20000
 
 - type: entity
-  parent: [ CrateTradeBaseSecureContraband, BaseFactionGearTaxedT2 ]
+  parent: [ CrateTradeBaseSecurePDV, BaseFactionGearTaxedT2 ]
   id: CrateTradeContrabandSecure2
   categories: [ HideSpawnMenu ]
   components:
@@ -153,7 +153,7 @@
     expressLatePenalty: 30000
 
 - type: entity
-  parent: [ CrateTradeBaseSecureContraband, BaseFactionGearTaxedT2 ]
+  parent: [ CrateTradeBaseSecurePDV, BaseFactionGearTaxedT2 ]
   id: CrateTradeContrabandSecure3
   categories: [ HideSpawnMenu ]
   components:
@@ -185,7 +185,7 @@
     expressLatePenalty: 25000
 
 - type: entity
-  parent: [ CrateTradeBaseSecureContraband, BaseFactionGearTaxedT2 ]
+  parent: [ CrateTradeBaseSecurePDV, BaseFactionGearTaxedT2 ]
   id: CrateTradeContrabandSecure4
   categories: [ HideSpawnMenu ]
   components:
@@ -217,7 +217,7 @@
     expressLatePenalty: 30000
 
 - type: entity
-  parent: [ CrateTradeBaseSecureContraband, BaseFactionGearTaxedT3 ] # the only t3
+  parent: [ CrateTradeBaseSecurePDV, BaseFactionGearTaxedT3 ] # the only t3
   id: CrateTradeContrabandSecure5
   categories: [ HideSpawnMenu ]
   components:

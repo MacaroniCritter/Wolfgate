@@ -9,6 +9,11 @@
     Poison:
       effects:
       - !type:HealthChange
+        # WOLFGATE(WolfChem) START: thin haze from smoking is harmless; fire-thick smoke still chokes
+        conditions:
+        - !type:ReagentThreshold
+          min: 0.25
+        # WOLFGATE END
         ignoreResistances: true
         damage:
           types:
@@ -17,6 +22,11 @@
     Gas:
       effects:
       - !type:HealthChange
+        # WOLFGATE(WolfChem) START: thin haze from smoking is harmless; fire-thick smoke still chokes
+        conditions:
+        - !type:ReagentThreshold
+          min: 0.25
+        # WOLFGATE END
         ignoreResistances: true
         damage:
           types:

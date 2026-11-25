@@ -28,6 +28,7 @@ public sealed partial class RadarBlipSystem : EntitySystem
         base.Initialize();
         SubscribeNetworkEvent<RequestBlipsEvent>(OnBlipsRequested);
         SubscribeLocalEvent<RadarBlipComponent, ComponentShutdown>(OnBlipShutdown);
+        SubscribeLocalEvent<RadarBlipComponent, ComponentStartup>(WGOnBlipStartup); // WOLFGATE(Performance): new blips join the cached squares before the next sort
     }
 
     private void OnBlipsRequested(RequestBlipsEvent ev, EntitySessionEventArgs args)
@@ -37,7 +38,11 @@ public sealed partial class RadarBlipSystem : EntitySystem
         )
             return;
 
-        WFNoteRequest(args.SenderSession); // WOLFGATE(Performance): removals go only to sessions that asked recently
+        WGNoteRequest(args.SenderSession); // WOLFGATE(Performance): removals go only to sessions that asked recently
+        // WOLFGATE(Performance) START: the server caps how often it answers one player; the client's throttle is not enforced
+        if (!WGTakeRequest(args.SenderSession))
+            return;
+        // WOLFGATE END
 
         var sourcesEv = new GetRadarSourcesEvent();
         RaiseLocalEvent(radarUid.Value, ref sourcesEv);
@@ -70,7 +75,7 @@ public sealed partial class RadarBlipSystem : EntitySystem
         // WOLFGATE(Performance) START: send removals only to recent radar users, none during round cleanup
         // var removalEv = new BlipRemovalEvent(netBlipUid);
         // RaiseNetworkEvent(removalEv);
-        WFSendRemoval(netBlipUid);
+        WGSendRemoval(netBlipUid);
         // WOLFGATE END
     }
 
@@ -82,13 +87,13 @@ public sealed partial class RadarBlipSystem : EntitySystem
         var radarXform = Transform(uid);
         var radarGrid = radarXform.GridUid;
         var radarMapId = radarXform.MapID;
+        _wgReported.Clear(); // WOLFGATE(Performance): missile arcs go only with blips this radar is sent
 
-        // WOLFGATE(Performance) START: every radar on a map shares one walk of the blips per tick
+        // WOLFGATE(Performance) START: radars share one walk of the blips per tick and skip the squares out of reach
         // var blipQuery = EntityQueryEnumerator<RadarBlipComponent, TransformComponent, PhysicsComponent>();
-        WFNoteSources(sources);
-        foreach (var (blipUid, blip, blipXform, blipPhysics, blipPosition) in WFBlipsOnMap(radarMapId))
+        foreach (var (blipUid, blip, blipXform, blipPhysics, _) in WGBlipsInReach(radarMapId, sources))
         {
-            if (blip.Deleted || !WFNearAnySource(blipPosition, blip.MaxDistance))
+            if (blip.Deleted)
                 continue;
         // WOLFGATE END
 
@@ -135,11 +140,15 @@ public sealed partial class RadarBlipSystem : EntitySystem
                             rotation,
                             configIdx,
                             gridConfigIdx));
+            _wgReported.Add(blipUid); // WOLFGATE(Performance): missile arcs go only with blips this radar is sent
         }
 
         var missileQuery = EntityQueryEnumerator<TargetSeekingComponent, RadarBlipComponent, TransformComponent>();
         while (missileQuery.MoveNext(out var missile, out var seeker, out var missileBlip, out var missileBlipXform))
         {
+            if (!_wgReported.Contains(missile)) // WOLFGATE(Performance): missile arcs go only with blips this radar is sent
+                continue; // WOLFGATE(Performance)
+
             var netMissileUid = GetNetEntity(missile);
             var missileArc = MathHelper.DegreesToRadians(seeker.ScanArc);
             if (seeker.ArcLines)
@@ -151,6 +160,9 @@ public sealed partial class RadarBlipSystem : EntitySystem
         var saclosQuery = EntityQueryEnumerator<TargetGuidedComponent, RadarBlipComponent, TransformComponent>();
         while (saclosQuery.MoveNext(out var missile, out var seeker, out var missileBlip, out var missileBlipXform))
         {
+            if (!_wgReported.Contains(missile)) // WOLFGATE(Performance): missile arcs go only with blips this radar is sent
+                continue; // WOLFGATE(Performance)
+
             var netMissileUid = GetNetEntity(missile);
             if (seeker.RadarLines)
                 _tempMissileCache.Add(new(netMissileUid,
@@ -190,14 +202,19 @@ public sealed partial class RadarBlipSystem : EntitySystem
         var radarXform = Transform(uid);
 
         var hitscanQuery = EntityQueryEnumerator<HitscanRadarComponent>();
+        WGNoteSources(sources); // WOLFGATE(Performance): source positions are taken once, not twice per hitscan
 
         while (hitscanQuery.MoveNext(out var hitscanUid, out var hitscan))
         {
             if (!hitscan.Enabled)
                 continue;
 
-            if (!NearAnySources(hitscan.StartPosition, sources, component.MaxRange) && NearAnySources(hitscan.EndPosition, sources, component.MaxRange))
+            // WOLFGATE(Performance) START: source positions are taken once, and only lines passing within range are sent
+            // The upstream test skipped only lines ending in range and sent every far one.
+            // if (!NearAnySources(hitscan.StartPosition, sources, component.MaxRange) && NearAnySources(hitscan.EndPosition, sources, component.MaxRange))
+            if (!WGLineInReach(hitscan.StartPosition, hitscan.EndPosition, _wgSourcePositions, component.MaxRange))
                 continue;
+            // WOLFGATE END
 
             _tempHitscansCache.Add(new(hitscan.StartPosition, hitscan.EndPosition, hitscan.LineThickness, hitscan.RadarColor));
         }

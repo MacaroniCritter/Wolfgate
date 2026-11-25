@@ -990,6 +990,11 @@ namespace Content.Server.Database.Migrations.Postgres
                         .HasColumnType("text")
                         .HasColumnName("chat_font");
 
+                    b.Property<string>("CombatMusic")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("combat_music");
+
                     b.Property<string>("Company")
                         .IsRequired()
                         .HasColumnType("text")
@@ -1067,6 +1072,11 @@ namespace Content.Server.Database.Migrations.Postgres
                     b.Property<int>("LegStance")
                         .HasColumnType("integer")
                         .HasColumnName("leg_stance");
+
+                    b.Property<string>("MarkingGlow")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("marking_glow");
 
                     b.Property<JsonDocument>("Markings")
                         .HasColumnType("jsonb")
@@ -1804,6 +1814,37 @@ namespace Content.Server.Database.Migrations.Postgres
                     b.ToTable("whitelist", (string)null);
                 });
 
+            modelBuilder.Entity("Content.Server.Database.WolfgateAdminObserver", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("wolfgate_admin_observer_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("data");
+
+                    b.Property<Guid>("PlayerUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("player_user_id");
+
+                    b.Property<DateTime>("Saved")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("saved");
+
+                    b.HasKey("Id")
+                        .HasName("PK_wolfgate_admin_observer");
+
+                    b.HasIndex("PlayerUserId")
+                        .IsUnique();
+
+                    b.ToTable("wolfgate_admin_observer", (string)null);
+                });
+
             modelBuilder.Entity("Content.Server.Database.WolfgateCensus", b =>
                 {
                     b.Property<int>("Id")
@@ -2342,6 +2383,10 @@ namespace Content.Server.Database.Migrations.Postgres
                         .HasColumnType("uuid")
                         .HasColumnName("player_user_id");
 
+                    b.Property<int?>("Slot")
+                        .HasColumnType("integer")
+                        .HasColumnName("slot");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
@@ -2374,6 +2419,10 @@ namespace Content.Server.Database.Migrations.Postgres
                     b.Property<byte[]>("FrameTimes")
                         .HasColumnType("bytea")
                         .HasColumnName("frame_times");
+
+                    b.Property<byte[]>("Glow")
+                        .HasColumnType("bytea")
+                        .HasColumnName("glow");
 
                     b.Property<byte[]>("Png")
                         .IsRequired()
@@ -2568,6 +2617,79 @@ namespace Content.Server.Database.Migrations.Postgres
                     b.ToTable("wolfgate_game_score", (string)null);
                 });
 
+            modelBuilder.Entity("Content.Server.Database.WolfgateNanoChatNumber", b =>
+                {
+                    b.Property<int>("ProfileId")
+                        .HasColumnType("integer")
+                        .HasColumnName("profile_id");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("integer")
+                        .HasColumnName("number");
+
+                    b.HasKey("ProfileId")
+                        .HasName("PK_wolfgate_nano_chat_number");
+
+                    b.HasIndex("Number")
+                        .IsUnique();
+
+                    b.ToTable("wolfgate_nano_chat_number", (string)null);
+                });
+
+            modelBuilder.Entity("Content.Server.Database.WolfgatePainting", b =>
+                {
+                    b.Property<string>("Hash")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("hash");
+
+                    b.Property<string>("Artist")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("artist");
+
+                    b.Property<Guid?>("AuthorUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("author_user_id");
+
+                    b.Property<bool>("Blocked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("blocked");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("Height")
+                        .HasColumnType("integer")
+                        .HasColumnName("height");
+
+                    b.Property<byte[]>("Pixels")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("pixels");
+
+                    b.Property<Guid>("ScannedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("scanned_by_user_id");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("title");
+
+                    b.Property<int>("Width")
+                        .HasColumnType("integer")
+                        .HasColumnName("width");
+
+                    b.HasKey("Hash")
+                        .HasName("PK_wolfgate_painting");
+
+                    b.ToTable("wolfgate_painting", (string)null);
+                });
+
             modelBuilder.Entity("Content.Server.Database.WolfgatePhoto", b =>
                 {
                     b.Property<string>("Hash")
@@ -2641,6 +2763,49 @@ namespace Content.Server.Database.Migrations.Postgres
                         .HasDatabaseName("IX_wolfgate_photo_album_profile_id");
 
                     b.ToTable("wolfgate_photo_album", (string)null);
+                });
+
+            modelBuilder.Entity("Content.Server.Database.WolfgateShipCommandPreset", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("wolfgate_ship_command_preset_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("data");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("PlayerUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("player_user_id");
+
+                    b.Property<DateTime>("Saved")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("saved");
+
+                    b.Property<string>("Vessel")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("vessel");
+
+                    b.HasKey("Id")
+                        .HasName("PK_wolfgate_ship_command_preset");
+
+                    b.HasIndex("PlayerUserId", "Vessel", "Name")
+                        .IsUnique();
+
+                    b.ToTable("wolfgate_ship_command_preset", (string)null);
                 });
 
             modelBuilder.Entity("PlayerRound", b =>
@@ -3389,6 +3554,18 @@ namespace Content.Server.Database.Migrations.Postgres
                         .HasConstraintName("FK_wolfgate_custom_marking_art");
 
                     b.Navigation("Art");
+                });
+
+            modelBuilder.Entity("Content.Server.Database.WolfgateNanoChatNumber", b =>
+                {
+                    b.HasOne("Content.Server.Database.Profile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_wolfgate_nano_chat_number_profile_profile_id");
+
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("Content.Server.Database.WolfgatePhotoAlbum", b =>

@@ -10,8 +10,8 @@ using Content.Client.Lobby.UI;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Systems.MenuBar.Widgets;
-using Content.Client._WF.EventStaff; // WOLFGATE(EventStaff)
-using Content.Shared._WF.EventStaff; // WOLFGATE(EventStaff)
+using Content.Client._WG.EventStaff; // WOLFGATE(EventStaff)
+using Content.Shared._WG.EventStaff; // WOLFGATE(EventStaff)
 using Content.Shared.Administration;
 using Content.Shared.CCVar;
 using Content.Shared.Input;
@@ -141,7 +141,10 @@ public sealed partial class AHelpUIController: UIController, IOnSystemChanged<Bw
         {
             if (_aHelpSound != null && (_bwoinkSoundEnabled || !_adminManager.IsActive()))
                 _audio.PlayGlobal(_aHelpSound, Filter.Local(), false);
-            _clyde.RequestWindowAttention();
+            // WOLFGATE(Notifications) START: the player can turn this window flash off
+            // _clyde.RequestWindowAttention();
+            Content.Client._WG.Notifications.WGWindowFlash.Request(Content.Shared._WG.Notifications.NotificationCVars.FlashAHelp);
+            // WOLFGATE END
         }
 
         EnsureUIHelper();
