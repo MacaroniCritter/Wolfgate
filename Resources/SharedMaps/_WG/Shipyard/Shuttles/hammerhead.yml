@@ -4,7 +4,7 @@ meta:
   engineVersion: 291.0.4
   forkId: wolfgate-mapping
   forkVersion: 20261124-142757-5bcd597-tm740-b8438d08
-  time: 11/25/2026 23:50:24
+  time: 11/27/2026 14:03:17
   entityCount: 1718
 maps: []
 grids:
@@ -1034,7 +1034,7 @@ entities:
     - type: IFF
       flags: IsPlayerShuttle
       color: '#FFFFFFFF'
-      address: ' 593E-C12A'
+      address: ' 5811-7D34'
     - type: InitRepairSnapshot
 - proto: AirAlarm
   entities:
@@ -1110,6 +1110,7 @@ entities:
       devices:
       - 702
       - 16
+      - 416
   - uid: 473
     components:
     - type: Transform
@@ -1168,7 +1169,6 @@ entities:
       parent: 2
       rot: -1.5707963267948966 rad
       pos: 3.5,-16.5
-    - type: DeviceNetwork
 - proto: AirlockCargo
   entities:
   - uid: 1
@@ -1197,7 +1197,6 @@ entities:
       parent: 2
       rot: -1.5707963267948966 rad
       pos: -4.5,-16.5
-    - type: DeviceNetwork
 - proto: AirlockCommand
   entities:
   - uid: 18
@@ -1226,7 +1225,6 @@ entities:
     - type: Transform
       parent: 2
       pos: 0.5,-22.5
-    - type: DeviceNetwork
   - uid: 27
     components:
     - type: Transform
@@ -1242,7 +1240,6 @@ entities:
     - type: Transform
       parent: 2
       pos: 2.5,11.5
-    - type: DeviceNetwork
 - proto: AirlockExternalShuttleLocked
   entities:
   - uid: 30
@@ -1274,7 +1271,6 @@ entities:
       parent: 2
       rot: -1.5707963267948966 rad
       pos: 2.5,0.5
-    - type: DeviceNetwork
 - proto: AirlockGlass
   entities:
   - uid: 312
@@ -1323,7 +1319,6 @@ entities:
     - type: Transform
       parent: 2
       pos: -5.5,-16.5
-    - type: DeviceNetwork
 - proto: AmeController
   entities:
   - uid: 406
@@ -6238,6 +6233,8 @@ entities:
     - type: Transform
       parent: 2
       pos: 9.650655,-12.533073
+    - type: Physics
+      canCollide: False
   - uid: 1355
     components:
     - type: Transform
@@ -6259,6 +6256,8 @@ entities:
     - type: Transform
       parent: 2
       pos: 9.361718,-12.493672
+    - type: Physics
+      canCollide: False
   - uid: 1353
     components:
     - type: Transform
@@ -7677,6 +7676,9 @@ entities:
     - type: Transform
       parent: 2
       pos: 7.5,-7.5
+    - type: DeviceNetwork
+      deviceLists:
+      - 313
     - type: AtmosPipeLayers
       pipeLayer: Secondary
     - type: AtmosPipeColor
@@ -7799,7 +7801,6 @@ entities:
     - type: Transform
       parent: 2
       pos: -5.5,-15.5
-    - type: DeviceNetwork
     - type: AtmosPipeLayers
       pipeLayer: Secondary
     - type: AtmosPipeColor
@@ -7953,7 +7954,6 @@ entities:
     - type: Transform
       parent: 2
       pos: -6.5,-15.5
-    - type: DeviceNetwork
     - type: AtmosPipeLayers
       pipeLayer: Tertiary
     - type: AtmosPipeColor
@@ -8356,6 +8356,8 @@ entities:
     - type: Transform
       parent: 2
       pos: 9.5,-12.5
+    - type: Physics
+      canCollide: False
   - uid: 1352
     components:
     - type: Transform
