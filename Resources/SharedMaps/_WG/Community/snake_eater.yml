@@ -4,7 +4,7 @@ meta:
   engineVersion: 291.0.4
   forkId: wolfgate-mapping
   forkVersion: 20261124-142757-5bcd597-tm740-b8438d08
-  time: 11/26/2026 15:07:17
+  time: 11/27/2026 00:39:29
   entityCount: 1629
 maps: []
 grids:
@@ -937,11 +937,10 @@ entities:
       parent: 1
       rot: -1.5707963267948966 rad
       pos: -7.5,2.5
-  - uid: 758
+  - uid: 504
     components:
     - type: Transform
       parent: 1
-      rot: 3.141592653589793 rad
       pos: 0.5,14.5
 - proto: AirlockViperGlass
   entities:
@@ -957,40 +956,40 @@ entities:
       parent: 1
       rot: 3.141592653589793 rad
       pos: -1.5,-10.5
-  - uid: 504
-    components:
-    - type: Transform
-      parent: 1
-      pos: -1.5,4.5
   - uid: 505
     components:
     - type: Transform
       parent: 1
-      pos: -0.5,4.5
+      pos: -1.5,4.5
   - uid: 510
     components:
     - type: Transform
       parent: 1
       rot: 1.5707963267948966 rad
       pos: -2.5,5.5
+  - uid: 666
+    components:
+    - type: Transform
+      parent: 1
+      rot: -1.5707963267948966 rad
+      pos: 8.5,7.5
+  - uid: 758
+    components:
+    - type: Transform
+      parent: 1
+      rot: -1.5707963267948966 rad
+      pos: 8.5,8.5
   - uid: 774
     components:
     - type: Transform
       parent: 1
       rot: -1.5707963267948966 rad
       pos: 8.5,9.5
-  - uid: 775
-    components:
-    - type: Transform
-      parent: 1
-      rot: -1.5707963267948966 rad
-      pos: 8.5,8.5
   - uid: 781
     components:
     - type: Transform
       parent: 1
-      rot: -1.5707963267948966 rad
-      pos: 8.5,7.5
+      pos: -0.5,4.5
 - proto: AirSensor
   entities:
   - uid: 1785
@@ -1114,6 +1113,8 @@ entities:
     - type: Transform
       parent: 1
       pos: -0.91196954,11.406029
+    - type: Physics
+      canCollide: False
 - proto: AtmosDeviceFanDirectional
   entities:
   - uid: 3
@@ -2295,6 +2296,8 @@ entities:
     - type: Transform
       parent: 1
       pos: -3.4904919,4.9634933
+    - type: Physics
+      canCollide: False
 - proto: ButtonFrameCautionSecurity
   entities:
   - uid: 101
@@ -4651,9 +4654,9 @@ entities:
       powerLoad: 5
     - type: Battery
       startingCharge: 0
-- proto: ComputerTabletopShuttleAntag
+- proto: ComputerTabletopShuttle
   entities:
-  - uid: 666
+  - uid: 775
     components:
     - type: Transform
       parent: 1
@@ -4897,6 +4900,14 @@ entities:
       parent: 1
       rot: 1.5707963267948966 rad
       pos: 3.5,14.5
+    - type: DeviceList
+      devices:
+      - 262
+      - 2440
+      - 2441
+      - 2439
+      - 22
+      - 207
 - proto: Firelock
   entities:
   - uid: 8
@@ -4926,10 +4937,10 @@ entities:
       pos: -0.5,4.5
     - type: DeviceNetwork
       deviceLists:
-      - invalid
       - 416
       - 768
       - 328
+      - 766
   - uid: 23
     components:
     - type: Transform
@@ -4957,10 +4968,10 @@ entities:
       pos: -1.5,4.5
     - type: DeviceNetwork
       deviceLists:
-      - invalid
       - 416
       - 768
       - 328
+      - 766
   - uid: 252
     components:
     - type: Transform
@@ -4979,8 +4990,8 @@ entities:
       pos: 0.5,14.5
     - type: DeviceNetwork
       deviceLists:
-      - invalid
       - 768
+      - 766
   - uid: 618
     components:
     - type: Transform
@@ -5001,7 +5012,6 @@ entities:
       pos: -7.5,1.5
     - type: DeviceNetwork
       deviceLists:
-      - invalid
       - 416
       - 328
   - uid: 1342
@@ -5012,7 +5022,6 @@ entities:
       pos: -7.5,2.5
     - type: DeviceNetwork
       deviceLists:
-      - invalid
       - 416
       - 328
   - uid: 1629
@@ -5022,7 +5031,6 @@ entities:
       pos: -5.5,0.5
     - type: DeviceNetwork
       deviceLists:
-      - invalid
       - 416
       - 292
       - 328
@@ -5035,6 +5043,7 @@ entities:
     - type: DeviceNetwork
       deviceLists:
       - 768
+      - 766
   - uid: 2440
     components:
     - type: Transform
@@ -5044,6 +5053,7 @@ entities:
     - type: DeviceNetwork
       deviceLists:
       - 768
+      - 766
   - uid: 2441
     components:
     - type: Transform
@@ -5053,6 +5063,7 @@ entities:
     - type: DeviceNetwork
       deviceLists:
       - 768
+      - 766
 - proto: FloorDrain
   entities:
   - uid: 1470
@@ -5079,6 +5090,8 @@ entities:
     - type: Transform
       parent: 1
       pos: -3.6294448,-6.5312347
+    - type: Physics
+      canCollide: False
 - proto: FoodShakerSalt
   entities:
   - uid: 1280
@@ -6830,6 +6843,8 @@ entities:
     - type: Transform
       parent: 1
       pos: -0.51613617,11.551964
+    - type: Physics
+      canCollide: False
 - proto: N14ChairOfficeRed
   entities:
   - uid: 1526
@@ -6873,6 +6888,8 @@ entities:
     - type: Transform
       parent: 1
       pos: -3.5,-6.5
+    - type: Physics
+      canCollide: False
 - proto: NFHolopadShip
   entities:
   - uid: 1455
@@ -8764,6 +8781,9 @@ entities:
         2640:
         - - Pressed
           - Toggle
+        929:
+        - - Pressed
+          - DoorBolt
   - uid: 1536
     components:
     - type: Transform
